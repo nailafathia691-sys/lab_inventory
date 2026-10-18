@@ -168,12 +168,12 @@ class Borrowing {
 // SAMPLE DATA - Temporary sampai konek Supabase
 // TODO: Ganti dengan fetch dari Supabase
 // ============================================================
-// SAMPLE DATA & FALLBACK
+// SAMPLE DATA & FALLBACK (Synchronized with Supabase items table)
 // ============================================================
 const sampleItems = [
   InventoryItem(
-    id: '00000000-0000-0000-0000-000000000001',
-    name: 'Proyektor Epson EB-X400',
+    id: '0fe110a1-828f-4d1a-9106-e44107b944a3',
+    name: 'Proyektor Epson',
     code: 'INV-ELK-0012',
     category: 'Elektronik',
     condition: 'Sangat Baik',
@@ -181,8 +181,8 @@ const sampleItems = [
     location: 'Lemari A - Rak 2',
   ),
   InventoryItem(
-    id: '00000000-0000-0000-0000-000000000002',
-    name: 'Laptop Lenovo ThinkPad',
+    id: 'd5812ce4-dee6-45fa-aa8a-51e0a95d952e',
+    name: 'Laptop Lenovo',
     code: 'INV-CMP-0008',
     category: 'Komputer',
     condition: 'Baik',
@@ -190,8 +190,8 @@ const sampleItems = [
     location: 'Lemari B - Rak 1',
   ),
   InventoryItem(
-    id: '00000000-0000-0000-0000-000000000003',
-    name: 'Kabel HDMI & Adaptor',
+    id: 'b4eb9973-96a3-4422-a20c-fef72138faef',
+    name: 'Kabel HDMI',
     code: 'INV-AKS-0021',
     category: 'Aksesoris',
     condition: 'Baik',
@@ -199,8 +199,8 @@ const sampleItems = [
     location: 'Lemari C - Rak 3',
   ),
   InventoryItem(
-    id: '00000000-0000-0000-0000-000000000004',
-    name: 'Speaker Aktif Portable 15"',
+    id: '235e9ed8-b705-424c-9a6b-6575589cdb69',
+    name: 'Speaker Aktif 15"',
     code: 'INV-ELK-0017',
     category: 'Elektronik',
     condition: 'Baik',
@@ -220,9 +220,9 @@ class InventoryService {
     Borrowing(
       id: 'b0000000-0000-0000-0000-000000000001',
       userId: '00000000-0000-0000-0000-000000000000',
-      itemId: '00000000-0000-0000-0000-000000000001',
+      itemId: '0fe110a1-828f-4d1a-9106-e44107b944a3',
       namaPeminjam: 'Naila Fathia',
-      namaBarang: 'Proyektor Epson EB-X400',
+      namaBarang: 'Proyektor Epson',
       jumlah: 1,
       tglPinjam: DateTime.now().subtract(const Duration(days: 1)),
       tglKembali: DateTime.now().add(const Duration(days: 2)),
@@ -330,7 +330,7 @@ class InventoryService {
     // Validasi format UUID untuk PostgreSQL
     String validItemId = (itemId.length == 36 && itemId.contains('-'))
         ? itemId
-        : '00000000-0000-0000-0000-000000000001';
+        : '0fe110a1-828f-4d1a-9106-e44107b944a3';
 
     // Pastikan item_id ada di tabel items Supabase agar foreign key tidak ditolak
     try {
