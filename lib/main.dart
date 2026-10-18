@@ -168,70 +168,11 @@ class Borrowing {
 // SAMPLE DATA - Temporary sampai konek Supabase
 // TODO: Ganti dengan fetch dari Supabase
 // ============================================================
-// SAMPLE DATA & FALLBACK (Synchronized with Supabase items table)
-// ============================================================
-const sampleItems = [
-  InventoryItem(
-    id: '0fe110a1-828f-4d1a-9106-e44107b944a3',
-    name: 'Proyektor Epson',
-    code: 'INV-ELK-0012',
-    category: 'Elektronik',
-    condition: 'Sangat Baik',
-    stock: 2,
-    location: 'Lemari A - Rak 2',
-  ),
-  InventoryItem(
-    id: 'd5812ce4-dee6-45fa-aa8a-51e0a95d952e',
-    name: 'Laptop Lenovo',
-    code: 'INV-CMP-0008',
-    category: 'Komputer',
-    condition: 'Baik',
-    stock: 4,
-    location: 'Lemari B - Rak 1',
-  ),
-  InventoryItem(
-    id: 'b4eb9973-96a3-4422-a20c-fef72138faef',
-    name: 'Kabel HDMI',
-    code: 'INV-AKS-0021',
-    category: 'Aksesoris',
-    condition: 'Baik',
-    stock: 6,
-    location: 'Lemari C - Rak 3',
-  ),
-  InventoryItem(
-    id: '235e9ed8-b705-424c-9a6b-6575589cdb69',
-    name: 'Speaker Aktif 15"',
-    code: 'INV-ELK-0017',
-    category: 'Elektronik',
-    condition: 'Baik',
-    stock: 3,
-    location: 'Lemari A - Rak 4',
-  ),
-];
-
-// ============================================================
-// SUPABASE SERVICES
+// SUPABASE SERVICES (REALTIME CLOUD DATABASE)
 // ============================================================
 
 class InventoryService {
-  // In-memory cache agar peminjaman yang baru diajukan langsung tampil
-  // meskipun dalam Demo Mode atau RLS Supabase
-  static final List<Borrowing> _localBorrowings = [
-    Borrowing(
-      id: 'b0000000-0000-0000-0000-000000000001',
-      userId: '00000000-0000-0000-0000-000000000000',
-      itemId: '0fe110a1-828f-4d1a-9106-e44107b944a3',
-      namaPeminjam: 'Naila Fathia',
-      namaBarang: 'Proyektor Epson',
-      jumlah: 1,
-      tglPinjam: DateTime.now().subtract(const Duration(days: 1)),
-      tglKembali: DateTime.now().add(const Duration(days: 2)),
-      keperluan: 'Praktikum Multimedia & Jaringan',
-      status: 'pending',
-    ),
-  ];
-
-  // Ambil data barang dari tabel items di Supabase
+  // Ambil data barang asli dari tabel items di Supabase
   static Future<List<InventoryItem>> getItems() async {
     try {
       final response = await supabase
@@ -241,21 +182,22 @@ class InventoryService {
       final list = (response as List)
           .map((json) => InventoryItem.fromJson(json))
           .toList();
-      if (list.isNotEmpty) return list;
+      return list;
     } catch (e) {
       debugPrint('Error getItems Supabase: $e');
       try {
         final resFallback = await supabase.from('items').select();
-        final listFallback = (resFallback as List)
+        return (resFallback as List)
             .map((json) => InventoryItem.fromJson(json))
             .toList();
-        if (listFallback.isNotEmpty) return listFallback;
-      } catch (_) {}
+      } catch (err) {
+        debugPrint('Fallback getItems error: $err');
+      }
+      return [];
     }
-    return sampleItems;
   }
 
-  // Tambah barang ke tabel items
+  // Tambah barang baru langsung ke tabel items Supabase
   static Future<bool> addItem({
     required String name,
     required String code,
@@ -280,7 +222,7 @@ class InventoryService {
     }
   }
 
-  // Ambil data peminjaman dari tabel borrowings
+  // Ambil data peminjaman asli langsung dari tabel borrowings Supabase
   static Future<List<Borrowing>> getBorrowings({String? status, String? userId}) async {
     try {
       var query = supabase.from('borrowings').select();
@@ -294,30 +236,14 @@ class InventoryService {
       final list = (response as List)
           .map((json) => Borrowing.fromJson(json))
           .toList();
-
-      // Gabungkan dengan peminjaman lokal yang baru dibuat
-      final all = <Borrowing>[..._localBorrowings, ...list];
-      final uniqueMap = <String, Borrowing>{};
-      for (final b in all) {
-        uniqueMap[b.id] = b;
-      }
-      var result = uniqueMap.values.toList();
-      if (status != null) {
-        result = result.where((b) => b.status.toLowerCase() == status.toLowerCase()).toList();
-      }
-      return result;
+      return list;
     } catch (e) {
       debugPrint('Error getBorrowings Supabase: $e');
-      if (status != null) {
-        return _localBorrowings
-            .where((b) => b.status.toLowerCase() == status.toLowerCase())
-            .toList();
-      }
-      return List.from(_localBorrowings);
+      return [];
     }
   }
 
-  // Buat pengajuan peminjaman baru (menyimpan ke Supabase & memory lokal)
+  // Buat pengajuan peminjaman baru langsung ke Supabase PostgreSQL
   static Future<String?> createBorrowing({
     required String itemId,
     required String namaBarang,
@@ -327,54 +253,13 @@ class InventoryService {
     required DateTime tglKembali,
     required String keperluan,
   }) async {
-    // Validasi format UUID untuk PostgreSQL
-    String validItemId = (itemId.length == 36 && itemId.contains('-'))
-        ? itemId
-        : '0fe110a1-828f-4d1a-9106-e44107b944a3';
-
-    // Pastikan item_id ada di tabel items Supabase agar foreign key tidak ditolak
-    try {
-      final existing = await supabase
-          .from('items')
-          .select('id')
-          .eq('id', validItemId)
-          .maybeSingle();
-      if (existing == null) {
-        final anyItem = await supabase
-            .from('items')
-            .select('id')
-            .limit(1)
-            .maybeSingle();
-        if (anyItem != null && anyItem['id'] != null) {
-          validItemId = anyItem['id'].toString();
-        }
-      }
-    } catch (_) {}
-
     final user = supabase.auth.currentUser;
     final userId = user?.id ?? '00000000-0000-0000-0000-000000000000';
-    final newId = 'b-${DateTime.now().millisecondsSinceEpoch}';
 
-    // 1. Simpan ke local cache agar langsung tampil di UI
-    final newBorrowing = Borrowing(
-      id: newId,
-      userId: userId,
-      itemId: validItemId,
-      namaPeminjam: namaPeminjam,
-      namaBarang: namaBarang,
-      jumlah: jumlah,
-      tglPinjam: tglPinjam,
-      tglKembali: tglKembali,
-      keperluan: keperluan,
-      status: 'pending',
-    );
-    _localBorrowings.insert(0, newBorrowing);
-
-    // 2. Simpan ke Supabase PostgreSQL
     try {
       await supabase.from('borrowings').insert({
         'user_id': userId,
-        'item_id': validItemId,
+        'item_id': itemId,
         'nama_peminjam': namaPeminjam,
         'nama_barang': namaBarang,
         'jumlah': jumlah,
@@ -383,40 +268,19 @@ class InventoryService {
         'keperluan': keperluan,
         'status': 'pending',
       });
-      return null; // Sukses tanpa error
+      return null; // Berhasil masuk ke Supabase
     } catch (e) {
-      debugPrint('Catatan createBorrowing Supabase: $e');
+      debugPrint('Error createBorrowing Supabase: $e');
       return e.toString();
     }
   }
 
-  // Update status peminjaman (approve, reject, returned)
+  // Update status peminjaman (approve, reject, returned) langsung di Supabase
   static Future<bool> updateBorrowingStatus({
     required String id,
     required String status,
     String? notes,
   }) async {
-    // 1. Update di cache lokal
-    final idx = _localBorrowings.indexWhere((b) => b.id == id);
-    if (idx != -1) {
-      final old = _localBorrowings[idx];
-      _localBorrowings[idx] = Borrowing(
-        id: old.id,
-        userId: old.userId,
-        itemId: old.itemId,
-        namaPeminjam: old.namaPeminjam,
-        namaBarang: old.namaBarang,
-        jumlah: old.jumlah,
-        tglPinjam: old.tglPinjam,
-        tglKembali: old.tglKembali,
-        keperluan: old.keperluan,
-        status: status,
-        catatanKondisi: notes ?? old.catatanKondisi,
-        updatedBy: old.updatedBy,
-      );
-    }
-
-    // 2. Update di Supabase
     try {
       final updateData = <String, dynamic>{
         'status': status,
@@ -426,7 +290,7 @@ class InventoryService {
       return true;
     } catch (e) {
       debugPrint('Error updateBorrowingStatus Supabase: $e');
-      return true; // Status lokal sudah terupdate
+      return false;
     }
   }
 }
@@ -2404,8 +2268,66 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
 // DASHBOARD ADMIN / LABORAN
 // ============================================================
 
-class DashboardAdmin extends StatelessWidget {
+class DashboardAdmin extends StatefulWidget {
   const DashboardAdmin({super.key});
+
+  @override
+  State<DashboardAdmin> createState() => _DashboardAdminState();
+}
+
+class _DashboardAdminState extends State<DashboardAdmin> {
+  int totalBarang = 0;
+  int pendingCount = 0;
+  List<Borrowing> pendingList = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAdminData();
+  }
+
+  Future<void> _loadAdminData() async {
+    setState(() => isLoading = true);
+    final items = await InventoryService.getItems();
+    final pending = await InventoryService.getBorrowings(status: 'pending');
+    if (mounted) {
+      setState(() {
+        totalBarang = items.length;
+        pendingCount = pending.length;
+        pendingList = pending;
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _processAction(String id, String newStatus, String item) async {
+    final success = await InventoryService.updateBorrowingStatus(
+      id: id,
+      status: newStatus,
+    );
+    if (!mounted) return;
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            newStatus == 'approved'
+                ? 'Pengajuan "$item" disetujui di Supabase.'
+                : 'Pengajuan "$item" ditolak di Supabase.',
+          ),
+          backgroundColor: newStatus == 'approved' ? Colors.green : Colors.red,
+        ),
+      );
+      _loadAdminData();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Gagal memperbarui status di Supabase.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -2417,168 +2339,239 @@ class DashboardAdmin extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_none),
+            onPressed: _loadAdminData,
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh Data',
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: const [
-                Expanded(
-                  child: AdminStatCard(
-                    icon: Icons.inventory_2_outlined,
-                    title: 'Total Barang',
-                    value: '45',
+      body: RefreshIndicator(
+        onRefresh: _loadAdminData,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: AdminStatCard(
+                      icon: Icons.inventory_2_outlined,
+                      title: 'Total Barang',
+                      value: isLoading ? '...' : totalBarang.toString(),
+                    ),
                   ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: AdminStatCard(
-                    icon: Icons.access_time,
-                    title: 'Pending',
-                    value: '3',
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: AdminStatCard(
+                      icon: Icons.access_time,
+                      title: 'Pending',
+                      value: isLoading ? '...' : pendingCount.toString(),
+                    ),
                   ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            const Text(
-              'Aksi Cepat:',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
+                ],
               ),
-            ),
-            const SizedBox(height: 10),
 
-            Row(
-              children: [
-                Expanded(
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const AddItemScreen(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                        horizontal: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.blue.shade200),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.add_box_outlined,
-                            color: Colors.blue.shade800,
-                            size: 20,
+              const SizedBox(height: 20),
+
+              const Text(
+                'Aksi Cepat:',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () async {
+                        final res = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AddItemScreen(),
                           ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Tambah Barang',
-                            style: TextStyle(
+                        );
+                        if (res == true) {
+                          _loadAdminData();
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                          horizontal: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.blue.shade200),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.add_box_outlined,
                               color: Colors.blue.shade800,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
+                              size: 20,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const ReturnItemScreen(),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Tambah Barang',
+                              style: TextStyle(
+                                color: Colors.blue.shade800,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                        horizontal: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.shade50,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.orange.shade200),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.assignment_return_outlined,
-                            color: Colors.orange.shade900,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Pengembalian',
-                            style: TextStyle(
-                              color: Colors.orange.shade900,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 25),
-
-            const Text(
-              'Pengajuan Menunggu (Pending):',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () async {
+                        final res = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ReturnItemScreen(),
+                          ),
+                        );
+                        if (res == true) {
+                          _loadAdminData();
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                          horizontal: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.orange.shade200),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.assignment_return_outlined,
+                              color: Colors.orange.shade900,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Pengembalian',
+                              style: TextStyle(
+                                color: Colors.orange.shade900,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 12),
 
-            const PendingCard(
-              name: 'Naila Fathia',
-              item: 'Laptop Lenovo',
-              amount: '1 Unit',
-            ),
-            const SizedBox(height: 10),
-            const PendingCard(
-              name: 'Budi Santoso',
-              item: 'Proyektor Epson',
-              amount: '1 Unit',
-            ),
-            const SizedBox(height: 10),
-            const PendingCard(
-              name: 'Siti Aisyah',
-              item: 'Kabel HDMI',
-              amount: '2 Unit',
-            ),
-          ],
+              const SizedBox(height: 25),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Pengajuan Menunggu (Pending):',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  if (pendingList.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade100,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '${pendingList.length} baru',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange.shade900,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              if (isLoading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(32),
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              else if (pendingList.isNotEmpty)
+                ...pendingList.map(
+                  (b) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: PendingCard(
+                      name: b.namaPeminjam.isNotEmpty ? b.namaPeminjam : 'Mahasiswa',
+                      item: b.namaBarang,
+                      amount: '${b.jumlah} Unit',
+                      onApprove: () => _processAction(b.id, 'approved', b.namaBarang),
+                      onReject: () => _processAction(b.id, 'rejected', b.namaBarang),
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.check_circle_outline,
+                        size: 44,
+                        color: Colors.green.shade500,
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Semua Pengajuan Selesai',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Tidak ada antrean peminjaman berstatus pending di Supabase.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -3304,53 +3297,34 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
                       },
                     )
                   : ListView(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(24),
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(20),
-                          alignment: Alignment.center,
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.check_circle_outline,
-                                size: 48,
-                                color: Colors.green.shade400,
-                              ),
-                              const SizedBox(height: 10),
-                              const Text(
-                                'Belum Ada Pengajuan di Database Cloud',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Berikut adalah simulasi data pengajuan:',
-                                style: TextStyle(
-                                  color: Colors.grey.shade600,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
+                        const SizedBox(height: 60),
+                        Icon(
+                          Icons.inbox_outlined,
+                          size: 60,
+                          color: Colors.grey.shade400,
+                        ),
+                        const SizedBox(height: 14),
+                        const Center(
+                          child: Text(
+                            'Tidak Ada Pengajuan Menunggu',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                         ),
-                        const PendingCard(
-                          name: 'Naila Fathia',
-                          item: 'Laptop Lenovo',
-                          amount: '1 Unit',
-                        ),
-                        const SizedBox(height: 10),
-                        const PendingCard(
-                          name: 'Budi Santoso',
-                          item: 'Proyektor Epson',
-                          amount: '1 Unit',
-                        ),
-                        const SizedBox(height: 10),
-                        const PendingCard(
-                          name: 'Siti Aisyah',
-                          item: 'Kabel HDMI',
-                          amount: '2 Unit',
+                        const SizedBox(height: 6),
+                        Center(
+                          child: Text(
+                            'Semua permohonan peminjaman di database Supabase telah diproses.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 13,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -3587,7 +3561,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
 // ============================================================
 
 class ReturnItemScreen extends StatefulWidget {
-  const ReturnItemScreen({super.key});
+  final Borrowing? initialBorrowing;
+  const ReturnItemScreen({super.key, this.initialBorrowing});
 
   @override
   State<ReturnItemScreen> createState() => _ReturnItemScreenState();
@@ -3596,11 +3571,82 @@ class ReturnItemScreen extends StatefulWidget {
 class _ReturnItemScreenState extends State<ReturnItemScreen> {
   String condition = 'Normal / Baik';
   final notesController = TextEditingController();
+  List<Borrowing> activeBorrowings = [];
+  Borrowing? selectedBorrowing;
+  bool isLoading = true;
+  bool isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBorrowings();
+  }
+
+  Future<void> _loadBorrowings() async {
+    setState(() => isLoading = true);
+    final all = await InventoryService.getBorrowings();
+    final active = all
+        .where((b) =>
+            b.status.toLowerCase() == 'approved' ||
+            b.status.toLowerCase() == 'dipinjam')
+        .toList();
+    if (mounted) {
+      setState(() {
+        activeBorrowings = active;
+        if (widget.initialBorrowing != null) {
+          selectedBorrowing = widget.initialBorrowing;
+        } else if (active.isNotEmpty) {
+          selectedBorrowing = active.first;
+        }
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   void dispose() {
     notesController.dispose();
     super.dispose();
+  }
+
+  String _formatDate(DateTime dt) {
+    return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}';
+  }
+
+  Future<void> _submitReturn() async {
+    if (selectedBorrowing == null) return;
+    setState(() => isSubmitting = true);
+
+    final notes = notesController.text.trim();
+    final fullNotes = notes.isNotEmpty ? '$condition - $notes' : condition;
+
+    final success = await InventoryService.updateBorrowingStatus(
+      id: selectedBorrowing!.id,
+      status: 'returned',
+      notes: fullNotes,
+    );
+
+    if (!mounted) return;
+    setState(() => isSubmitting = false);
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Barang "${selectedBorrowing!.namaBarang}" berhasil dikembalikan di Supabase.',
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.pop(context, true);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Gagal memperbarui status pengembalian di Supabase.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -3611,93 +3657,189 @@ class _ReturnItemScreenState extends State<ReturnItemScreen> {
           'Proses Pengembalian',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(
+            onPressed: _loadBorrowings,
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh',
+          ),
+        ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade400),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Column(
-                children: [
-                  InfoLine(label: 'Peminjam', value: 'Naila Fathia'),
-                  InfoLine(label: 'Barang', value: 'Proyektor Epson'),
-                  InfoLine(label: 'Jumlah', value: '1 Unit'),
-                  InfoLine(label: 'Tgl Pinjam', value: '20/05/2025'),
-                  InfoLine(label: 'Tgl Kembali', value: '27/05/2025'),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 22),
-
-            const Text(
-              'Kondisi Pengembalian:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-
-            RadioListTile<String>(
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Normal / Baik'),
-              value: 'Normal / Baik',
-              groupValue: condition,
-              onChanged: (value) {
-                setState(() => condition = value!);
-              },
-            ),
-            RadioListTile<String>(
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Rusak'),
-              value: 'Rusak',
-              groupValue: condition,
-              onChanged: (value) {
-                setState(() => condition = value!);
-              },
-            ),
-
-            const Text(
-              'Catatan',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: notesController,
-              maxLines: 5,
-              decoration: const InputDecoration(
-                hintText: 'Input catatan (opsional)...',
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: FilledButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Pengembalian berhasil dicatat (data sementara).',
-                      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : activeBorrowings.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.assignment_turned_in_outlined,
+                          size: 60,
+                          color: Colors.green.shade400,
+                        ),
+                        const SizedBox(height: 14),
+                        const Text(
+                          'Tidak Ada Peminjaman Aktif',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Seluruh barang yang dipinjam telah dikembalikan ke laboratorium.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
                     ),
-                  );
-                },
-                child: const Text(
-                  'KONFIRMASI KEMBALI',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                )
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Pilih Peminjaman yang Dikembalikan:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<Borrowing>(
+                        initialValue: selectedBorrowing,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                        ),
+                        isExpanded: true,
+                        items: activeBorrowings.map((b) {
+                          return DropdownMenuItem<Borrowing>(
+                            value: b,
+                            child: Text(
+                              '${b.namaBarang} (${b.namaPeminjam})',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          setState(() => selectedBorrowing = val);
+                        },
+                      ),
+
+                      const SizedBox(height: 18),
+
+                      if (selectedBorrowing != null)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade400),
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.grey.shade50,
+                          ),
+                          child: Column(
+                            children: [
+                              InfoLine(
+                                label: 'Peminjam',
+                                value: selectedBorrowing!.namaPeminjam,
+                              ),
+                              InfoLine(
+                                label: 'Barang',
+                                value: selectedBorrowing!.namaBarang,
+                              ),
+                              InfoLine(
+                                label: 'Jumlah',
+                                value: '${selectedBorrowing!.jumlah} Unit',
+                              ),
+                              InfoLine(
+                                label: 'Tgl Pinjam',
+                                value: _formatDate(selectedBorrowing!.tglPinjam),
+                              ),
+                              if (selectedBorrowing!.tglKembali != null)
+                                InfoLine(
+                                  label: 'Tgl Kembali',
+                                  value:
+                                      _formatDate(selectedBorrowing!.tglKembali!),
+                                ),
+                              InfoLine(
+                                label: 'Keperluan',
+                                value: selectedBorrowing!.keperluan,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      const SizedBox(height: 22),
+
+                      const Text(
+                        'Kondisi Pengembalian:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 6),
+
+                      RadioListTile<String>(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Normal / Baik'),
+                        value: 'Normal / Baik',
+                        groupValue: condition,
+                        onChanged: (value) {
+                          setState(() => condition = value!);
+                        },
+                      ),
+                      RadioListTile<String>(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Rusak / Perlu Perbaikan'),
+                        value: 'Rusak',
+                        groupValue: condition,
+                        onChanged: (value) {
+                          setState(() => condition = value!);
+                        },
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      const Text(
+                        'Catatan Laboran',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: notesController,
+                        maxLines: 4,
+                        decoration: const InputDecoration(
+                          hintText: 'Input catatan kondisi fisik barang...',
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: FilledButton(
+                          onPressed: isSubmitting ? null : _submitReturn,
+                          child: isSubmitting
+                              ? const SizedBox(
+                                  height: 22,
+                                  width: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  'KONFIRMASI KEMBALI',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -3777,18 +3919,34 @@ class _BorrowingHistoryScreenState extends State<BorrowingHistoryScreen> {
                       },
                     )
                   : ListView(
-                      padding: const EdgeInsets.all(16),
-                      children: const [
-                        HistoryCard(
-                          item: 'Proyektor Epson EB-X400 (1 Unit)',
-                          date: '20/05/2025 - 27/05/2025',
-                          status: 'Approved',
+                      padding: const EdgeInsets.all(24),
+                      children: [
+                        const SizedBox(height: 60),
+                        Icon(
+                          Icons.history_outlined,
+                          size: 60,
+                          color: Colors.grey.shade400,
                         ),
-                        SizedBox(height: 10),
-                        HistoryCard(
-                          item: 'Laptop Lenovo Ideapad 3 (1 Unit)',
-                          date: '10/05/2025 - 12/05/2025',
-                          status: 'Returned',
+                        const SizedBox(height: 14),
+                        const Center(
+                          child: Text(
+                            'Belum Ada Riwayat Peminjaman',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Center(
+                          child: Text(
+                            'Data riwayat peminjaman Anda di database Supabase masih kosong.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 13,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -3868,24 +4026,34 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                       },
                     )
                   : ListView(
-                      padding: const EdgeInsets.all(16),
-                      children: const [
-                        HistoryCard(
-                          item: 'Proyektor Epson - Peminjam: Naila Fathia',
-                          date: '20/05/2025 - 27/05/2025',
-                          status: 'Returned',
+                      padding: const EdgeInsets.all(24),
+                      children: [
+                        const SizedBox(height: 60),
+                        Icon(
+                          Icons.receipt_long_outlined,
+                          size: 60,
+                          color: Colors.grey.shade400,
                         ),
-                        SizedBox(height: 10),
-                        HistoryCard(
-                          item: 'Kabel HDMI - Peminjam: Budi Santoso',
-                          date: '12/05/2025',
-                          status: 'Rejected',
+                        const SizedBox(height: 14),
+                        const Center(
+                          child: Text(
+                            'Belum Ada Riwayat Transaksi',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
                         ),
-                        SizedBox(height: 10),
-                        HistoryCard(
-                          item: 'Laptop Lenovo - Peminjam: Siti Aisyah',
-                          date: '05/05/2025 - 08/05/2025',
-                          status: 'Approved',
+                        const SizedBox(height: 6),
+                        Center(
+                          child: Text(
+                            'Seluruh transaksi peminjaman lab dari Supabase akan ditampilkan di sini.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 13,
+                            ),
+                          ),
                         ),
                       ],
                     ),
