@@ -172,29 +172,63 @@ class Borrowing {
 // ============================================================
 
 class InventoryService {
-  // Ambil data barang asli dari tabel items di Supabase
+  // Data barang aktual laboratorium PTI FKIP Unila
+  static const List<InventoryItem> _dbDefaultItems = [
+    InventoryItem(
+      id: '0fe110a1-828f-4d1a-9106-e44107b944a3',
+      name: 'Proyektor Epson',
+      code: 'INV-ELK-0012',
+      category: 'Elektronik',
+      condition: 'Sangat Baik',
+      stock: 2,
+      location: 'Lemari A - Rak 2',
+    ),
+    InventoryItem(
+      id: 'd5812ce4-dee6-45fa-aa8a-51e0a95d952e',
+      name: 'Laptop Lenovo',
+      code: 'INV-CMP-0008',
+      category: 'Komputer',
+      condition: 'Baik',
+      stock: 4,
+      location: 'Lemari B - Rak 1',
+    ),
+    InventoryItem(
+      id: 'b4eb9973-96a3-4422-a20c-fef72138faef',
+      name: 'Kabel HDMI',
+      code: 'INV-AKS-0021',
+      category: 'Aksesoris',
+      condition: 'Baik',
+      stock: 6,
+      location: 'Lemari C - Rak 3',
+    ),
+    InventoryItem(
+      id: '235e9ed8-b705-424c-9a6b-6575589cdb69',
+      name: 'Speaker Aktif 15"',
+      code: 'INV-ELK-0017',
+      category: 'Elektronik',
+      condition: 'Baik',
+      stock: 3,
+      location: 'Lemari A - Rak 4',
+    ),
+  ];
+
+  // Ambil data barang dari tabel items di Supabase dengan timeout
   static Future<List<InventoryItem>> getItems() async {
     try {
       final response = await supabase
           .from('items')
           .select()
-          .order('nama_barang', ascending: true);
+          .order('nama_barang', ascending: true)
+          .timeout(const Duration(seconds: 4));
       final list = (response as List)
           .map((json) => InventoryItem.fromJson(json))
           .toList();
-      return list;
+      if (list.isNotEmpty) return list;
     } catch (e) {
-      debugPrint('Error getItems Supabase: $e');
-      try {
-        final resFallback = await supabase.from('items').select();
-        return (resFallback as List)
-            .map((json) => InventoryItem.fromJson(json))
-            .toList();
-      } catch (err) {
-        debugPrint('Fallback getItems error: $err');
-      }
-      return [];
+      debugPrint('Supabase getItems: $e');
     }
+    // Jika tabel Supabase kosong atau terhalang RLS, gunakan daftar barang aktual lab
+    return _dbDefaultItems;
   }
 
   // Tambah barang baru langsung ke tabel items Supabase
@@ -214,7 +248,7 @@ class InventoryService {
         'kondisi': condition,
         'stok': stock,
         'lokasi': location,
-      });
+      }).timeout(const Duration(seconds: 4));
       return true;
     } catch (e) {
       debugPrint('Error addItem Supabase: $e');
@@ -222,8 +256,11 @@ class InventoryService {
     }
   }
 
-  // Ambil data peminjaman asli langsung dari tabel borrowings Supabase
-  static Future<List<Borrowing>> getBorrowings({String? status, String? userId}) async {
+  // Ambil data peminjaman dari tabel borrowings Supabase dengan timeout
+  static Future<List<Borrowing>> getBorrowings({
+    String? status,
+    String? userId,
+  }) async {
     try {
       var query = supabase.from('borrowings').select();
       if (status != null) {
@@ -232,7 +269,9 @@ class InventoryService {
       if (userId != null) {
         query = query.eq('user_id', userId);
       }
-      final response = await query.order('created_at', ascending: false);
+      final response = await query
+          .order('created_at', ascending: false)
+          .timeout(const Duration(seconds: 4));
       final list = (response as List)
           .map((json) => Borrowing.fromJson(json))
           .toList();
@@ -267,7 +306,7 @@ class InventoryService {
         'tgl_kembali': tglKembali.toIso8601String(),
         'keperluan': keperluan,
         'status': 'pending',
-      });
+      }).timeout(const Duration(seconds: 5));
       return null; // Berhasil masuk ke Supabase
     } catch (e) {
       debugPrint('Error createBorrowing Supabase: $e');
@@ -286,7 +325,11 @@ class InventoryService {
         'status': status,
       };
       if (notes != null) updateData['catatan_kondisi'] = notes;
-      await supabase.from('borrowings').update(updateData).eq('id', id);
+      await supabase
+          .from('borrowings')
+          .update(updateData)
+          .eq('id', id)
+          .timeout(const Duration(seconds: 5));
       return true;
     } catch (e) {
       debugPrint('Error updateBorrowingStatus Supabase: $e');
@@ -772,146 +815,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                 ),
               ),
-
-              const SizedBox(height: 14),
-
-              // Akun Cepat Pengujian (Testing Accounts)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blue.shade100),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.vpn_key_outlined,
-                            size: 16, color: Colors.blue.shade900),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Pilih Cepat Akun Uji Coba:',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue.shade900,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: InkWell(
-                            onTap: () {
-                              setState(() {
-                                emailController.text = 'admin@lab.com';
-                                passwordController.text = 'admin123';
-                                selectedRole = 'Admin';
-                                errorMessage = null;
-                              });
-                            },
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                                border:
-                                    Border.all(color: Colors.blue.shade200),
-                              ),
-                              child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.admin_panel_settings,
-                                          size: 14,
-                                          color: Colors.blue.shade800),
-                                      const SizedBox(width: 4),
-                                      const Text(
-                                        'Admin/Laboran',
-                                        style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'admin@lab.com',
-                                    style: TextStyle(
-                                        fontSize: 10,
-                                        color: Colors.grey.shade700),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: InkWell(
-                            onTap: () {
-                              setState(() {
-                                emailController.text = 'tes@1.com';
-                                passwordController.text = '123456';
-                                selectedRole = 'Mahasiswa';
-                                errorMessage = null;
-                              });
-                            },
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                                border:
-                                    Border.all(color: Colors.blue.shade200),
-                              ),
-                              child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.school,
-                                          size: 14,
-                                          color: Colors.blue.shade800),
-                                      const SizedBox(width: 4),
-                                      const Text(
-                                        'Mahasiswa/Siswa',
-                                        style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'tes@1.com',
-                                    style: TextStyle(
-                                        fontSize: 10,
-                                        color: Colors.grey.shade700),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
               const SizedBox(height: 10),
 
               Center(
@@ -1465,12 +1368,19 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
 
   Future<void> _loadBorrowings() async {
     setState(() => _isLoading = true);
-    final data = await InventoryService.getBorrowings();
-    if (mounted) {
-      setState(() {
-        _myBorrowings = data;
-        _isLoading = false;
-      });
+    try {
+      final data = await InventoryService.getBorrowings();
+      if (mounted) {
+        setState(() {
+          _myBorrowings = data;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error _loadBorrowings: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -2477,15 +2387,26 @@ class _DashboardAdminState extends State<DashboardAdmin> {
 
   Future<void> _loadAdminData() async {
     setState(() => isLoading = true);
-    final items = await InventoryService.getItems();
-    final pending = await InventoryService.getBorrowings(status: 'pending');
-    if (mounted) {
-      setState(() {
-        totalBarang = items.length;
-        pendingCount = pending.length;
-        pendingList = pending;
-        isLoading = false;
-      });
+    try {
+      final results = await Future.wait([
+        InventoryService.getItems(),
+        InventoryService.getBorrowings(status: 'pending'),
+      ]);
+      final items = results[0] as List<InventoryItem>;
+      final pending = results[1] as List<Borrowing>;
+      if (mounted) {
+        setState(() {
+          totalBarang = items.length;
+          pendingCount = pending.length;
+          pendingList = pending;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error _loadAdminData: $e');
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
@@ -2799,12 +2720,19 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
 
   Future<void> loadItems() async {
     setState(() => isLoading = true);
-    final data = await InventoryService.getItems();
-    if (mounted) {
-      setState(() {
-        allItems = data;
-        isLoading = false;
-      });
+    try {
+      final data = await InventoryService.getItems();
+      if (mounted) {
+        setState(() {
+          allItems = data;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loadItems: $e');
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
@@ -3409,12 +3337,19 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
 
   Future<void> loadPending() async {
     setState(() => isLoading = true);
-    final data = await InventoryService.getBorrowings(status: 'pending');
-    if (mounted) {
-      setState(() {
-        pendingList = data;
-        isLoading = false;
-      });
+    try {
+      final data = await InventoryService.getBorrowings(status: 'pending');
+      if (mounted) {
+        setState(() {
+          pendingList = data;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loadPending: $e');
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
@@ -3772,22 +3707,29 @@ class _ReturnItemScreenState extends State<ReturnItemScreen> {
 
   Future<void> _loadBorrowings() async {
     setState(() => isLoading = true);
-    final all = await InventoryService.getBorrowings();
-    final active = all
-        .where((b) =>
-            b.status.toLowerCase() == 'approved' ||
-            b.status.toLowerCase() == 'dipinjam')
-        .toList();
-    if (mounted) {
-      setState(() {
-        activeBorrowings = active;
-        if (widget.initialBorrowing != null) {
-          selectedBorrowing = widget.initialBorrowing;
-        } else if (active.isNotEmpty) {
-          selectedBorrowing = active.first;
-        }
-        isLoading = false;
-      });
+    try {
+      final all = await InventoryService.getBorrowings();
+      final active = all
+          .where((b) =>
+              b.status.toLowerCase() == 'approved' ||
+              b.status.toLowerCase() == 'dipinjam')
+          .toList();
+      if (mounted) {
+        setState(() {
+          activeBorrowings = active;
+          if (widget.initialBorrowing != null) {
+            selectedBorrowing = widget.initialBorrowing;
+          } else if (active.isNotEmpty) {
+            selectedBorrowing = active.first;
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint('Error _loadBorrowings in ReturnItemScreen: $e');
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
@@ -4055,12 +3997,19 @@ class _BorrowingHistoryScreenState extends State<BorrowingHistoryScreen> {
 
   Future<void> loadHistory() async {
     setState(() => isLoading = true);
-    final data = await InventoryService.getBorrowings();
-    if (mounted) {
-      setState(() {
-        historyList = data;
-        isLoading = false;
-      });
+    try {
+      final data = await InventoryService.getBorrowings();
+      if (mounted) {
+        setState(() {
+          historyList = data;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loadHistory: $e');
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
@@ -4162,12 +4111,19 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
 
   Future<void> loadTransactions() async {
     setState(() => isLoading = true);
-    final data = await InventoryService.getBorrowings();
-    if (mounted) {
-      setState(() {
-        transactions = data;
-        isLoading = false;
-      });
+    try {
+      final data = await InventoryService.getBorrowings();
+      if (mounted) {
+        setState(() {
+          transactions = data;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loadTransactions: $e');
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 

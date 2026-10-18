@@ -175,17 +175,17 @@ Tersedia akun pengujian aktif yang terdaftar langsung di **Supabase Authenticati
 | 🎓 **Mahasiswa / Siswa** | `tes@1.com` | `123456` | Akses katalog inventaris, pengajuan pinjam alat, status & riwayat peminjaman |
 
 > [!TIP]
-> Pada halaman login aplikasi, terdapat tombol pintasan **"Pilih Cepat Akun Uji Coba"** yang dapat diklik langsung untuk mengisi email, password, dan role secara otomatis tanpa perlu mengetik manual. Selain itu, tersedia pula tombol **"Masuk Mode Demo (Tanpa Akun)"** untuk pengujian instan tanpa koneksi autentikasi.
+> Kredensial di atas dapat dimasukkan langsung pada formulir login sesuai perannya. Selain itu, tersedia pula tombol **"Masuk Mode Demo (Tanpa Akun)"** untuk penilaian cepat tanpa perlu mengetik akun.
 
 ### 4. Petunjuk Pengujian Aplikasi (Uji Alur Lengkap)
 1. **Login sebagai Mahasiswa / Siswa**:
-   - Ketik email `tes@1.com` dan password `123456` (atau klik tombol cepat *Mahasiswa/Siswa* di layar login), lalu pilih role **Mahasiswa** dan tekan **MASUK**.
+   - Ketik email `tes@1.com` dan password `123456`, pilih role **Mahasiswa**, lalu tekan tombol **MASUK**.
    - Buka tab **Inventaris**, pilih salah satu barang (contoh: *Proyektor Epson* atau *Laptop Lenovo*), lalu tekan tombol **"Pinjam Alat"**.
    - Masukkan jumlah unit, pilih tanggal pinjam dan tanggal kembali, isi keperluan praktikum, lalu tekan **"Kirim Pengajuan"**.
    - Pengajuan akan tersimpan langsung di database cloud Supabase dengan status `pending`.
 
 2. **Login sebagai Admin / Laboran**:
-   - Logout dari profil mahasiswa, kemudian masuk dengan email `admin@lab.com` dan password `admin123` (atau klik tombol cepat *Admin/Laboran*).
+   - Logout dari profil mahasiswa, kemudian masuk dengan email `admin@lab.com` dan password `admin123`, pilih role **Admin / Laboran**, lalu tekan **MASUK**.
    - Di **Dashboard Laboran** atau tab **Pengajuan**, permohonan pinjam dari mahasiswa tadi akan langsung muncul secara real-time.
    - Tekan tombol **"Setujui"** -> status peminjaman di Supabase langsung berubah menjadi `approved`.
 
