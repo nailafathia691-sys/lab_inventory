@@ -1,6 +1,6 @@
 # 📦 LabInventory - Sistem Inventaris & Peminjaman Laboratorium Komputer PTI
 
-Aplikasi mobile berbasis Flutter dan Supabase yang dirancang khusus untuk memodernisasi manajemen inventaris dan alur peminjaman alat pada **Laboratorium Komputer Program Studi Pendidikan Teknologi Informasi (PTI), FKIP Universitas Lampung**.
+Aplikasi mobile berbasis **Flutter** dan **Supabase Cloud Database (PostgreSQL)** yang dirancang khusus untuk memodernisasi manajemen inventaris serta alur peminjaman alat pada **Laboratorium Komputer Program Studi Pendidikan Teknologi Informasi (PTI), FKIP Universitas Lampung**.
 
 ---
 
@@ -9,113 +9,140 @@ Aplikasi mobile berbasis Flutter dan Supabase yang dirancang khusus untuk memode
 - **Nama**: Naila Fathia  
 - **NPM**: 2413025076  
 - **Program Studi**: S1 Pendidikan Teknologi Informasi (PTI)  
+- **Jurusan**: Pendidikan Matematika dan Ilmu Pengetahuan Alam (PMIPA)  
 - **Fakultas**: Keguruan dan Ilmu Pendidikan (FKIP)  
 - **Universitas**: Universitas Lampung (UNILA)  
 - **Mata Kuliah**: Pemrograman Mobile (Mobile Programming)  
+- **Dosen Pengampu**: Tim Dosen PTI FKIP Unila  
 
 ---
 
 ## 📱 Gambaran Umum Aplikasi
 
-**LabInventory** mentransformasi proses pencatatan inventaris lab komputer yang sebelumnya manual (menggunakan formulir kertas / buku fisik) menjadi sistem digital terpusat yang transparan, terstruktur, dan mudah diakses langsung melalui smartphone.
+**LabInventory** mentransformasi proses pencatatan inventaris lab komputer yang sebelumnya manual (menggunakan buku formulir fisik) menjadi sistem digital terpusat yang transparan, terstruktur, dan dapat diakses langsung melalui smartphone secara real-time.
 
-Aplikasi ini melayani dua peran utama (*roles*):
-1. **Mahasiswa**: Mengecek ketersediaan stok barang secara real-time, melihat spesifikasi alat, mengajukan permohonan pinjam praktikum, memantau alur & status persetujuan, serta melihat tenggat waktu pengembalian.
-2. **Laboran / Admin**: Memverifikasi pengajuan peminjaman (*approve/reject*), mengelola stok dan kondisi fisik inventaris, mencatat pengembalian alat, serta meninjau riwayat transaksi seluruh laboratorium.
+Aplikasi ini melayani dua peran pengguna (*multi-role system*):
+1. **Mahasiswa**: Mengecek ketersediaan stok barang secara real-time dari database cloud, melihat spesifikasi alat, mengajukan permohonan peminjaman praktikum, memantau alur & status persetujuan, serta melihat tenggat waktu pengembalian.
+2. **Laboran / Admin**: Memverifikasi pengajuan peminjaman (*approve/reject*), mengelola stok dan kondisi fisik inventaris, memproses pengembalian alat (*return*), serta meninjau riwayat transaksi seluruh laboratorium.
+
+> [!NOTE]
+> Seluruh data inventaris barang (`items`) dan permohonan peminjaman (`borrowings`) telah **100% terhubung secara live & real-time ke Supabase PostgreSQL Cloud Database** tanpa menggunakan data dummy/tiruan.
 
 ---
 
-## ✨ Fitur-Fitur Utama
+## ✨ Fitur-Fitur Utama Aplikasi
 
-### 🎓 1. Fitur Mahasiswa (Student Flow)
-- **Animated Splash Screen**: Animasi intro logo resmi Universitas Lampung & transisi halus.
+### 🎓 1. Alur & Antarmuka Mahasiswa (Student Flow)
+
+- **Animated Splash Screen**: Animasi intro logo resmi Universitas Lampung dengan transisi halus (*Scale & Fade Transition*).
 - **Autentikasi Fleksibel**:
-  - Login via Supabase Auth.
-  - **Mode Demo (Tanpa Akun)** untuk presentasi & penilaian cepat tanpa hambatan jaringan.
+  - Login via Supabase Auth (Email & Password).
+  - **Mode Demo Instan (Tanpa Akun)** untuk pengujian dan penilaian praktis tanpa kendala koneksi akun.
 - **Mobile Bottom Navigation Bar (4 Tab)**:
-  - 🏠 **Beranda**:
-    - *Hero Banner* informatif dengan status operasional lab (*"Lab Buka"*).
-    - Status peminjaman aktif & tenggat pengembalian real-time.
-    - Pintasan cepat (*Katalog*, *Ajukan*, *Riwayat*, *Tata Tertib*).
-    - Filter kategori cepat (*Komputer*, *Proyektor*, *Kabel*, *Audio*).
-    - **Panduan Visual Alur Peminjaman (4 Langkah)**:
-      1. Pilih Alat di Katalog
-      2. Isi Formulir Pengajuan
-      3. Verifikasi & Ambil di Lab (Bawa KTM Fisik)
-      4. Pengembalian & Cek Kondisi
-    - Informasi jam operasional (Senin–Jumat, 08:00–16:00 WIB) & lokasi (Gedung FKIP Lt. 2).
-    - Dialog interaktif tata tertib dan pengumuman lab.
-  - 📦 **Katalog Inventaris**: Daftar seluruh aset lab lengkap dengan badge kondisi, lokasi rak, stok real-time, dan fitur pencarian/filter.
-  - 📝 **Formulir Peminjaman**: Pemilihan jumlah unit, pemilih tanggal pinjam/kembali (*DatePicker*), serta input keperluan akademik.
-  - 🕒 **Peminjaman Saya**: Jejak riwayat pengajuan dengan status (*Pending*, *Approved*, *Rejected*, *Returned*).
-  - 👤 **Profil Pengguna**: Rincian identitas mahasiswa (Nama, NPM, Prodi, Hak Akses) & fitur *Logout*.
+  1. 🏠 **Beranda (Dashboard Mahasiswa)**:
+     - *Hero Banner* informatif dengan status operasional lab (*"Lab Buka"*).
+     - *Status Card* peminjaman aktif & tenggat pengembalian real-time dari database.
+     - Pintasan cepat (*Katalog*, *Ajukan*, *Riwayat*, *Tata Tertib*).
+     - Filter kategori cepat (*Komputer*, *Proyektor*, *Kabel*, *Audio*).
+     - **Panduan Visual Alur Peminjaman (4 Langkah Interaktif)**:
+       1. Pilih Alat di Katalog
+       2. Isi Formulir Pengajuan
+       3. Verifikasi & Ambil di Lab (Wajib Bawa KTM Fisik)
+       4. Pengembalian & Cek Kondisi Fisik
+     - Informasi jam operasional (Senin–Jumat, 08:00–16:00 WIB) & lokasi (Gedung FKIP Lt. 2).
+     - Dialog interaktif tata tertib laboratorium & modal pengumuman lab.
+  2. 📦 **Inventaris (Katalog Alat Real-time)**:
+     - Daftar seluruh aset lab dari tabel Supabase `items`.
+     - Badge kondisi fisik (*Sangat Baik*, *Baik*, *Perlu Perbaikan*), lokasi rak, dan stok live.
+     - Fitur pencarian (*search bar*) nama barang dan filter per kategori (*Elektronik, Komputer, Aksesoris*).
+     - **Detail Barang & Formulir Peminjaman**: Pemilihan jumlah unit, pemilih rentang tanggal pinjam & kembali (*DatePicker*), serta input keperluan akademik.
+  3. 🕒 **Peminjaman (Peminjaman Saya)**:
+     - Jejak riwayat pengajuan peminjaman mahasiswa langsung dari tabel Supabase `borrowings`.
+     - Status badge informatif (*PENDING*, *APPROVED*, *REJECTED*, *RETURNED*).
+     - Empty state bersih jika belum ada riwayat transaksi.
+  4. 👤 **Profil (Identitas Mahasiswa)**:
+     - Rincian identitas mahasiswa (Nama: Naila Fathia, NPM: 2413025076, Prodi: PTI FKIP Unila).
+     - Informasi hak akses, kontak pengembang, dan tombol *Logout*.
 
 ---
 
-### 🛠️ 2. Fitur Laboran / Admin (Administrator Flow)
+### 🛠️ 2. Alur & Antarmuka Laboran / Admin (Administrator Flow)
+
 - **Mobile Bottom Navigation Bar (5 Tab)**:
-  - 📊 **Dashboard Laboran**: Ringkasan statistik total alat, unit dipinjam, pengajuan pending, dan kondisi aset lab.
-  - 📦 **Katalog & Manajemen Alat**: Monitoring stok, lokasi lemari/rak, serta tombol tambah barang baru (*Floating Action Button*).
-  - ➕ **Tambah Inventaris Baru**: Pembuatan kode barang otomatis (*Auto-generate code: `INV-[KAT]-[RANDOM]`*), input nama, kategori, kondisi, stok, dan lokasi penyimpanan.
-  - 📋 **Approval Pengajuan**: Verifikasi peminjaman masuk dengan opsi *Setujui* atau *Tolak* yang langsung terhubung ke database.
-  - 📜 **Riwayat Transaksi**: Audit log lengkap keluar-masuk inventaris lab.
-  - 👤 **Profil Laboran**: Pengelolaan akun admin laboratorium.
+  1. 📊 **Dashboard Laboran**:
+     - Kartu metrik ringkasan real-time (*Total Barang* dan *Pengajuan Pending* dari Supabase).
+     - Tombol aksi cepat: **Tambah Barang** dan **Pengembalian Alat**.
+     - Daftar antrean pengajuan pending dengan tombol aksi langsung **Setujui** (*Approve*) atau **Tolak** (*Reject*).
+  2. 📦 **Inventaris & Manajemen Alat**:
+     - Monitoring stok seluruh aset lab secara real-time.
+     - Tombol Tambah Barang Baru (*Floating Action Button*).
+  3. 📋 **Pengajuan (Approval Screen)**:
+     - Verifikasi peminjaman masuk dari mahasiswa.
+     - Aksi *Setujui* atau *Tolak* yang langsung memperbarui status baris di tabel `borrowings` Supabase.
+  4. 📜 **Riwayat (Riwayat Transaksi Lab)**:
+     - Audit log lengkap transaksi peminjaman seluruh laboratorium secara transparan.
+  5. 👤 **Profil Laboran**:
+     - Pengelolaan informasi akun admin/laboran Lab Komputer PTI.
+- **Fitur Tambahan Laboran**:
+  - ➕ **Tambah Inventaris Baru**: Form pendaftaran alat dengan pembuatan kode barang otomatis (*Auto-generate code: `INV-[KAT]-[RANDOM]`*), nama, kategori, kondisi, stok, dan lokasi rak.
+  - 🔄 **Proses Pengembalian Barang (Return Item)**: Pemilihan peminjaman aktif dari database, inspeksi kondisi fisik (*Normal / Baik* atau *Rusak*), input catatan laboran, dan konfirmasi pengembalian barang.
 
 ---
 
 ## 🏗️ Arsitektur & Teknologi
 
-| Komponen | Teknologi |
+| Komponen | Spesifikasi & Teknologi |
 | :--- | :--- |
 | **Framework Utama** | [Flutter](https://flutter.dev/) (Channel Stable, Dart SDK ^3.13) |
-| **Desain Antarmuka** | Material Design 3, Curated Unila Navy Palette (`0xFF0F3B7A`), Responsive Layout |
-| **Navigasi** | Bottom Navigation Bar + IndexedStack (Preserve State) |
-| **Backend & Database** | [Supabase](https://supabase.com/) (PostgreSQL Database & Realtime API) |
-| **Autentikasi** | Supabase Auth (Email & Password) + Fallback Demo Mode |
-| **Aset Grafis** | Custom Logo & Adaptive Launcher Icon Android Mipmaps |
+| **Desain Antarmuka** | Material Design 3, Unila Navy & Sapphire Palette (`0xFF0F3B7A`, `0xFF1E60B8`), Responsive Layout |
+| **Pola Navigasi** | Mobile Bottom Navigation Bar + `IndexedStack` (Preserve State antar-tab) |
+| **Backend & Cloud Database** | [Supabase](https://supabase.com/) (PostgreSQL Database & Realtime API) |
+| **Autentikasi** | Supabase Auth (Email & Password) + Mode Demo Instan |
+| **Ikon & Aset Grafis** | Custom Launcher Icon Android Adaptive Mipmaps & Lambang Unila |
 
 ---
 
-## 🗄️ Struktur Database (Supabase PostgreSQL)
+## 🗄️ Skema Database (Supabase PostgreSQL)
 
-### Tabel `items` (Daftar Inventaris Alat)
-| Kolom | Tipe Data | Keterangan |
+### 1. Tabel `items` (Daftar Inventaris Laboratorium)
+| Kolom | Tipe Data | Deskripsi |
 | :--- | :--- | :--- |
-| `id` | `uuid` / `text` | Primary Key |
-| `nama_barang` | `text` | Nama alat laboratorium |
-| `kode_barang` | `text` | Kode unik inventaris (cth: `INV-KOM-4120`) |
-| `kategori` | `text` | Komputer, Elektronik, Aksesoris, Audio |
-| `kondisi` | `text` | Sangat Baik, Baik, Rusak Ringan |
-| `stok` | `integer` | Jumlah unit yang tersedia |
-| `lokasi` | `text` | Posisi lemari / rak di ruang lab |
+| `id` | `uuid` / `text` | Primary Key unik barang |
+| `nama_barang` | `text` | Nama peralatan lab (cth: *Laptop Lenovo, Proyektor Epson*) |
+| `kode_barang` | `text` | Kode unik inventaris (cth: `INV-CMP-0008`, `INV-ELK-0012`) |
+| `kategori` | `text` | Kategori alat (*Komputer, Elektronik, Aksesoris*) |
+| `kondisi` | `text` | Kondisi fisik (*Sangat Baik, Baik, Perlu Perbaikan*) |
+| `stok` | `integer` | Jumlah stok unit yang tersedia |
+| `lokasi` | `text` | Posisi lemari / rak di ruang laboratorium |
 | `created_at` | `timestamptz` | Waktu pencatatan aset |
 
-### Tabel `borrowings` (Pengajuan & Transaksi Peminjaman)
-| Kolom | Tipe Data | Keterangan |
+### 2. Tabel `borrowings` (Pengajuan & Transaksi Peminjaman)
+| Kolom | Tipe Data | Deskripsi |
 | :--- | :--- | :--- |
-| `id` | `uuid` / `text` | Primary Key |
-| `user_id` | `uuid` | ID mahasiswa peminjam |
-| `item_id` | `text` | Referensi ke barang yang dipinjam |
+| `id` | `uuid` / `text` | Primary Key unik transaksi peminjaman |
+| `user_id` | `uuid` | ID akun peminjam |
+| `item_id` | `uuid` / `text` | Foreign Key ke baris barang di tabel `items` |
 | `nama_peminjam` | `text` | Nama lengkap peminjam |
-| `nama_barang` | `text` | Nama barang yang dipinjam |
+| `nama_barang` | `text` | Nama alat yang dipinjam |
 | `jumlah` | `integer` | Jumlah unit yang diajukan |
-| `tgl_pinjam` | `date` / `timestamptz` | Tanggal mulai peminjaman |
-| `tgl_kembali` | `date` / `timestamptz` | Batas tanggal pengembalian |
-| `keperluan` | `text` | Alasan / peruntukan peminjaman |
-| `status` | `text` | `pending`, `approved`, `rejected`, `returned` |
-| `catatan_kondisi` | `text` | Catatan pengecekan saat kembali |
-| `created_at` | `timestamptz` | Waktu permohonan dibuat |
+| `tgl_pinjam` | `timestamptz` | Tanggal mulai peminjaman |
+| `tgl_kembali` | `timestamptz` | Tanggal batas pengembalian |
+| `keperluan` | `text` | Keperluan praktikum / kegiatan akademik |
+| `status` | `text` | Status peminjaman (`pending`, `approved`, `rejected`, `returned`) |
+| `catatan_kondisi` | `text` | Catatan hasil inspeksi kondisi saat barang dikembalikan |
+| `created_at` | `timestamptz` | Waktu pengajuan dibuat |
 
 ---
 
 ## 🚀 Panduan Menjalankan Aplikasi
 
-### 1. Prasyarat
-- [Flutter SDK](https://docs.flutter.dev/get-started/install) (versi 3.13 ke atas)
-- Android Studio / VS Code dengan ekstensi Flutter & Dart
-- Emulator Android atau Device fisik (USB Debugging aktif)
+### 1. Prasyarat Sistem
+- **Flutter SDK** (versi 3.13.0 atau yang lebih baru)
+- **Dart SDK** (versi 3.0.0 atau yang lebih baru)
+- **Android Studio** / **VS Code** dengan ekstensi Flutter & Dart
+- **Perangkat Android** (USB Debugging aktif) atau **Android Emulator**
 
-### 2. Langkah Instalasi
+### 2. Langkah-Langkah Instalasi
 
 1. **Clone repository ini**:
    ```bash
@@ -123,24 +150,35 @@ Aplikasi ini melayani dua peran utama (*roles*):
    cd lab_inventory
    ```
 
-2. **Unduh dependensi pub**:
+2. **Unduh seluruh package dependensi**:
    ```bash
    flutter pub get
    ```
 
-3. **Verifikasi tidak ada error sintaks**:
+3. **Verifikasi kepatuhan kode (Code Analysis)**:
    ```bash
    flutter analyze --no-fatal-infos
    ```
 
-4. **Jalankan aplikasi di emulator / device**:
+4. **Jalankan aplikasi di perangkat / emulator**:
    ```bash
    flutter run
    ```
 
+### 3. Petunjuk Pengujian Aplikasi (Untuk Penilaian)
+- **Layar Login**:
+  - Pilih role **Mahasiswa**, lalu tekan tombol **"Masuk Mode Demo (Tanpa Akun)"** untuk masuk langsung ke Beranda Mahasiswa.
+  - Untuk mencoba role laboran, kembali ke layar login, pilih role **Admin / Laboran**, lalu tekan **"Masuk Mode Demo (Tanpa Akun)"** untuk membuka Dashboard Laboran.
+- **Uji Alur Peminjaman Real-Time**:
+  1. Masuk sebagai **Mahasiswa** -> buka tab **Inventaris** -> pilih salah satu barang (contoh: *Proyektor Epson*) -> tekan **"Pinjam Alat"**.
+  2. Isi jumlah, tanggal pinjam/kembali, dan keperluan praktikum -> tekan **"Kirim Pengajuan"**.
+  3. Logout dan masuk sebagai **Admin / Laboran** -> di **Dashboard** atau tab **Pengajuan**, pengajuan mahasiswa tadi akan langsung muncul secara real-time dari Supabase.
+  4. Tekan tombol **"Setujui"** -> status peminjaman di Supabase langsung berubah menjadi `approved`.
+  5. Di Dashboard Admin, tekan tombol **"Pengembalian"** -> pilih peminjaman aktif -> pilih kondisi barang -> tekan **"KONFIRMASI KEMBALI"** -> status otomatis terupdate menjadi `returned`.
+
 ---
 
-## 📂 Struktur Folder Proyek
+## 📂 Struktur Direktori Proyek
 
 ```text
 lab_inventory/
@@ -149,16 +187,16 @@ lab_inventory/
 │       ├── AndroidManifest.xml   # Label "LabInventory" & Internet Permission
 │       └── res/mipmap-*/         # Ikon aplikasi resmi LabInventory
 ├── assets/images/            # Logo & grafis visual
-│   ├── app_icon.png          # Ikon launcher square
+│   ├── app_icon.png          # Ikon launcher aplikasi
 │   └── lab_inventory_logo.png# Lambang utama aplikasi
 ├── lib/
-│   └── main.dart             # Kode utama (Service, Screens, BottomNav, Dashboard)
+│   └── main.dart             # Kode utama (Model, Service Supabase, Screens, Nav)
 ├── pubspec.yaml              # Dependensi pustaka & pendaftaran aset
-└── README.md                 # Dokumentasi proyek
+└── README.md                 # Dokumentasi resmi proyek
 ```
 
 ---
 
 ## 📄 Lisensi & Hak Cipta
 
-Proyek ini dikembangkan oleh **Naila Fathia (NPM: 2413025076)** untuk memenuhi tugas mata kuliah **Pemrograman Mobile**, Program Studi Pendidikan Teknologi Informasi, Jurusan Pendidikan MIPA, Fakultas Keguruan dan Ilmu Pendidikan, **Universitas Lampung**.
+Proyek aplikasi ini dikembangkan oleh **Naila Fathia (NPM: 2413025076)** untuk memenuhi tugas ujian / tugas besar mata kuliah **Pemrograman Mobile**, Program Studi Pendidikan Teknologi Informasi, Jurusan Pendidikan Matematika dan Ilmu Pengetahuan Alam, Fakultas Keguruan dan Ilmu Pendidikan, **Universitas Lampung**.
