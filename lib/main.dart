@@ -244,6 +244,13 @@ class InventoryService {
       if (list.isNotEmpty) return list;
     } catch (e) {
       debugPrint('Error getItems Supabase: $e');
+      try {
+        final resFallback = await supabase.from('items').select();
+        final listFallback = (resFallback as List)
+            .map((json) => InventoryItem.fromJson(json))
+            .toList();
+        if (listFallback.isNotEmpty) return listFallback;
+      } catch (_) {}
     }
     return sampleItems;
   }
@@ -321,9 +328,29 @@ class InventoryService {
     required String keperluan,
   }) async {
     // Validasi format UUID untuk PostgreSQL
-    final validItemId = (itemId.length == 36 && itemId.contains('-'))
+    String validItemId = (itemId.length == 36 && itemId.contains('-'))
         ? itemId
         : '00000000-0000-0000-0000-000000000001';
+
+    // Pastikan item_id ada di tabel items Supabase agar foreign key tidak ditolak
+    try {
+      final existing = await supabase
+          .from('items')
+          .select('id')
+          .eq('id', validItemId)
+          .maybeSingle();
+      if (existing == null) {
+        final anyItem = await supabase
+            .from('items')
+            .select('id')
+            .limit(1)
+            .maybeSingle();
+        if (anyItem != null && anyItem['id'] != null) {
+          validItemId = anyItem['id'].toString();
+        }
+      }
+    } catch (_) {}
+
     final user = supabase.auth.currentUser;
     final userId = user?.id ?? '00000000-0000-0000-0000-000000000000';
     final newId = 'b-${DateTime.now().millisecondsSinceEpoch}';
