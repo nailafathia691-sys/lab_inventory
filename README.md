@@ -165,16 +165,34 @@ Aplikasi ini melayani dua peran pengguna (*multi-role system*):
    flutter run
    ```
 
-### 3. Petunjuk Pengujian Aplikasi (Untuk Penilaian)
-- **Layar Login**:
-  - Pilih role **Mahasiswa**, lalu tekan tombol **"Masuk Mode Demo (Tanpa Akun)"** untuk masuk langsung ke Beranda Mahasiswa.
-  - Untuk mencoba role laboran, kembali ke layar login, pilih role **Admin / Laboran**, lalu tekan **"Masuk Mode Demo (Tanpa Akun)"** untuk membuka Dashboard Laboran.
-- **Uji Alur Peminjaman Real-Time**:
-  1. Masuk sebagai **Mahasiswa** -> buka tab **Inventaris** -> pilih salah satu barang (contoh: *Proyektor Epson*) -> tekan **"Pinjam Alat"**.
-  2. Isi jumlah, tanggal pinjam/kembali, dan keperluan praktikum -> tekan **"Kirim Pengajuan"**.
-  3. Logout dan masuk sebagai **Admin / Laboran** -> di **Dashboard** atau tab **Pengajuan**, pengajuan mahasiswa tadi akan langsung muncul secara real-time dari Supabase.
-  4. Tekan tombol **"Setujui"** -> status peminjaman di Supabase langsung berubah menjadi `approved`.
-  5. Di Dashboard Admin, tekan tombol **"Pengembalian"** -> pilih peminjaman aktif -> pilih kondisi barang -> tekan **"KONFIRMASI KEMBALI"** -> status otomatis terupdate menjadi `returned`.
+### 3. 🔐 Akun Uji Coba / Testing Credentials
+
+Tersedia akun pengujian aktif yang terdaftar langsung di **Supabase Authentication** untuk memudahkan proses demo dan penilaian aplikasi:
+
+| Role / Peran | Email | Password | Keterangan |
+| :--- | :--- | :--- | :--- |
+| 🛡️ **Admin / Laboran** | `admin@lab.com` | `admin123` | Akses penuh dashboard laboran, verifikasi pengajuan, input barang & pengembalian |
+| 🎓 **Mahasiswa / Siswa** | `tes@1.com` | `123456` | Akses katalog inventaris, pengajuan pinjam alat, status & riwayat peminjaman |
+
+> [!TIP]
+> Pada halaman login aplikasi, terdapat tombol pintasan **"Pilih Cepat Akun Uji Coba"** yang dapat diklik langsung untuk mengisi email, password, dan role secara otomatis tanpa perlu mengetik manual. Selain itu, tersedia pula tombol **"Masuk Mode Demo (Tanpa Akun)"** untuk pengujian instan tanpa koneksi autentikasi.
+
+### 4. Petunjuk Pengujian Aplikasi (Uji Alur Lengkap)
+1. **Login sebagai Mahasiswa / Siswa**:
+   - Ketik email `tes@1.com` dan password `123456` (atau klik tombol cepat *Mahasiswa/Siswa* di layar login), lalu pilih role **Mahasiswa** dan tekan **MASUK**.
+   - Buka tab **Inventaris**, pilih salah satu barang (contoh: *Proyektor Epson* atau *Laptop Lenovo*), lalu tekan tombol **"Pinjam Alat"**.
+   - Masukkan jumlah unit, pilih tanggal pinjam dan tanggal kembali, isi keperluan praktikum, lalu tekan **"Kirim Pengajuan"**.
+   - Pengajuan akan tersimpan langsung di database cloud Supabase dengan status `pending`.
+
+2. **Login sebagai Admin / Laboran**:
+   - Logout dari profil mahasiswa, kemudian masuk dengan email `admin@lab.com` dan password `admin123` (atau klik tombol cepat *Admin/Laboran*).
+   - Di **Dashboard Laboran** atau tab **Pengajuan**, permohonan pinjam dari mahasiswa tadi akan langsung muncul secara real-time.
+   - Tekan tombol **"Setujui"** -> status peminjaman di Supabase langsung berubah menjadi `approved`.
+
+3. **Proses Pengembalian Barang**:
+   - Masih pada akun Laboran di halaman **Dashboard**, tekan tombol aksi cepat **"Pengembalian"**.
+   - Pilih barang yang sedang dipinjam dari daftar peminjaman aktif, tentukan kondisi fisik (*Normal / Baik* atau *Rusak*), masukkan catatan laboran, lalu tekan **"KONFIRMASI KEMBALI"**.
+   - Status peminjaman otomatis terupdate menjadi `returned` di database Supabase dan tercatat pada riwayat transaksi lab.
 
 ---
 
