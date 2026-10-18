@@ -311,7 +311,7 @@ class InventoryService {
   }
 
   // Buat pengajuan peminjaman baru (menyimpan ke Supabase & memory lokal)
-  static Future<bool> createBorrowing({
+  static Future<String?> createBorrowing({
     required String itemId,
     required String namaBarang,
     required String namaPeminjam,
@@ -356,11 +356,10 @@ class InventoryService {
         'keperluan': keperluan,
         'status': 'pending',
       });
-      return true;
+      return null; // Sukses tanpa error
     } catch (e) {
       debugPrint('Catatan createBorrowing Supabase: $e');
-      // Berhasil tersimpan di sesi lokal (aplikasi tetap berjalan lancar)
-      return true;
+      return e.toString();
     }
   }
 
@@ -2951,7 +2950,7 @@ class _BorrowingFormScreenState extends State<BorrowingFormScreen> {
     final user = supabase.auth.currentUser;
     final userName = user?.email?.split('@').first ?? 'Naila Fathia';
 
-    final success = await InventoryService.createBorrowing(
+    final errorMsg = await InventoryService.createBorrowing(
       itemId: widget.item.id.isNotEmpty ? widget.item.id : widget.item.code,
       namaBarang: widget.item.name,
       namaPeminjam: userName,
@@ -2964,18 +2963,25 @@ class _BorrowingFormScreenState extends State<BorrowingFormScreen> {
     if (!mounted) return;
     setState(() => isSubmitting = false);
 
-    if (success) {
+    if (errorMsg == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: Colors.green,
-          content: Text('Pengajuan peminjaman berhasil dikirim ke Supabase!'),
+          content: Text('Pengajuan peminjaman berhasil masuk ke database Supabase!'),
         ),
       );
       Navigator.pop(context, true);
     } else {
+      final isRls = errorMsg.contains('42501') || errorMsg.contains('row-level security');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Pengajuan tersimpan lokal (RLS/Demo Mode).'),
+        SnackBar(
+          backgroundColor: isRls ? Colors.orange.shade900 : Colors.blue.shade800,
+          content: Text(
+            isRls
+                ? 'Tersimpan di aplikasi (Supabase RLS aktif, silakan matikan RLS tabel borrowings)'
+                : 'Pengajuan tersimpan di aplikasi ($errorMsg)',
+          ),
+          duration: const Duration(seconds: 4),
         ),
       );
       Navigator.pop(context, true);
