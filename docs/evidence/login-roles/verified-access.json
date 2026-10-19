@@ -1,0 +1,23 @@
+{
+  "project": "ykbabgphvavzojrsjefh",
+  "databaseProfilesPreviouslyMissing": true,
+  "stagedLoginBridgeApplied": true,
+  "databaseVerification": "READ ONLY authenticated JWT claim checks, rolled back",
+  "roles": [
+    {"email": "admin@lab.com", "role": "admin", "active": true, "itemsVisible": 4, "loansVisible": 1},
+    {"email": "tes@1.com", "role": "student", "active": true, "itemsVisible": 4, "ownLoansVisible": 1},
+    {"role": "otherStudent", "itemsVisible": 4, "loansVisible": 0}
+  ],
+  "inventoryRowsUnchanged": true,
+  "borrowingRowsUnchanged": true,
+  "clientTableWritesDenied": true,
+  "anonymousProfileReadDenied": true,
+  "transactionsEnabled": false,
+  "nativeAdminDashboardObserved": true,
+  "nativeAdminItemCount": 4,
+  "nativeStudentPasswordLoginAutomated": false,
+  "device": "Pixel 7a / Android 17",
+  "flutterTestsPassed": 40,
+  "sqlTestsPassed": 37,
+  "analyzerIssues": 0
+}

@@ -1,0 +1,17 @@
+﻿{
+    "device":  "Pixel 7a",
+    "android":  "17",
+    "serial":  "33211JEHN10338",
+    "package":  "com.example.lab_inventory",
+    "command":  "flutter run -d 33211JEHN10338",
+    "dartDefinesProvided":  false,
+    "beforeConfigurationErrorVisible":  true,
+    "afterConfigurationErrorVisible":  false,
+    "loginVisible":  true,
+    "storedSessionProfileAccessDenied":  true,
+    "signedOutForLoginVerification":  true,
+    "at":  "2026-10-18T23:26:57.0887618+00:00",
+    "bundledConfigMatchesLocal":  true,
+    "apkSha256":  "00e6781bcfc8f35968128a993303b428d31803a6399291bab797c8bed5467e44",
+    "coldStartWithoutFlutterPassed":  true
+}

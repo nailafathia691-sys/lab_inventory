@@ -46,3 +46,10 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Local configuration and database-test dependencies
+config/*.local.json
+.env
+node_modules/
+supabase/.temp/
+.playwright-mcp/

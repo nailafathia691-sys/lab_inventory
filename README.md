@@ -1,220 +1,97 @@
-# 📦 LabInventory - Sistem Inventaris & Peminjaman Laboratorium Komputer PTI
+# LabInventory
 
-Aplikasi mobile berbasis **Flutter** dan **Supabase Cloud Database (PostgreSQL)** yang dirancang khusus untuk memodernisasi manajemen inventaris serta alur peminjaman alat pada **Laboratorium Komputer Program Studi Pendidikan Teknologi Informasi (PTI), FKIP Universitas Lampung**.
+Aplikasi Android Flutter untuk inventaris dan peminjaman barang Laboratorium Komputer PTI FKIP Universitas Lampung.
 
----
+Backend yang dipakai adalah **Supabase Auth dan PostgreSQL**. Acuan terbaru ada di [SRD v2](docs/SRD_V2.md); dokumen Word SRD v1 di root disimpan sebagai riwayat rancangan awal PHP/MySQL.
 
-## 👤 Informasi Mahasiswa / Pengembang
+Status database aktif 19 Oktober 2026: migration penuh sudah diterapkan setelah pengguna memastikan total proyektor 2 unit dan reservasi approved 1 unit. Saldo tersedia proyektor menjadi 1. Transaksi admin/mahasiswa aktif dan banner mode baca tidak lagi tampil setelah sesi dimuat ulang. Lihat [aktivasi dan hasil verifikasi](docs/AKTIVASI_TRANSAKSI_2026-10-19.md).
 
-- **Nama**: Naila Fathia  
-- **NPM**: 2413025076  
-- **Program Studi**: S1 Pendidikan Teknologi Informasi (PTI)  
-- **Jurusan**: Pendidikan Matematika dan Ilmu Pengetahuan Alam (PMIPA)  
-- **Fakultas**: Keguruan dan Ilmu Pendidikan (FKIP)  
-- **Universitas**: Universitas Lampung (UNILA)  
-- **Mata Kuliah**: Pemrograman Mobile (Mobile Programming)  
-- **Dosen Pengampu**: Tim Dosen PTI FKIP Unila  
+## Menjalankan demo lokal
 
----
+Demo menggunakan data dalam memori, tanpa akun Supabase dan tanpa koneksi database operasional. Label aplikasi dan application ID Android berbeda dari aplikasi operasional.
 
-## 📱 Gambaran Umum Aplikasi
-
-**LabInventory** mentransformasi proses pencatatan inventaris lab komputer yang sebelumnya manual (menggunakan buku formulir fisik) menjadi sistem digital terpusat yang transparan, terstruktur, dan dapat diakses langsung melalui smartphone secara real-time.
-
-Aplikasi ini melayani dua peran pengguna (*multi-role system*):
-1. **Mahasiswa**: Mengecek ketersediaan stok barang secara real-time dari database cloud, melihat spesifikasi alat, mengajukan permohonan peminjaman praktikum, memantau alur & status persetujuan, serta melihat tenggat waktu pengembalian.
-2. **Laboran / Admin**: Memverifikasi pengajuan peminjaman (*approve/reject*), mengelola stok dan kondisi fisik inventaris, memproses pengembalian alat (*return*), serta meninjau riwayat transaksi seluruh laboratorium.
-
-> [!NOTE]
-> Seluruh data inventaris barang (`items`) dan permohonan peminjaman (`borrowings`) telah **100% terhubung secara live & real-time ke Supabase PostgreSQL Cloud Database** tanpa menggunakan data dummy/tiruan.
-
----
-
-## ✨ Fitur-Fitur Utama Aplikasi
-
-### 🎓 1. Alur & Antarmuka Mahasiswa (Student Flow)
-
-- **Animated Splash Screen**: Animasi intro logo resmi Universitas Lampung dengan transisi halus (*Scale & Fade Transition*).
-- **Autentikasi Fleksibel**:
-  - Login via Supabase Auth (Email & Password).
-  - **Mode Demo Instan (Tanpa Akun)** untuk pengujian dan penilaian praktis tanpa kendala koneksi akun.
-- **Mobile Bottom Navigation Bar (4 Tab)**:
-  1. 🏠 **Beranda (Dashboard Mahasiswa)**:
-     - *Hero Banner* informatif dengan status operasional lab (*"Lab Buka"*).
-     - *Status Card* peminjaman aktif & tenggat pengembalian real-time dari database.
-     - Pintasan cepat (*Katalog*, *Ajukan*, *Riwayat*, *Tata Tertib*).
-     - Filter kategori cepat (*Komputer*, *Proyektor*, *Kabel*, *Audio*).
-     - **Panduan Visual Alur Peminjaman (4 Langkah Interaktif)**:
-       1. Pilih Alat di Katalog
-       2. Isi Formulir Pengajuan
-       3. Verifikasi & Ambil di Lab (Wajib Bawa KTM Fisik)
-       4. Pengembalian & Cek Kondisi Fisik
-     - Informasi jam operasional (Senin–Jumat, 08:00–16:00 WIB) & lokasi (Gedung FKIP Lt. 2).
-     - Dialog interaktif tata tertib laboratorium & modal pengumuman lab.
-  2. 📦 **Inventaris (Katalog Alat Real-time)**:
-     - Daftar seluruh aset lab dari tabel Supabase `items`.
-     - Badge kondisi fisik (*Sangat Baik*, *Baik*, *Perlu Perbaikan*), lokasi rak, dan stok live.
-     - Fitur pencarian (*search bar*) nama barang dan filter per kategori (*Elektronik, Komputer, Aksesoris*).
-     - **Detail Barang & Formulir Peminjaman**: Pemilihan jumlah unit, pemilih rentang tanggal pinjam & kembali (*DatePicker*), serta input keperluan akademik.
-  3. 🕒 **Peminjaman (Peminjaman Saya)**:
-     - Jejak riwayat pengajuan peminjaman mahasiswa langsung dari tabel Supabase `borrowings`.
-     - Status badge informatif (*PENDING*, *APPROVED*, *REJECTED*, *RETURNED*).
-     - Empty state bersih jika belum ada riwayat transaksi.
-  4. 👤 **Profil (Identitas Mahasiswa)**:
-     - Rincian identitas mahasiswa (Nama: Naila Fathia, NPM: 2413025076, Prodi: PTI FKIP Unila).
-     - Informasi hak akses, kontak pengembang, dan tombol *Logout*.
-
----
-
-### 🛠️ 2. Alur & Antarmuka Laboran / Admin (Administrator Flow)
-
-- **Mobile Bottom Navigation Bar (5 Tab)**:
-  1. 📊 **Dashboard Laboran**:
-     - Kartu metrik ringkasan real-time (*Total Barang* dan *Pengajuan Pending* dari Supabase).
-     - Tombol aksi cepat: **Tambah Barang** dan **Pengembalian Alat**.
-     - Daftar antrean pengajuan pending dengan tombol aksi langsung **Setujui** (*Approve*) atau **Tolak** (*Reject*).
-  2. 📦 **Inventaris & Manajemen Alat**:
-     - Monitoring stok seluruh aset lab secara real-time.
-     - Tombol Tambah Barang Baru (*Floating Action Button*).
-  3. 📋 **Pengajuan (Approval Screen)**:
-     - Verifikasi peminjaman masuk dari mahasiswa.
-     - Aksi *Setujui* atau *Tolak* yang langsung memperbarui status baris di tabel `borrowings` Supabase.
-  4. 📜 **Riwayat (Riwayat Transaksi Lab)**:
-     - Audit log lengkap transaksi peminjaman seluruh laboratorium secara transparan.
-  5. 👤 **Profil Laboran**:
-     - Pengelolaan informasi akun admin/laboran Lab Komputer PTI.
-- **Fitur Tambahan Laboran**:
-  - ➕ **Tambah Inventaris Baru**: Form pendaftaran alat dengan pembuatan kode barang otomatis (*Auto-generate code: `INV-[KAT]-[RANDOM]`*), nama, kategori, kondisi, stok, dan lokasi rak.
-  - 🔄 **Proses Pengembalian Barang (Return Item)**: Pemilihan peminjaman aktif dari database, inspeksi kondisi fisik (*Normal / Baik* atau *Rusak*), input catatan laboran, dan konfirmasi pengembalian barang.
-
----
-
-## 🏗️ Arsitektur & Teknologi
-
-| Komponen | Spesifikasi & Teknologi |
-| :--- | :--- |
-| **Framework Utama** | [Flutter](https://flutter.dev/) (Channel Stable, Dart SDK ^3.13) |
-| **Desain Antarmuka** | Material Design 3, Unila Navy & Sapphire Palette (`0xFF0F3B7A`, `0xFF1E60B8`), Responsive Layout |
-| **Pola Navigasi** | Mobile Bottom Navigation Bar + `IndexedStack` (Preserve State antar-tab) |
-| **Backend & Cloud Database** | [Supabase](https://supabase.com/) (PostgreSQL Database & Realtime API) |
-| **Autentikasi** | Supabase Auth (Email & Password) + Mode Demo Instan |
-| **Ikon & Aset Grafis** | Custom Launcher Icon Android Adaptive Mipmaps & Lambang Unila |
-
----
-
-## 🗄️ Skema Database (Supabase PostgreSQL)
-
-### 1. Tabel `items` (Daftar Inventaris Laboratorium)
-| Kolom | Tipe Data | Deskripsi |
-| :--- | :--- | :--- |
-| `id` | `uuid` / `text` | Primary Key unik barang |
-| `nama_barang` | `text` | Nama peralatan lab (cth: *Laptop Lenovo, Proyektor Epson*) |
-| `kode_barang` | `text` | Kode unik inventaris (cth: `INV-CMP-0008`, `INV-ELK-0012`) |
-| `kategori` | `text` | Kategori alat (*Komputer, Elektronik, Aksesoris*) |
-| `kondisi` | `text` | Kondisi fisik (*Sangat Baik, Baik, Perlu Perbaikan*) |
-| `stok` | `integer` | Jumlah stok unit yang tersedia |
-| `lokasi` | `text` | Posisi lemari / rak di ruang laboratorium |
-| `created_at` | `timestamptz` | Waktu pencatatan aset |
-
-### 2. Tabel `borrowings` (Pengajuan & Transaksi Peminjaman)
-| Kolom | Tipe Data | Deskripsi |
-| :--- | :--- | :--- |
-| `id` | `uuid` / `text` | Primary Key unik transaksi peminjaman |
-| `user_id` | `uuid` | ID akun peminjam |
-| `item_id` | `uuid` / `text` | Foreign Key ke baris barang di tabel `items` |
-| `nama_peminjam` | `text` | Nama lengkap peminjam |
-| `nama_barang` | `text` | Nama alat yang dipinjam |
-| `jumlah` | `integer` | Jumlah unit yang diajukan |
-| `tgl_pinjam` | `timestamptz` | Tanggal mulai peminjaman |
-| `tgl_kembali` | `timestamptz` | Tanggal batas pengembalian |
-| `keperluan` | `text` | Keperluan praktikum / kegiatan akademik |
-| `status` | `text` | Status peminjaman (`pending`, `approved`, `rejected`, `returned`) |
-| `catatan_kondisi` | `text` | Catatan hasil inspeksi kondisi saat barang dikembalikan |
-| `created_at` | `timestamptz` | Waktu pengajuan dibuat |
-
----
-
-## 🚀 Panduan Menjalankan Aplikasi
-
-### 1. Prasyarat Sistem
-- **Flutter SDK** (versi 3.13.0 atau yang lebih baru)
-- **Dart SDK** (versi 3.0.0 atau yang lebih baru)
-- **Android Studio** / **VS Code** dengan ekstensi Flutter & Dart
-- **Perangkat Android** (USB Debugging aktif) atau **Android Emulator**
-
-### 2. Langkah-Langkah Instalasi
-
-1. **Clone repository ini**:
-   ```bash
-   git clone https://github.com/nailafathia691-sys/lab_inventory.git
-   cd lab_inventory
-   ```
-
-2. **Unduh seluruh package dependensi**:
-   ```bash
-   flutter pub get
-   ```
-
-3. **Verifikasi kepatuhan kode (Code Analysis)**:
-   ```bash
-   flutter analyze --no-fatal-infos
-   ```
-
-4. **Jalankan aplikasi di perangkat / emulator**:
-   ```bash
-   flutter run
-   ```
-
-### 3. 🔐 Akun Uji Coba / Testing Credentials
-
-Tersedia akun pengujian aktif yang terdaftar langsung di **Supabase Authentication** untuk memudahkan proses demo dan penilaian aplikasi:
-
-| Role / Peran | Email | Password | Keterangan |
-| :--- | :--- | :--- | :--- |
-| 🛡️ **Admin / Laboran** | `admin@lab.com` | `admin123` | Akses penuh dashboard laboran, verifikasi pengajuan, input barang & pengembalian |
-| 🎓 **Mahasiswa / Siswa** | `tes@1.com` | `123456` | Akses katalog inventaris, pengajuan pinjam alat, status & riwayat peminjaman |
-
-> [!TIP]
-> Kredensial di atas dapat dimasukkan langsung pada formulir login sesuai perannya. Selain itu, tersedia pula tombol **"Masuk Mode Demo (Tanpa Akun)"** untuk penilaian cepat tanpa perlu mengetik akun.
-
-### 4. Petunjuk Pengujian Aplikasi (Uji Alur Lengkap)
-1. **Login sebagai Mahasiswa / Siswa**:
-   - Ketik email `tes@1.com` dan password `123456`, pilih role **Mahasiswa**, lalu tekan tombol **MASUK**.
-   - Buka tab **Inventaris**, pilih salah satu barang (contoh: *Proyektor Epson* atau *Laptop Lenovo*), lalu tekan tombol **"Pinjam Alat"**.
-   - Masukkan jumlah unit, pilih tanggal pinjam dan tanggal kembali, isi keperluan praktikum, lalu tekan **"Kirim Pengajuan"**.
-   - Pengajuan akan tersimpan langsung di database cloud Supabase dengan status `pending`.
-
-2. **Login sebagai Admin / Laboran**:
-   - Logout dari profil mahasiswa, kemudian masuk dengan email `admin@lab.com` dan password `admin123`, pilih role **Admin / Laboran**, lalu tekan **MASUK**.
-   - Di **Dashboard Laboran** atau tab **Pengajuan**, permohonan pinjam dari mahasiswa tadi akan langsung muncul secara real-time.
-   - Tekan tombol **"Setujui"** -> status peminjaman di Supabase langsung berubah menjadi `approved`.
-
-3. **Proses Pengembalian Barang**:
-   - Masih pada akun Laboran di halaman **Dashboard**, tekan tombol aksi cepat **"Pengembalian"**.
-   - Pilih barang yang sedang dipinjam dari daftar peminjaman aktif, tentukan kondisi fisik (*Normal / Baik* atau *Rusak*), masukkan catatan laboran, lalu tekan **"KONFIRMASI KEMBALI"**.
-   - Status peminjaman otomatis terupdate menjadi `returned` di database Supabase dan tercatat pada riwayat transaksi lab.
-
----
-
-## 📂 Struktur Direktori Proyek
-
-```text
-lab_inventory/
-├── android/                  # Konfigurasi native Android & Launcher Mipmaps
-│   └── app/src/main/
-│       ├── AndroidManifest.xml   # Label "LabInventory" & Internet Permission
-│       └── res/mipmap-*/         # Ikon aplikasi resmi LabInventory
-├── assets/images/            # Logo & grafis visual
-│   ├── app_icon.png          # Ikon launcher aplikasi
-│   └── lab_inventory_logo.png# Lambang utama aplikasi
-├── lib/
-│   └── main.dart             # Kode utama (Model, Service Supabase, Screens, Nav)
-├── pubspec.yaml              # Dependensi pustaka & pendaftaran aset
-└── README.md                 # Dokumentasi resmi proyek
+```powershell
+flutter pub get
+flutter run --flavor demo -t lib/main_demo.dart
 ```
 
----
+Pilih peran latihan pada layar demo. Data bertahan selama proses aplikasi berjalan; keluar/masuk sebagai peran lain dalam proses yang sama dapat digunakan untuk mencoba persetujuan dan pengembalian.
 
-## 📄 Lisensi & Hak Cipta
+Untuk menjalankan demo di Chrome:
 
-Proyek aplikasi ini dikembangkan oleh **Naila Fathia (NPM: 2413025076)** untuk memenuhi tugas ujian / tugas besar mata kuliah **Pemrograman Mobile**, Program Studi Pendidikan Teknologi Informasi, Jurusan Pendidikan Matematika dan Ilmu Pengetahuan Alam, Fakultas Keguruan dan Ilmu Pendidikan, **Universitas Lampung**.
+```powershell
+flutter run -d chrome --web-hostname 127.0.0.1 --web-port 8766 -t lib/main_demo.dart
+```
+
+Lihat [hasil pengujian Playwright dan database](docs/PENGUJIAN_PLAYWRIGHT_2026-10-19.md), termasuk skrip pengujian ulang dan bukti layar.
+
+Katalog, detail, dan formulir peminjaman memakai foto ilustrasi lokal untuk proyektor, laptop, kabel HDMI, serta speaker. Sumber dan lisensi tercatat pada [daftar aset](assets/images/inventory/README.md) dan tombol Kredit foto pada aplikasi. Gambar tersebut belum merupakan foto unit fisik laboratorium.
+
+## Menjalankan aplikasi operasional
+
+Varian bawaan adalah `production`, sesuai entry point `lib/main.dart`. Perintah `flutter run` atau `flutter build apk` tanpa `--flavor` kini memilih varian ini. Koneksi server tetap memerlukan konfigurasi lokal di bawah. Untuk demo, gunakan perintah demo di atas atau pilih **LabInventory Demo** pada Run and Debug VS Code lalu tekan F5. Profil **LabInventory Production (konfigurasi lokal)** membutuhkan `config/supabase.local.json` yang sudah diisi.
+
+Pengaturan ini memakai [`default-flavor` resmi Flutter](https://docs.flutter.dev/tools/pubspec#default-flavor-field) untuk menghindari error `Gradle build failed to produce an .apk file` ketika Flutter mencari APK tanpa varian pada proyek yang menghasilkan APK demo/production.
+
+1. Gunakan Flutter dengan Dart yang memenuhi `pubspec.yaml`. Perubahan ini diverifikasi menggunakan Flutter 3.47.2 / Dart 3.13.2.
+2. Siapkan Supabase dan terapkan migration sesuai [panduan tahap 1–2](docs/TAHAP_1_DAN_2.md). Aplikasi baru membutuhkan skema, policy, dan RPC dari migration; tidak ada fallback ke operasi database lama.
+3. Salin `config/supabase.example.json` menjadi `config/supabase.local.json`, lalu isi URL proyek dan **publishable key**. Legacy anon key juga didukung. File lokal diabaikan Git. Jangan memasukkan secret/service-role key ke aplikasi.
+4. Buat akun melalui Supabase Auth. Akun baru berperan mahasiswa; penetapan laboran dilakukan pengelola di server, bukan lewat form login.
+
+```powershell
+flutter pub get
+flutter run --flavor production -t lib/main.dart --dart-define-from-file=config/supabase.local.json
+```
+
+Di PowerShell, `./tools/run.ps1` otomatis menyertakan file konfigurasi lokal tersebut. Gunakan `./tools/run.ps1 -Device chrome` atau `-Device SERIAL_ADB` untuk memilih perangkat; tambahkan `-Demo` untuk demo tanpa database. Di VS Code, pilih **LabInventory Production (konfigurasi lokal)** lalu F5 untuk koneksi Supabase.
+
+`flutter run` biasa sekarang membaca `config/supabase.local.json` yang dibundel sebagai aset aplikasi. URL dan public key yang diberikan lewat `--dart-define-from-file` tetap diutamakan sebagai satu pasangan; override yang hanya mengisi salah satunya ditolak agar konfigurasi dua proyek tidak tercampur. Folder `config/` khusus konfigurasi client yang boleh masuk APK, tanpa password pengguna atau secret/service-role key. File lokal tetap diabaikan Git.
+
+Lihat [hasil debug layar konfigurasi dan bukti login production](docs/DEBUG_KONFIGURASI_2026-10-19.md).
+
+Tidak tersedia password demo atau tombol masuk tanpa autentikasi pada build operasional. Role diambil dari profil server. Kegagalan simpan ditampilkan sebagai kegagalan; formulir tetap terbuka agar dapat dicoba ulang.
+
+## Aturan transaksi
+
+| Peristiwa | Perubahan stok |
+| --- | --- |
+| Pengajuan `pending` | Tidak berubah |
+| Persetujuan `pending → approved` | Stok dicadangkan/dikurangi secara atomik |
+| Penolakan `pending → rejected` | Tidak berubah |
+| Pengembalian baik `approved → returned` | Stok siap pakai bertambah |
+| Pengembalian rusak `approved → returned` | Stok rusak bertambah; stok siap pakai tidak bertambah |
+
+Permintaan berulang dengan ID yang sama mengembalikan hasil sebelumnya. Persetujuan/pengembalian yang sudah selesai tidak mengubah stok dua kali jika dikirim dengan ID baru. Perubahan stok mencatat ledger dan audit dalam transaksi yang sama.
+
+Pembacaan data memakai query/refetch dan tombol muat ulang; subscription Supabase Realtime belum diimplementasikan. Edit/arsip inventaris, pagination, pemulihan akun lewat UI, notifikasi, dan kesiapan distribusi release merupakan tahap berikutnya.
+
+## Pengujian
+
+Alur mahasiswa dan laboran sudah diuji pada Redmi 12 melalui Playwright Android. Lihat [laporan perangkat fisik dan bukti layar](docs/PENGUJIAN_DEVICE_2026-10-19.md) serta [panduan kendali native](tools/device-tests/README.md). Pengujian perangkat memakai demo lokal dalam memori.
+
+```powershell
+flutter analyze --no-pub
+flutter test --no-pub
+npm.cmd --prefix tools/database-tests ci --ignore-scripts --no-audit --no-fund
+npm.cmd --prefix tools/database-tests test
+```
+
+Test SQL memakai PostgreSQL berbasis WASM (PGlite) tanpa menghubungi Supabase. Test memeriksa SQL, grants, RLS, validasi, rollback, ledger, dan idempotensi. Uji dua koneksi bersamaan serta integrasi Supabase Auth/Data API harus dilengkapi di staging sebelum produksi; lihat panduan tahap 1–2.
+
+## Struktur
+
+```text
+lib/auth/                 autentikasi dan siklus sesi
+lib/core/                 konfigurasi, model, validasi, error
+lib/data/                 repository RPC dan ID permintaan persisten
+lib/demo/                 backend demo dalam memori
+lib/main.dart             bootstrap operasional dan UI
+lib/main_demo.dart        entry point demo
+supabase/migrations/      skema, RLS, RPC transaksi, ledger, audit
+supabase/preflight.sql    pemeriksaan awal database yang sudah ada
+test/                     test unit, repository, dan antarmuka
+tools/database-tests/     test SQL lokal
+docs/                     analisis, kebutuhan, dan prosedur penerapan
+```
+
+Pengembang awal: Naila Fathia, NPM 2413025076, Pendidikan Teknologi Informasi, Universitas Lampung. Proyek dikembangkan untuk mata kuliah Pemrograman Mobile.

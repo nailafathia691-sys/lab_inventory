@@ -1,0 +1,505 @@
+{
+  "scope": "Android native demo; not production database integration",
+  "device": "Redmi 12 / 23053RN02A, Android 15 API 35",
+  "package": "com.example.lab_inventory.demo",
+  "checkpointsPassed": 18,
+  "checks": {
+    "adminDashboard": {
+      "at": "2026-10-18T19:25:31.400Z",
+      "clazz": "android.view.View",
+      "desc": "Dashboard Laboran",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "",
+      "bounds": {
+        "x": 44,
+        "y": 242,
+        "width": 541,
+        "height": 77
+      },
+      "checkable": false,
+      "checked": false,
+      "clickable": false,
+      "enabled": true,
+      "focusable": true,
+      "focused": false,
+      "longClickable": false,
+      "scrollable": false,
+      "selected": false
+    },
+    "emptyDates": {
+      "at": "2026-10-18T19:21:05.309Z",
+      "clazz": "android.view.View",
+      "desc": "Pilih tanggal pinjam dan tanggal kembali.",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "",
+      "bounds": {
+        "x": 0,
+        "y": 2068,
+        "width": 1080,
+        "height": 158
+      },
+      "checkable": false,
+      "checked": false,
+      "clickable": false,
+      "enabled": true,
+      "focusable": true,
+      "focused": false,
+      "longClickable": false,
+      "scrollable": true,
+      "selected": false
+    },
+    "pending": {
+      "at": "2026-10-18T19:27:17.147Z",
+      "clazz": "android.view.View",
+      "desc": "Proyektor Demo (1 Unit)\n19/10/2026 - 19/10/2026\nPENDING",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "",
+      "bounds": {
+        "x": 44,
+        "y": 640,
+        "width": 992,
+        "height": 212
+      },
+      "checkable": false,
+      "checked": false,
+      "clickable": false,
+      "enabled": true,
+      "focusable": true,
+      "focused": false,
+      "longClickable": false,
+      "scrollable": false,
+      "selected": false
+    },
+    "pendingStock": {
+      "at": "2026-10-18T19:27:48.973Z",
+      "clazz": "android.view.View",
+      "desc": "Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 2",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "",
+      "bounds": {
+        "x": 44,
+        "y": 759,
+        "width": 992,
+        "height": 357
+      },
+      "checkable": false,
+      "checked": false,
+      "clickable": true,
+      "enabled": true,
+      "focusable": true,
+      "focused": false,
+      "longClickable": false,
+      "scrollable": false,
+      "selected": false
+    },
+    "approved": {
+      "at": "2026-10-18T19:25:48.858Z",
+      "clazz": "android.view.View",
+      "desc": "Proyektor Demo - Peminjam: Mahasiswa Demo\n19/10/2026 - 19/10/2026\nAPPROVED",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "",
+      "bounds": {
+        "x": 44,
+        "y": 401,
+        "width": 992,
+        "height": 267
+      },
+      "checkable": false,
+      "checked": false,
+      "clickable": false,
+      "enabled": true,
+      "focusable": true,
+      "focused": false,
+      "longClickable": false,
+      "scrollable": false,
+      "selected": false
+    },
+    "approvedStock": {
+      "at": "2026-10-18T19:25:48.028Z",
+      "clazz": "android.view.View",
+      "desc": "Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 1",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "",
+      "bounds": {
+        "x": 44,
+        "y": 759,
+        "width": 992,
+        "height": 357
+      },
+      "checkable": false,
+      "checked": false,
+      "clickable": true,
+      "enabled": true,
+      "focusable": true,
+      "focused": false,
+      "longClickable": false,
+      "scrollable": false,
+      "selected": false
+    },
+    "goodReturn": {
+      "at": "2026-10-18T19:26:19.359Z",
+      "clazz": "android.view.View",
+      "desc": "Proyektor Demo - Peminjam: Mahasiswa Demo\n19/10/2026 - 19/10/2026\nRETURNED",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "",
+      "bounds": {
+        "x": 44,
+        "y": 401,
+        "width": 992,
+        "height": 267
+      },
+      "checkable": false,
+      "checked": false,
+      "clickable": false,
+      "enabled": true,
+      "focusable": true,
+      "focused": false,
+      "longClickable": false,
+      "scrollable": false,
+      "selected": false
+    },
+    "goodReturnStock": {
+      "at": "2026-10-18T19:26:20.184Z",
+      "clazz": "android.view.View",
+      "desc": "Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 2",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "",
+      "bounds": {
+        "x": 44,
+        "y": 759,
+        "width": 992,
+        "height": 357
+      },
+      "checkable": false,
+      "checked": false,
+      "clickable": true,
+      "enabled": true,
+      "focusable": true,
+      "focused": false,
+      "longClickable": false,
+      "scrollable": false,
+      "selected": false
+    },
+    "rejected": {
+      "at": "2026-10-18T19:27:55.486Z",
+      "clazz": "android.view.View",
+      "desc": "Proyektor Demo - Peminjam: Mahasiswa Demo\n19/10/2026 - 19/10/2026\nREJECTED",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "",
+      "bounds": {
+        "x": 44,
+        "y": 695,
+        "width": 992,
+        "height": 267
+      },
+      "checkable": false,
+      "checked": false,
+      "clickable": false,
+      "enabled": true,
+      "focusable": true,
+      "focused": false,
+      "longClickable": false,
+      "scrollable": false,
+      "selected": false
+    },
+    "rejectedStock": {
+      "at": "2026-10-18T19:27:56.317Z",
+      "clazz": "android.view.View",
+      "desc": "Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 2",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "",
+      "bounds": {
+        "x": 44,
+        "y": 759,
+        "width": 992,
+        "height": 357
+      },
+      "checkable": false,
+      "checked": false,
+      "clickable": true,
+      "enabled": true,
+      "focusable": true,
+      "focused": false,
+      "longClickable": false,
+      "scrollable": false,
+      "selected": false
+    },
+    "damaged": {
+      "at": "2026-10-18T19:29:23.371Z",
+      "clazz": "android.widget.RadioButton",
+      "desc": "Rusak / Perlu Perbaikan",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "",
+      "bounds": {
+        "x": 44,
+        "y": 1666,
+        "width": 992,
+        "height": 154
+      },
+      "checkable": true,
+      "checked": true,
+      "clickable": true,
+      "enabled": true,
+      "focusable": true,
+      "focused": false,
+      "longClickable": false,
+      "scrollable": false,
+      "selected": false
+    },
+    "damagedStock": {
+      "at": "2026-10-18T19:29:29.661Z",
+      "clazz": "android.view.View",
+      "desc": "Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 1",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "",
+      "bounds": {
+        "x": 44,
+        "y": 759,
+        "width": 992,
+        "height": 357
+      },
+      "checkable": false,
+      "checked": false,
+      "clickable": true,
+      "enabled": true,
+      "focusable": true,
+      "focused": false,
+      "longClickable": false,
+      "scrollable": false,
+      "selected": false
+    },
+    "newItem": {
+      "at": "2026-10-18T19:31:12.655Z",
+      "clazz": "android.view.View",
+      "desc": "USB Hub Uji Android\nDEMO-3\nKategori: Elektronik\nStatus: Tersedia\nStok: 1",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "",
+      "bounds": {
+        "x": 44,
+        "y": 1529,
+        "width": 992,
+        "height": 357
+      },
+      "checkable": false,
+      "checked": false,
+      "clickable": true,
+      "enabled": true,
+      "focusable": true,
+      "focused": false,
+      "longClickable": false,
+      "scrollable": false,
+      "selected": false
+    },
+    "invalidNewItem": {
+      "at": "2026-10-18T19:31:02.717Z",
+      "clazz": "android.view.View",
+      "desc": "Isi nama barang dan stok yang valid (minimal 0).",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "",
+      "bounds": {
+        "x": 0,
+        "y": 2068,
+        "width": 1080,
+        "height": 158
+      },
+      "checkable": false,
+      "checked": false,
+      "clickable": false,
+      "enabled": true,
+      "focusable": true,
+      "focused": false,
+      "longClickable": false,
+      "scrollable": true,
+      "selected": false
+    },
+    "projectorImage": {
+      "at": "2026-10-18T19:05:25.019Z",
+      "clazz": "android.widget.ImageView",
+      "desc": "Ilustrasi Proyektor Demo",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "",
+      "bounds": {
+        "x": 80,
+        "y": 541,
+        "width": 920,
+        "height": 520
+      },
+      "checkable": false,
+      "checked": false,
+      "clickable": false,
+      "enabled": true,
+      "focusable": true,
+      "focused": false,
+      "longClickable": false,
+      "scrollable": false,
+      "selected": false
+    },
+    "laptopImage": {
+      "at": "2026-10-18T19:30:46.895Z",
+      "clazz": "android.widget.ImageView",
+      "desc": "Ilustrasi Laptop Demo",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "",
+      "bounds": {
+        "x": 80,
+        "y": 437,
+        "width": 920,
+        "height": 520
+      },
+      "checkable": false,
+      "checked": false,
+      "clickable": false,
+      "enabled": true,
+      "focusable": true,
+      "focused": false,
+      "longClickable": false,
+      "scrollable": false,
+      "selected": false
+    },
+    "searchInput": {
+      "at": "2026-10-18T19:34:12.057Z",
+      "clazz": "android.widget.EditText",
+      "desc": "",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "laptop",
+      "bounds": {
+        "x": 44,
+        "y": 385,
+        "width": 992,
+        "height": 143
+      },
+      "checkable": false,
+      "checked": false,
+      "clickable": true,
+      "enabled": true,
+      "focusable": true,
+      "focused": true,
+      "longClickable": false,
+      "scrollable": false,
+      "selected": false
+    },
+    "signedOut": {
+      "at": "2026-10-18T19:32:41.129Z",
+      "clazz": "android.widget.Button",
+      "desc": "MASUK",
+      "res": "",
+      "pkg": "com.example.lab_inventory.demo",
+      "text": "",
+      "bounds": {
+        "x": 61,
+        "y": 1388,
+        "width": 959,
+        "height": 143
+      },
+      "checkable": false,
+      "checked": false,
+      "clickable": true,
+      "enabled": true,
+      "focusable": true,
+      "focused": false,
+      "longClickable": false,
+      "scrollable": false,
+      "selected": false
+    }
+  },
+  "images": [
+    {
+      "filename": "01-login.png",
+      "bytes": 178718,
+      "width": 1080,
+      "height": 2460
+    },
+    {
+      "filename": "02-student-form-before-safe-area.png",
+      "bytes": 164791,
+      "width": 1080,
+      "height": 2460
+    },
+    {
+      "filename": "02-student-form.png",
+      "bytes": 164791,
+      "width": 1080,
+      "height": 2460
+    },
+    {
+      "filename": "03-admin-approved.png",
+      "bytes": 114287,
+      "width": 1080,
+      "height": 2460
+    },
+    {
+      "filename": "04-student-pending.png",
+      "bytes": 136968,
+      "width": 1080,
+      "height": 2460
+    },
+    {
+      "filename": "05-form-safe-area-fixed.png",
+      "bytes": 149458,
+      "width": 1080,
+      "height": 2460
+    },
+    {
+      "filename": "06-damaged-return.png",
+      "bytes": 183871,
+      "width": 1080,
+      "height": 2460
+    },
+    {
+      "filename": "07-stock-after-damage.png",
+      "bytes": 238171,
+      "width": 1080,
+      "height": 2460
+    },
+    {
+      "filename": "08-laptop-detail.png",
+      "bytes": 515404,
+      "width": 1080,
+      "height": 2460
+    },
+    {
+      "filename": "09-admin-created-item.png",
+      "bytes": 260136,
+      "width": 1080,
+      "height": 2460
+    },
+    {
+      "filename": "10-catalog-search.png",
+      "bytes": 149512,
+      "width": 1080,
+      "height": 2460
+    },
+    {
+      "filename": "11-final-history.png",
+      "bytes": 174095,
+      "width": 1080,
+      "height": 2460
+    },
+    {
+      "filename": "12-student-final-history.png",
+      "bytes": 140859,
+      "width": 1080,
+      "height": 2460
+    }
+  ],
+  "apkSha256": "982d90f139a9e5fa1a61f1345e77ff210d85377aeafd89f9deae2b8917bb1a2d",
+  "failedActionsRetainedInLog": 32,
+  "note": "Raw actions retain failed USB/selector/setup attempts; checkpoints above refer to successful native observations. Search filtering was also visually checked in 10-catalog-search.png."
+}

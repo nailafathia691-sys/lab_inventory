@@ -1,0 +1,77 @@
+{
+  "project": "ykbabgphvavzojrsjefh",
+  "legacyStockMode": "total",
+  "confirmedPhysicalTotal": 2,
+  "approvedReservedUnits": 1,
+  "items": [
+    {
+      "id": "0fe110a1-828f-4d1a-9106-e44107b944a3",
+      "name": "Proyektor Epson",
+      "stock": 1,
+      "damaged": 0
+    },
+    {
+      "id": "235e9ed8-b705-424c-9a6b-6575589cdb69",
+      "name": "Speaker Aktif 15\"",
+      "stock": 3,
+      "damaged": 0
+    },
+    {
+      "id": "b4eb9973-96a3-4422-a20c-fef72138faef",
+      "name": "Kabel HDMI",
+      "stock": 6,
+      "damaged": 0
+    },
+    {
+      "id": "d5812ce4-dee6-45fa-aa8a-51e0a95d952e",
+      "name": "Laptop Lenovo",
+      "stock": 4,
+      "damaged": 0
+    }
+  ],
+  "loans": [
+    {
+      "id": "8d5ea7fa-07b4-4da6-be0a-47699e06a928",
+      "status": "approved",
+      "quantity": 1
+    }
+  ],
+  "roles": [
+    {
+      "id": "36f32dae-3f6b-4b27-aac3-1df206b5df77",
+      "role": "student"
+    },
+    {
+      "id": "58247a30-e35b-4ea6-99cf-6c1d3d96bc43",
+      "role": "admin"
+    },
+    {
+      "id": "5dccf229-91ad-4771-b93e-1d2d9dbff89d",
+      "role": "student"
+    },
+    {
+      "id": "e21f1b50-a8aa-4b1f-91b6-8e4c15fcbcf6",
+      "role": "student"
+    }
+  ],
+  "rpc_installed": true,
+  "opening_movements": 4,
+  "transactions_enabled": true,
+  "verification": {
+    "rls_enabled": true,
+    "owner_isolation": true,
+    "anonymous_denied": true,
+    "direct_writes_denied": true,
+    "legacy_loan_preserved": true,
+    "test_rows_rolled_back": true,
+    "student_cannot_approve": true,
+    "pending_stock_unchanged": true,
+    "request_retry_idempotent": true,
+    "approval_retry_idempotent": true,
+    "rejection_stock_unchanged": true,
+    "insufficient_stock_rejected": true,
+    "good_return_retry_idempotent": true,
+    "damaged_return_ledger_correct": true
+  },
+  "verificationScope": "Real PostgreSQL RPCs under authenticated account claims in a rolled-back transaction; no password login for both accounts"
+}

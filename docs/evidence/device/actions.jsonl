@@ -1,0 +1,244 @@
+{"at":"2026-10-18T19:05:23.970Z","action":"tap","selector":{"desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 2"},"ok":true,"result":true}
+{"at":"2026-10-18T19:05:25.019Z","action":"info","selector":{"desc":"Ilustrasi Proyektor Demo"},"ok":true,"result":{"clazz":"android.widget.ImageView","desc":"Ilustrasi Proyektor Demo","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":80,"y":541,"width":920,"height":520},"checkable":false,"checked":false,"clickable":false,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:05:25.135Z","action":"info","selector":{"desc":"AJUKAN PEMINJAMAN"},"ok":true,"result":{"clazz":"android.widget.Button","desc":"AJUKAN PEMINJAMAN","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":2018,"width":992,"height":143},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:05:25.211Z","action":"tap","selector":{"desc":"AJUKAN PEMINJAMAN"},"ok":true,"result":true}
+{"at":"2026-10-18T19:05:26.211Z","action":"info","selector":{"desc":"Form Peminjaman"},"ok":true,"result":{"clazz":"android.view.View","desc":"Form Peminjaman","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":198,"y":346,"width":490,"height":77},"checkable":false,"checked":false,"clickable":false,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:05:26.365Z","action":"info","selector":{"scrollable":true},"ok":true,"result":{"clazz":"android.widget.ScrollView","desc":"","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":0,"y":461,"width":1080,"height":1765},"checkable":false,"checked":false,"clickable":false,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":true,"selected":false}}
+{"at":"2026-10-18T19:05:47.930Z","action":"info","selector":{"desc":"Ilustrasi Proyektor Demo"},"ok":true,"result":{"clazz":"android.widget.ImageView","desc":"Ilustrasi Proyektor Demo","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":124,"y":585,"width":832,"height":368},"checkable":false,"checked":false,"clickable":false,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:05:47.983Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:05:48.033Z","action":"info","selector":{"desc":"KIRIM / COBA LAGI"},"ok":false,"error":"androidDevice.info: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String androidx.test.uiautomator.UiObject2.getClassName()' on a null object reference"}
+{"at":"2026-10-18T19:05:48.071Z","action":"tap","selector":{"desc":"KIRIM / COBA LAGI"},"ok":false,"error":"androidDevice.tap: java.lang.RuntimeException: Timed out waiting for selector"}
+{"at":"2026-10-18T19:05:48.108Z","action":"info","selector":{"desc":"Pilih tanggal pinjam dan tanggal kembali."},"ok":false,"error":"androidDevice.info: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String androidx.test.uiautomator.UiObject2.getClassName()' on a null object reference"}
+{"at":"2026-10-18T19:05:48.159Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:05:48.298Z","action":"info","selector":{"desc":"DD/MM/YYYY"},"ok":true,"result":{"clazz":"android.view.View","desc":"DD/MM/YYYY","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":1820,"width":992,"height":132},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:06:22.820Z","action":"swipe","ok":true,"result":true}
+{"at":"2026-10-18T19:06:23.510Z","action":"info","selector":{"desc":"KIRIM / COBA LAGI"},"ok":true,"result":{"clazz":"android.widget.Button","desc":"KIRIM / COBA LAGI","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":2273,"width":992,"height":143},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:06:23.588Z","action":"info","selector":{"desc":"DD/MM/YYYY"},"ok":true,"result":{"clazz":"android.view.View","desc":"DD/MM/YYYY","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":1239,"width":992,"height":132},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:06:55.469Z","action":"swipe","ok":true,"result":true}
+{"at":"2026-10-18T19:06:56.126Z","action":"info","selector":{"desc":"KIRIM / COBA LAGI"},"ok":true,"result":{"clazz":"android.widget.Button","desc":"KIRIM / COBA LAGI","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":2273,"width":992,"height":143},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:06:57.184Z","action":"tap","selector":{"desc":"KIRIM / COBA LAGI"},"ok":true,"result":true}
+{"at":"2026-10-18T19:06:57.385Z","action":"info","selector":{"desc":"Pilih tanggal pinjam dan tanggal kembali."},"ok":false,"error":"androidDevice.info: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String androidx.test.uiautomator.UiObject2.getClassName()' on a null object reference"}
+{"at":"2026-10-18T19:06:57.408Z","action":"tap","selector":{"desc":"DD/MM/YYYY"},"ok":false,"error":"androidDevice.tap: java.lang.RuntimeException: Timed out waiting for selector"}
+{"at":"2026-10-18T19:06:57.432Z","action":"info","selector":{"desc":"OK"},"ok":false,"error":"androidDevice.info: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String androidx.test.uiautomator.UiObject2.getClassName()' on a null object reference"}
+{"at":"2026-10-18T19:07:18.708Z","action":"info","selector":{},"ok":false,"error":"androidDevice.info: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String androidx.test.uiautomator.UiObject2.getClassName()' on a null object reference"}
+{"at":"2026-10-18T19:07:18.748Z","action":"screenshot","ok":false,"error":"androidDevice.info: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String androidx.test.uiautomator.UiObject2.getClassName()' on a null object reference"}
+{"at":"2026-10-18T19:08:05.014Z","action":"info","selector":{},"ok":true,"result":{"clazz":"android.widget.Button","desc":"Back","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":11,"y":318,"width":132,"height":132},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:08:05.692Z","action":"swipe","ok":true,"result":true}
+{"at":"2026-10-18T19:08:06.260Z","action":"info","selector":{"desc":"KIRIM / COBA LAGI"},"ok":true,"result":{"clazz":"android.widget.Button","desc":"KIRIM / COBA LAGI","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":2273,"width":992,"height":143},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:08:07.264Z","action":"screenshot","ok":false,"error":"Command failed: adb -s 6acc03487d78 pull /data/local/tmp/lab_inventory_native.png D:\\1Kuliah\\Joki\\LabInventory\\lab_inventory\\docs\\evidence\\device\\02-student-form.png\n"}
+{"at":"2026-10-18T19:09:08.407Z","action":"scroll","ok":false,"error":"androidDevice.scroll: Device is closed"}
+{"at":"2026-10-18T19:09:08.411Z","action":"info","selector":{"desc":"KIRIM / COBA LAGI"},"ok":false,"error":"androidDevice.info: Device is closed"}
+{"at":"2026-10-18T19:09:37.192Z","action":"quit","ok":true}
+{"at":"2026-10-18T19:10:13.745Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:10:14.516Z","action":"info","selector":{"desc":"KIRIM / COBA LAGI"},"ok":true,"result":{"clazz":"android.widget.Button","desc":"KIRIM / COBA LAGI","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":2273,"width":992,"height":143},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:10:14.608Z","action":"info","selector":{"desc":"DD/MM/YYYY"},"ok":true,"result":{"clazz":"android.view.View","desc":"DD/MM/YYYY","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":1239,"width":992,"height":132},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:10:14.699Z","action":"info","selector":{"clazz":"android.widget.EditText"},"ok":true,"result":{"clazz":"android.widget.EditText","desc":"","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":1756,"width":992,"height":462},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:10:32.531Z","action":"tap","selector":{"desc":"DD/MM/YYYY"},"ok":true,"result":true}
+{"at":"2026-10-18T19:10:34.211Z","action":"info","selector":{"desc":"OK"},"ok":true,"result":{"clazz":"android.widget.Button","desc":"OK","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":837,"y":1962,"width":176,"height":132},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:10:34.402Z","action":"tap","selector":{"desc":"OK"},"ok":true,"result":true}
+{"at":"2026-10-18T19:10:35.323Z","action":"tap","selector":{"desc":"DD/MM/YYYY"},"ok":true,"result":true}
+{"at":"2026-10-18T19:10:36.339Z","action":"tap","selector":{"desc":"OK"},"ok":true,"result":true}
+{"at":"2026-10-18T19:10:38.018Z","action":"fill","selector":{"clazz":"android.widget.EditText"},"ok":true,"result":true}
+{"at":"2026-10-18T19:10:40.471Z","action":"info","selector":{"clazz":"android.widget.EditText"},"ok":true,"result":{"clazz":"android.widget.EditText","desc":"","res":"","pkg":"com.example.lab_inventory.demo","text":"Uji Playwright Android - peminjaman dan pengembalian baik","bounds":{"x":44,"y":1238,"width":992,"height":278},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":true,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:11:19.760Z","action":"press","ok":true,"result":true}
+{"at":"2026-10-18T19:11:21.656Z","action":"info","selector":{"desc":"KIRIM / COBA LAGI"},"ok":true,"result":{"clazz":"android.widget.Button","desc":"KIRIM / COBA LAGI","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":2273,"width":992,"height":143},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:16:42.325Z","action":"quit","ok":true}
+{"at":"2026-10-18T19:20:25.417Z","action":"info","selector":{"desc":"MASUK"},"ok":true,"result":{"clazz":"android.widget.Button","desc":"MASUK","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":61,"y":1388,"width":959,"height":143},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:20:25.744Z","action":"tap","selector":{"desc":"MASUK"},"ok":true,"result":true}
+{"at":"2026-10-18T19:20:29.251Z","action":"tap","selector":{"desc":"Inventaris\nTab 2 of 4"},"ok":true,"result":true}
+{"at":"2026-10-18T19:20:30.142Z","action":"tap","selector":{"desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 2"},"ok":true,"result":true}
+{"at":"2026-10-18T19:20:31.193Z","action":"tap","selector":{"desc":"AJUKAN PEMINJAMAN"},"ok":true,"result":true}
+{"at":"2026-10-18T19:20:32.575Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:20:33.344Z","action":"info","selector":{"desc":"KIRIM / COBA LAGI"},"ok":true,"result":{"clazz":"android.widget.Button","desc":"KIRIM / COBA LAGI","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":2143,"width":992,"height":83},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:20:33.421Z","action":"info","selector":{"scrollable":true},"ok":true,"result":{"clazz":"android.widget.ScrollView","desc":"","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":0,"y":357,"width":1080,"height":1869},"checkable":false,"checked":false,"clickable":false,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":true,"selected":false}}
+{"at":"2026-10-18T19:21:04.371Z","action":"tap","selector":{"desc":"KIRIM / COBA LAGI"},"ok":true,"result":true}
+{"at":"2026-10-18T19:21:05.309Z","action":"info","selector":{"desc":"Pilih tanggal pinjam dan tanggal kembali."},"ok":true,"result":{"clazz":"android.view.View","desc":"Pilih tanggal pinjam dan tanggal kembali.","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":0,"y":2068,"width":1080,"height":158},"checkable":false,"checked":false,"clickable":false,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":true,"selected":false}}
+{"at":"2026-10-18T19:21:05.426Z","action":"tap","selector":{"desc":"DD/MM/YYYY"},"ok":true,"result":true}
+{"at":"2026-10-18T19:21:06.792Z","action":"tap","selector":{"desc":"OK"},"ok":true,"result":true}
+{"at":"2026-10-18T19:21:07.560Z","action":"tap","selector":{"desc":"DD/MM/YYYY"},"ok":true,"result":true}
+{"at":"2026-10-18T19:21:08.644Z","action":"tap","selector":{"desc":"OK"},"ok":true,"result":true}
+{"at":"2026-10-18T19:21:12.108Z","action":"fill","selector":{"clazz":"android.widget.EditText"},"ok":true,"result":true}
+{"at":"2026-10-18T19:21:12.251Z","action":"press","ok":true,"result":true}
+{"at":"2026-10-18T19:21:14.504Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:21:15.148Z","action":"tap","selector":{"desc":"KIRIM / COBA LAGI"},"ok":true,"result":true}
+{"at":"2026-10-18T19:21:15.503Z","action":"info","selector":{"desc":"Detail Barang"},"ok":false,"error":"androidDevice.info: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String androidx.test.uiautomator.UiObject2.getClassName()' on a null object reference"}
+{"at":"2026-10-18T19:21:34.732Z","action":"info","selector":{"desc":"Detail Barang"},"ok":false,"error":"androidDevice.info: Device is closed"}
+{"at":"2026-10-18T19:21:34.737Z","action":"info","selector":{"desc":"Pengajuan berhasil dikirim. Menunggu persetujuan laboran."},"ok":false,"error":"androidDevice.info: Device is closed"}
+{"at":"2026-10-18T19:21:34.741Z","action":"tap","selector":{"desc":"Back"},"ok":false,"error":"androidDevice.tap: Device is closed"}
+{"at":"2026-10-18T19:21:34.745Z","action":"tap","selector":{"desc":"Peminjaman\nTab 3 of 4"},"ok":false,"error":"androidDevice.tap: Device is closed"}
+{"at":"2026-10-18T19:21:34.747Z","action":"info","selector":{"descRegex":"Proyektor Demo[\\s\\S]*PENDING"},"ok":false,"error":"androidDevice.info: Device is closed"}
+{"at":"2026-10-18T19:21:34.749Z","action":"tap","selector":{"desc":"Inventaris\nTab 2 of 4"},"ok":false,"error":"androidDevice.tap: Device is closed"}
+{"at":"2026-10-18T19:21:34.751Z","action":"info","selector":{"desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 2"},"ok":false,"error":"androidDevice.info: Device is closed"}
+{"at":"2026-10-18T19:21:34.753Z","action":"tap","selector":{"desc":"Profil\nTab 4 of 4"},"ok":false,"error":"androidDevice.tap: Device is closed"}
+{"at":"2026-10-18T19:22:43.214Z","action":"quit","ok":true}
+{"at":"2026-10-18T19:23:12.691Z","action":"info","selector":{},"ok":true,"result":{"clazz":"android.widget.Button","desc":"Back","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":11,"y":214,"width":132,"height":132},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:23:12.811Z","action":"info","selector":{"desc":"Detail Barang"},"ok":true,"result":{"clazz":"android.view.View","desc":"Detail Barang","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":198,"y":242,"width":368,"height":77},"checkable":false,"checked":false,"clickable":false,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:23:12.860Z","action":"info","selector":{"desc":"Form Peminjaman"},"ok":false,"error":"androidDevice.info: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String androidx.test.uiautomator.UiObject2.getClassName()' on a null object reference"}
+{"at":"2026-10-18T19:23:41.730Z","action":"tap","selector":{"desc":"Back"},"ok":true,"result":true}
+{"at":"2026-10-18T19:23:41.785Z","action":"tap","selector":{"desc":"Peminjaman\nTab 3 of 4"},"ok":false,"error":"androidDevice.tap: java.lang.RuntimeException: Timed out waiting for selector"}
+{"at":"2026-10-18T19:23:42.802Z","action":"info","selector":{"descRegex":"Proyektor Demo[\\s\\S]*PENDING"},"ok":false,"error":"androidDevice.info: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String androidx.test.uiautomator.UiObject2.getClassName()' on a null object reference"}
+{"at":"2026-10-18T19:23:42.872Z","action":"tap","selector":{"desc":"Inventaris\nTab 2 of 4"},"ok":true,"result":true}
+{"at":"2026-10-18T19:23:43.510Z","action":"info","selector":{"desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 2"},"ok":true,"result":{"clazz":"android.view.View","desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 2","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":759,"width":992,"height":357},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:23:43.599Z","action":"tap","selector":{"desc":"Profil\nTab 4 of 4"},"ok":true,"result":true}
+{"at":"2026-10-18T19:23:43.752Z","action":"tap","selector":{"desc":"KELUAR DARI AKUN"},"ok":false,"error":"androidDevice.tap: java.lang.RuntimeException: Timed out waiting for selector"}
+{"at":"2026-10-18T19:23:44.235Z","action":"tap","selector":{"desc":"Keluar"},"ok":false,"error":"androidDevice.tap: java.lang.RuntimeException: Timed out waiting for selector"}
+{"at":"2026-10-18T19:23:44.268Z","action":"info","selector":{"desc":"MASUK"},"ok":false,"error":"androidDevice.info: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String androidx.test.uiautomator.UiObject2.getClassName()' on a null object reference"}
+{"at":"2026-10-18T19:23:44.313Z","action":"tap","selector":{"desc":"Laboran Demo"},"ok":false,"error":"androidDevice.tap: java.lang.RuntimeException: Timed out waiting for selector"}
+{"at":"2026-10-18T19:23:44.341Z","action":"tap","selector":{"desc":"MASUK"},"ok":false,"error":"androidDevice.tap: java.lang.RuntimeException: Timed out waiting for selector"}
+{"at":"2026-10-18T19:23:44.376Z","action":"info","selector":{"desc":"Dashboard Laboran"},"ok":false,"error":"androidDevice.info: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String androidx.test.uiautomator.UiObject2.getClassName()' on a null object reference"}
+{"at":"2026-10-18T19:23:44.414Z","action":"info","selector":{"desc":"Setujui"},"ok":false,"error":"androidDevice.info: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String androidx.test.uiautomator.UiObject2.getClassName()' on a null object reference"}
+{"at":"2026-10-18T19:24:48.856Z","action":"quit","ok":true}
+{"at":"2026-10-18T19:25:25.667Z","action":"info","selector":{},"ok":true,"result":{"clazz":"android.view.View","desc":"Profil Saya","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":242,"width":290,"height":77},"checkable":false,"checked":false,"clickable":false,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:25:26.523Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:25:26.744Z","action":"info","selector":{"desc":"KELUAR DARI AKUN"},"ok":true,"result":{"clazz":"android.widget.Button","desc":"KELUAR DARI AKUN","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":55,"y":1788,"width":970,"height":137},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:25:27.274Z","action":"tap","selector":{"desc":"KELUAR DARI AKUN"},"ok":true,"result":true}
+{"at":"2026-10-18T19:25:28.177Z","action":"tap","selector":{"desc":"Keluar"},"ok":true,"result":true}
+{"at":"2026-10-18T19:25:28.476Z","action":"info","selector":{"desc":"MASUK"},"ok":true,"result":{"clazz":"android.widget.Button","desc":"MASUK","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":61,"y":1388,"width":959,"height":143},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:25:29.061Z","action":"tap","selector":{"desc":"Laboran Demo"},"ok":true,"result":true}
+{"at":"2026-10-18T19:25:30.341Z","action":"tap","selector":{"desc":"MASUK"},"ok":true,"result":true}
+{"at":"2026-10-18T19:25:31.400Z","action":"info","selector":{"desc":"Dashboard Laboran"},"ok":true,"result":{"clazz":"android.view.View","desc":"Dashboard Laboran","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":242,"width":541,"height":77},"checkable":false,"checked":false,"clickable":false,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:25:46.450Z","action":"info","selector":{"desc":"Setujui"},"ok":true,"result":{"clazz":"android.widget.Button","desc":"Setujui","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":746,"y":1245,"width":254,"height":132},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:25:47.012Z","action":"tap","selector":{"desc":"Setujui"},"ok":true,"result":true}
+{"at":"2026-10-18T19:25:47.751Z","action":"tap","selector":{"desc":"Inventaris\nTab 2 of 5"},"ok":true,"result":true}
+{"at":"2026-10-18T19:25:48.028Z","action":"info","selector":{"desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 1"},"ok":true,"result":{"clazz":"android.view.View","desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 1","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":759,"width":992,"height":357},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:25:48.585Z","action":"tap","selector":{"desc":"Riwayat\nTab 4 of 5"},"ok":true,"result":true}
+{"at":"2026-10-18T19:25:48.858Z","action":"info","selector":{"descRegex":"Proyektor Demo[\\s\\S]*APPROVED"},"ok":true,"result":{"clazz":"android.view.View","desc":"Proyektor Demo - Peminjam: Mahasiswa Demo\n19/10/2026 - 19/10/2026\nAPPROVED","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":401,"width":992,"height":267},"checkable":false,"checked":false,"clickable":false,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:26:14.351Z","action":"screenshot","ok":true,"result":{"filename":"D:\\1Kuliah\\Joki\\LabInventory\\lab_inventory\\docs\\evidence\\device\\03-admin-approved.png"}}
+{"at":"2026-10-18T19:26:14.905Z","action":"tap","selector":{"desc":"Dashboard\nTab 1 of 5"},"ok":true,"result":true}
+{"at":"2026-10-18T19:26:15.624Z","action":"tap","selector":{"desc":"Pengembalian"},"ok":true,"result":true}
+{"at":"2026-10-18T19:26:16.339Z","action":"info","selector":{"desc":"Normal / Baik"},"ok":true,"result":{"clazz":"android.widget.RadioButton","desc":"Normal / Baik","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":1512,"width":992,"height":154},"checkable":true,"checked":true,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:26:17.199Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:26:17.931Z","action":"tap","selector":{"desc":"KONFIRMASI KEMBALI"},"ok":true,"result":true}
+{"at":"2026-10-18T19:26:19.118Z","action":"tap","selector":{"desc":"Riwayat\nTab 4 of 5"},"ok":true,"result":true}
+{"at":"2026-10-18T19:26:19.359Z","action":"info","selector":{"descRegex":"Proyektor Demo[\\s\\S]*RETURNED"},"ok":true,"result":{"clazz":"android.view.View","desc":"Proyektor Demo - Peminjam: Mahasiswa Demo\n19/10/2026 - 19/10/2026\nRETURNED","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":401,"width":992,"height":267},"checkable":false,"checked":false,"clickable":false,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:26:19.902Z","action":"tap","selector":{"desc":"Inventaris\nTab 2 of 5"},"ok":true,"result":true}
+{"at":"2026-10-18T19:26:20.184Z","action":"info","selector":{"desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 2"},"ok":true,"result":{"clazz":"android.view.View","desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 2","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":759,"width":992,"height":357},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:26:55.634Z","action":"tap","selector":{"desc":"Profil\nTab 5 of 5"},"ok":true,"result":true}
+{"at":"2026-10-18T19:26:56.572Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:26:57.334Z","action":"tap","selector":{"desc":"KELUAR DARI AKUN"},"ok":true,"result":true}
+{"at":"2026-10-18T19:26:58.132Z","action":"tap","selector":{"desc":"Keluar"},"ok":true,"result":true}
+{"at":"2026-10-18T19:26:58.846Z","action":"tap","selector":{"desc":"Mahasiswa Demo"},"ok":true,"result":true}
+{"at":"2026-10-18T19:26:59.500Z","action":"tap","selector":{"desc":"MASUK"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:00.905Z","action":"tap","selector":{"desc":"Inventaris\nTab 2 of 4"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:01.628Z","action":"tap","selector":{"desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 2"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:02.831Z","action":"tap","selector":{"desc":"AJUKAN PEMINJAMAN"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:04.825Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:27:05.547Z","action":"tap","selector":{"desc":"DD/MM/YYYY"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:06.631Z","action":"tap","selector":{"desc":"OK"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:07.485Z","action":"tap","selector":{"desc":"DD/MM/YYYY"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:08.580Z","action":"tap","selector":{"desc":"OK"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:11.184Z","action":"fill","selector":{"clazz":"android.widget.EditText"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:11.923Z","action":"press","ok":true,"result":true}
+{"at":"2026-10-18T19:27:13.856Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:27:14.563Z","action":"tap","selector":{"desc":"KIRIM / COBA LAGI"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:15.750Z","action":"tap","selector":{"desc":"Back"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:16.903Z","action":"tap","selector":{"desc":"Peminjaman\nTab 3 of 4"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:17.147Z","action":"info","selector":{"descRegex":"Proyektor Demo[\\s\\S]*PENDING"},"ok":true,"result":{"clazz":"android.view.View","desc":"Proyektor Demo (1 Unit)\n19/10/2026 - 19/10/2026\nPENDING","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":640,"width":992,"height":212},"checkable":false,"checked":false,"clickable":false,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:27:19.781Z","action":"screenshot","ok":true,"result":{"filename":"D:\\1Kuliah\\Joki\\LabInventory\\lab_inventory\\docs\\evidence\\device\\04-student-pending.png"}}
+{"at":"2026-10-18T19:27:48.649Z","action":"tap","selector":{"desc":"Inventaris\nTab 2 of 4"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:48.973Z","action":"info","selector":{"desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 2"},"ok":true,"result":{"clazz":"android.view.View","desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 2","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":759,"width":992,"height":357},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:27:49.522Z","action":"tap","selector":{"desc":"Profil\nTab 4 of 4"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:50.471Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:27:51.176Z","action":"tap","selector":{"desc":"KELUAR DARI AKUN"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:51.924Z","action":"tap","selector":{"desc":"Keluar"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:52.609Z","action":"tap","selector":{"desc":"Laboran Demo"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:53.282Z","action":"tap","selector":{"desc":"MASUK"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:54.530Z","action":"tap","selector":{"desc":"Tolak"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:55.242Z","action":"tap","selector":{"desc":"Riwayat\nTab 4 of 5"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:55.486Z","action":"info","selector":{"descRegex":"Proyektor Demo[\\s\\S]*REJECTED"},"ok":true,"result":{"clazz":"android.view.View","desc":"Proyektor Demo - Peminjam: Mahasiswa Demo\n19/10/2026 - 19/10/2026\nREJECTED","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":695,"width":992,"height":267},"checkable":false,"checked":false,"clickable":false,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:27:56.041Z","action":"tap","selector":{"desc":"Inventaris\nTab 2 of 5"},"ok":true,"result":true}
+{"at":"2026-10-18T19:27:56.317Z","action":"info","selector":{"desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 2"},"ok":true,"result":{"clazz":"android.view.View","desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 2","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":759,"width":992,"height":357},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:28:27.889Z","action":"tap","selector":{"desc":"Profil\nTab 5 of 5"},"ok":true,"result":true}
+{"at":"2026-10-18T19:28:28.843Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:28:29.542Z","action":"tap","selector":{"desc":"KELUAR DARI AKUN"},"ok":true,"result":true}
+{"at":"2026-10-18T19:28:30.316Z","action":"tap","selector":{"desc":"Keluar"},"ok":true,"result":true}
+{"at":"2026-10-18T19:28:31.142Z","action":"tap","selector":{"desc":"Mahasiswa Demo"},"ok":true,"result":true}
+{"at":"2026-10-18T19:28:31.800Z","action":"tap","selector":{"desc":"MASUK"},"ok":true,"result":true}
+{"at":"2026-10-18T19:28:33.062Z","action":"tap","selector":{"desc":"Inventaris\nTab 2 of 4"},"ok":true,"result":true}
+{"at":"2026-10-18T19:28:33.856Z","action":"tap","selector":{"desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 2"},"ok":true,"result":true}
+{"at":"2026-10-18T19:28:35.012Z","action":"tap","selector":{"desc":"AJUKAN PEMINJAMAN"},"ok":true,"result":true}
+{"at":"2026-10-18T19:28:36.478Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:28:37.219Z","action":"tap","selector":{"desc":"DD/MM/YYYY"},"ok":true,"result":true}
+{"at":"2026-10-18T19:28:38.745Z","action":"tap","selector":{"desc":"OK"},"ok":true,"result":true}
+{"at":"2026-10-18T19:28:39.620Z","action":"tap","selector":{"desc":"DD/MM/YYYY"},"ok":true,"result":true}
+{"at":"2026-10-18T19:28:40.643Z","action":"tap","selector":{"desc":"OK"},"ok":true,"result":true}
+{"at":"2026-10-18T19:28:43.193Z","action":"fill","selector":{"clazz":"android.widget.EditText"},"ok":true,"result":true}
+{"at":"2026-10-18T19:28:43.914Z","action":"press","ok":true,"result":true}
+{"at":"2026-10-18T19:28:45.721Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:28:45.964Z","action":"info","selector":{"desc":"KIRIM / COBA LAGI"},"ok":true,"result":{"clazz":"android.widget.Button","desc":"KIRIM / COBA LAGI","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":2143,"width":992,"height":83},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:28:48.717Z","action":"screenshot","ok":true,"result":{"filename":"D:\\1Kuliah\\Joki\\LabInventory\\lab_inventory\\docs\\evidence\\device\\05-form-safe-area-fixed.png"}}
+{"at":"2026-10-18T19:28:49.279Z","action":"tap","selector":{"desc":"KIRIM / COBA LAGI"},"ok":true,"result":true}
+{"at":"2026-10-18T19:28:50.411Z","action":"tap","selector":{"desc":"Back"},"ok":true,"result":true}
+{"at":"2026-10-18T19:28:51.569Z","action":"tap","selector":{"desc":"Peminjaman\nTab 3 of 4"},"ok":true,"result":true}
+{"at":"2026-10-18T19:28:51.808Z","action":"info","selector":{"descRegex":"Proyektor Demo[\\s\\S]*PENDING"},"ok":true,"result":{"clazz":"android.view.View","desc":"Proyektor Demo (1 Unit)\n19/10/2026 - 19/10/2026\nPENDING","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":880,"width":992,"height":211},"checkable":false,"checked":false,"clickable":false,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:29:12.569Z","action":"tap","selector":{"desc":"Profil\nTab 4 of 4"},"ok":true,"result":true}
+{"at":"2026-10-18T19:29:13.524Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:29:14.802Z","action":"tap","selector":{"desc":"KELUAR DARI AKUN"},"ok":true,"result":true}
+{"at":"2026-10-18T19:29:15.602Z","action":"tap","selector":{"desc":"Keluar"},"ok":true,"result":true}
+{"at":"2026-10-18T19:29:16.387Z","action":"tap","selector":{"desc":"Laboran Demo"},"ok":true,"result":true}
+{"at":"2026-10-18T19:29:17.075Z","action":"tap","selector":{"desc":"MASUK"},"ok":true,"result":true}
+{"at":"2026-10-18T19:29:18.925Z","action":"tap","selector":{"desc":"Setujui"},"ok":true,"result":true}
+{"at":"2026-10-18T19:29:19.787Z","action":"tap","selector":{"desc":"Inventaris\nTab 2 of 5"},"ok":true,"result":true}
+{"at":"2026-10-18T19:29:20.040Z","action":"info","selector":{"desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 1"},"ok":true,"result":{"clazz":"android.view.View","desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 1","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":759,"width":992,"height":357},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:29:20.607Z","action":"tap","selector":{"desc":"Dashboard\nTab 1 of 5"},"ok":true,"result":true}
+{"at":"2026-10-18T19:29:21.337Z","action":"tap","selector":{"desc":"Pengembalian"},"ok":true,"result":true}
+{"at":"2026-10-18T19:29:22.634Z","action":"tap","selector":{"desc":"Rusak / Perlu Perbaikan"},"ok":true,"result":true}
+{"at":"2026-10-18T19:29:23.371Z","action":"info","selector":{"desc":"Rusak / Perlu Perbaikan"},"ok":true,"result":{"clazz":"android.widget.RadioButton","desc":"Rusak / Perlu Perbaikan","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":1666,"width":992,"height":154},"checkable":true,"checked":true,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:29:24.223Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:29:27.675Z","action":"screenshot","ok":true,"result":{"filename":"D:\\1Kuliah\\Joki\\LabInventory\\lab_inventory\\docs\\evidence\\device\\06-damaged-return.png"}}
+{"at":"2026-10-18T19:29:28.244Z","action":"tap","selector":{"desc":"KONFIRMASI KEMBALI"},"ok":true,"result":true}
+{"at":"2026-10-18T19:29:29.400Z","action":"tap","selector":{"desc":"Inventaris\nTab 2 of 5"},"ok":true,"result":true}
+{"at":"2026-10-18T19:29:29.661Z","action":"info","selector":{"desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 1"},"ok":true,"result":{"clazz":"android.view.View","desc":"Proyektor Demo\nDEMO-001\nKategori: Elektronik\nStatus: Tersedia\nStok: 1","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":759,"width":992,"height":357},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:29:33.514Z","action":"screenshot","ok":true,"result":{"filename":"D:\\1Kuliah\\Joki\\LabInventory\\lab_inventory\\docs\\evidence\\device\\07-stock-after-damage.png"}}
+{"at":"2026-10-18T19:30:43.940Z","action":"fill","selector":{"clazz":"android.widget.EditText"},"ok":true,"result":true}
+{"at":"2026-10-18T19:30:44.300Z","action":"info","selector":{"desc":"Laptop Demo\nDEMO-002\nKategori: Komputer\nStatus: Tersedia\nStok: 3"},"ok":true,"result":{"clazz":"android.view.View","desc":"Laptop Demo\nDEMO-002\nKategori: Komputer\nStatus: Tersedia\nStok: 3","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":759,"width":992,"height":357},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:30:44.871Z","action":"wait","selector":{"descRegex":"Proyektor Demo[\\s\\S]*Stok: 1"},"ok":false,"error":"androidDevice.wait: java.lang.RuntimeException: Timed out waiting for selector"}
+{"at":"2026-10-18T19:30:45.774Z","action":"tap","selector":{"desc":"Laptop Demo\nDEMO-002\nKategori: Komputer\nStatus: Tersedia\nStok: 3"},"ok":true,"result":true}
+{"at":"2026-10-18T19:30:46.895Z","action":"info","selector":{"desc":"Ilustrasi Laptop Demo"},"ok":true,"result":{"clazz":"android.widget.ImageView","desc":"Ilustrasi Laptop Demo","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":80,"y":437,"width":920,"height":520},"checkable":false,"checked":false,"clickable":false,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:30:54.478Z","action":"screenshot","ok":true,"result":{"filename":"D:\\1Kuliah\\Joki\\LabInventory\\lab_inventory\\docs\\evidence\\device\\08-laptop-detail.png"}}
+{"at":"2026-10-18T19:30:55.024Z","action":"tap","selector":{"desc":"Back"},"ok":true,"result":true}
+{"at":"2026-10-18T19:30:57.240Z","action":"fill","selector":{"clazz":"android.widget.EditText"},"ok":true,"result":true}
+{"at":"2026-10-18T19:30:57.997Z","action":"press","ok":true,"result":true}
+{"at":"2026-10-18T19:30:59.520Z","action":"tap","selector":{"desc":"Dashboard\nTab 1 of 5"},"ok":true,"result":true}
+{"at":"2026-10-18T19:31:00.237Z","action":"tap","selector":{"desc":"Tambah Barang"},"ok":true,"result":true}
+{"at":"2026-10-18T19:31:01.710Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:31:02.411Z","action":"tap","selector":{"desc":"SIMPAN DATA"},"ok":true,"result":true}
+{"at":"2026-10-18T19:31:02.717Z","action":"info","selector":{"desc":"Isi nama barang dan stok yang valid (minimal 0)."},"ok":true,"result":{"clazz":"android.view.View","desc":"Isi nama barang dan stok yang valid (minimal 0).","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":0,"y":2068,"width":1080,"height":158},"checkable":false,"checked":false,"clickable":false,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":true,"selected":false}}
+{"at":"2026-10-18T19:31:03.567Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:31:06.062Z","action":"fill","selector":{"clazz":"android.widget.EditText","text":""},"ok":true,"result":true}
+{"at":"2026-10-18T19:31:08.237Z","action":"fill","selector":{"clazz":"android.widget.EditText","text":""},"ok":true,"result":true}
+{"at":"2026-10-18T19:31:08.825Z","action":"press","ok":true,"result":true}
+{"at":"2026-10-18T19:31:10.556Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:31:11.233Z","action":"tap","selector":{"desc":"SIMPAN DATA"},"ok":true,"result":true}
+{"at":"2026-10-18T19:31:12.388Z","action":"tap","selector":{"desc":"Inventaris\nTab 2 of 5"},"ok":true,"result":true}
+{"at":"2026-10-18T19:31:12.655Z","action":"info","selector":{"descRegex":"USB Hub Uji Android[\\s\\S]*Stok: 1"},"ok":true,"result":{"clazz":"android.view.View","desc":"USB Hub Uji Android\nDEMO-3\nKategori: Elektronik\nStatus: Tersedia\nStok: 1","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":1529,"width":992,"height":357},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:31:16.677Z","action":"screenshot","ok":true,"result":{"filename":"D:\\1Kuliah\\Joki\\LabInventory\\lab_inventory\\docs\\evidence\\device\\09-admin-created-item.png"}}
+{"at":"2026-10-18T19:32:08.563Z","action":"fill","selector":{"clazz":"android.widget.EditText"},"ok":true,"result":true}
+{"at":"2026-10-18T19:32:09.115Z","action":"tap","selector":{"clazz":"android.widget.EditText"},"ok":true,"result":true}
+{"at":"2026-10-18T19:32:11.207Z","action":"type","ok":true,"result":true}
+{"at":"2026-10-18T19:32:21.597Z","action":"info","selector":{"clazz":"android.widget.EditText","text":"Laptop"},"ok":false,"error":"androidDevice.info: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String androidx.test.uiautomator.UiObject2.getClassName()' on a null object reference"}
+{"at":"2026-10-18T19:32:30.770Z","action":"screenshot","ok":true,"result":{"filename":"D:\\1Kuliah\\Joki\\LabInventory\\lab_inventory\\docs\\evidence\\device\\10-catalog-search.png"}}
+{"at":"2026-10-18T19:32:31.851Z","action":"fill","selector":{"clazz":"android.widget.EditText"},"ok":true,"result":true}
+{"at":"2026-10-18T19:32:32.587Z","action":"press","ok":true,"result":true}
+{"at":"2026-10-18T19:32:34.015Z","action":"tap","selector":{"desc":"Riwayat\nTab 4 of 5"},"ok":true,"result":true}
+{"at":"2026-10-18T19:32:37.645Z","action":"screenshot","ok":true,"result":{"filename":"D:\\1Kuliah\\Joki\\LabInventory\\lab_inventory\\docs\\evidence\\device\\11-final-history.png"}}
+{"at":"2026-10-18T19:32:38.193Z","action":"tap","selector":{"desc":"Profil\nTab 5 of 5"},"ok":true,"result":true}
+{"at":"2026-10-18T19:32:39.431Z","action":"scroll","ok":true,"result":true}
+{"at":"2026-10-18T19:32:40.123Z","action":"tap","selector":{"desc":"KELUAR DARI AKUN"},"ok":true,"result":true}
+{"at":"2026-10-18T19:32:40.913Z","action":"tap","selector":{"desc":"Keluar"},"ok":true,"result":true}
+{"at":"2026-10-18T19:32:41.129Z","action":"info","selector":{"desc":"MASUK"},"ok":true,"result":{"clazz":"android.widget.Button","desc":"MASUK","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":61,"y":1388,"width":959,"height":143},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:32:44.194Z","action":"screenshot","ok":true,"result":{"filename":"D:\\1Kuliah\\Joki\\LabInventory\\lab_inventory\\docs\\evidence\\device\\01-login.png"}}
+{"at":"2026-10-18T19:34:04.698Z","action":"tap","selector":{"desc":"Mahasiswa Demo"},"ok":true,"result":true}
+{"at":"2026-10-18T19:34:05.335Z","action":"tap","selector":{"desc":"MASUK"},"ok":true,"result":true}
+{"at":"2026-10-18T19:34:06.605Z","action":"tap","selector":{"desc":"Inventaris\nTab 2 of 4"},"ok":true,"result":true}
+{"at":"2026-10-18T19:34:07.366Z","action":"tap","selector":{"clazz":"android.widget.EditText"},"ok":true,"result":true}
+{"at":"2026-10-18T19:34:09.703Z","action":"type","ok":true,"result":true}
+{"at":"2026-10-18T19:34:11.204Z","action":"press","ok":true,"result":true}
+{"at":"2026-10-18T19:34:12.057Z","action":"info","selector":{"clazz":"android.widget.EditText","textRegex":"[Ll]aptop"},"ok":true,"result":{"clazz":"android.widget.EditText","desc":"","res":"","pkg":"com.example.lab_inventory.demo","text":"laptop","bounds":{"x":44,"y":385,"width":992,"height":143},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":true,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:34:12.121Z","action":"info","selector":{"desc":"Laptop Demo\nDEMO-002\nKategori: Komputer\nStatus: Tersedia\nStok: 3"},"ok":true,"result":{"clazz":"android.view.View","desc":"Laptop Demo\nDEMO-002\nKategori: Komputer\nStatus: Tersedia\nStok: 3","res":"","pkg":"com.example.lab_inventory.demo","text":"","bounds":{"x":44,"y":759,"width":992,"height":357},"checkable":false,"checked":false,"clickable":true,"enabled":true,"focusable":true,"focused":false,"longClickable":false,"scrollable":false,"selected":false}}
+{"at":"2026-10-18T19:34:14.939Z","action":"screenshot","ok":true,"result":{"filename":"D:\\1Kuliah\\Joki\\LabInventory\\lab_inventory\\docs\\evidence\\device\\10-catalog-search.png"}}
+{"at":"2026-10-18T19:34:16.695Z","action":"fill","selector":{"clazz":"android.widget.EditText"},"ok":true,"result":true}
+{"at":"2026-10-18T19:34:17.454Z","action":"press","ok":true,"result":true}
+{"at":"2026-10-18T19:34:18.770Z","action":"tap","selector":{"desc":"Peminjaman\nTab 3 of 4"},"ok":true,"result":true}
+{"at":"2026-10-18T19:34:21.495Z","action":"screenshot","ok":true,"result":{"filename":"D:\\1Kuliah\\Joki\\LabInventory\\lab_inventory\\docs\\evidence\\device\\12-student-final-history.png"}}
+{"at":"2026-10-18T19:38:34.607Z","action":"quit","ok":true}

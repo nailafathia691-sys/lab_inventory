@@ -1,346 +1,262 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-// ============================================================
-// KONFIGURASI SUPABASE
-// ============================================================
-const supabaseUrl = 'https://ykbabgphvavzojrsjefh.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrYmFiZ3BodmF2em9qcnNqZWZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyNDAwNjcsImV4cCI6MjEwNzgxNjA2N30.0NqfgRy29sBWviV-Uu-Mq5rK4vi5QzJllZFFB6NUpnY';
+import 'auth/session_controller.dart';
+import 'core/app_config.dart';
+import 'core/config_loader.dart';
+import 'core/failures.dart';
+import 'core/models.dart';
+import 'core/runtime.dart';
+import 'data/inventory_repository.dart';
+import 'demo/demo_backend.dart';
+import 'presentation/inventory_image.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await Supabase.initialize(
-    url: supabaseUrl,
-    anonKey: supabaseAnonKey,
-  );
-
-  runApp(const LabInventoryApp());
-}
-
-// ============================================================
-// SUPABASE CLIENT
-// ============================================================
-final supabase = Supabase.instance.client;
-
-// ============================================================
-// APP
-// ============================================================
-
-class LabInventoryApp extends StatelessWidget {
-  const LabInventoryApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'LabInventory',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 14,
-            vertical: 14,
+  final ProductionConfig config;
+  try {
+    config = await loadProductionConfig();
+  } on FormatException {
+    runApp(
+      const MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: Text(
+                'Konfigurasi server belum lengkap. Hubungi pengelola aplikasi.',
+              ),
+            ),
           ),
         ),
       ),
-      home: const SplashScreen(),
+    );
+    return;
+  }
+  try {
+    await Supabase.initialize(
+      url: config.url,
+      publishableKey: config.publishableKey,
+    );
+    sessionController = SessionController(
+      SupabaseAuthGateway(Supabase.instance.client),
+    );
+    inventoryRepository = SupabaseInventoryRepository(
+      Supabase.instance.client,
+      sessionController,
+      PreferencesRequestIdStore(await SharedPreferences.getInstance()),
+    );
+    runApp(const LabInventoryApp());
+    unawaited(sessionController.start());
+  } catch (_) {
+    runApp(
+      const MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Text(
+              'Aplikasi belum dapat dimulai. Periksa konfigurasi dan penyimpanan perangkat, lalu buka kembali.',
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
 
-// ============================================================
-// MODEL DATA
-// ============================================================
-
-class User {
-  final String id;
-  final String email;
-  final String nama;
-  final String npm;
-  final String role;
-
-  const User({
-    required this.id,
-    required this.email,
-    required this.nama,
-    required this.npm,
-    required this.role,
-  });
-
-  bool get isAdmin => role == 'admin';
+Future<void> runDemo() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  isDemo = true;
+  sessionController = SessionController(DemoAuthGateway());
+  inventoryRepository = DemoInventoryRepository(sessionController);
+  await sessionController.start();
+  runApp(const LabInventoryApp());
 }
 
-class InventoryItem {
-  final String id;
-  final String name;
-  final String code;
-  final String category;
-  final String condition;
-  final int stock;
-  final String location;
-
-  const InventoryItem({
-    required this.id,
-    required this.name,
-    required this.code,
-    required this.category,
-    required this.condition,
-    required this.stock,
-    required this.location,
-  });
-
-  // Create from Supabase JSON response
-  factory InventoryItem.fromJson(Map<String, dynamic> json) {
-    return InventoryItem(
-      id: json['id'] ?? '',
-      name: json['nama_barang'] ?? '',
-      code: json['kode_barang'] ?? '',
-      category: json['kategori'] ?? '',
-      condition: json['kondisi'] ?? '',
-      stock: int.tryParse(json['stok']?.toString() ?? '0') ?? 0,
-      location: json['lokasi'] ?? '',
-    );
-  }
+class LabInventoryApp extends StatelessWidget {
+  const LabInventoryApp({super.key});
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+    debugShowCheckedModeBanner: false,
+    title: isDemo ? 'LabInventory Demo' : 'LabInventory',
+    theme: ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+      inputDecorationTheme: InputDecorationTheme(
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 14,
+        ),
+      ),
+    ),
+    builder: (context, child) => ColoredBox(
+      color: Theme.of(context).colorScheme.surface,
+      child: SafeArea(
+        top: false,
+        child: isDemo
+            ? Column(
+                children: [
+                  Material(
+                    color: Colors.amber.shade200,
+                    child: const SafeArea(
+                      bottom: false,
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Text(
+                            'DEMO LOKAL • Data latihan, hilang saat aplikasi ditutup',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: MediaQuery.removePadding(
+                      context: context,
+                      removeTop: true,
+                      child: child!,
+                    ),
+                  ),
+                ],
+              )
+            : child!,
+      ),
+    ),
+    home: const SplashScreen(),
+  );
 }
 
-class Borrowing {
-  final String id;
-  final String userId;
-  final String itemId;
-  final String namaPeminjam;
-  final String namaBarang;
-  final int jumlah;
-  final DateTime tglPinjam;
-  final DateTime? tglKembali;
-  final String keperluan;
-  final String status;
-  final String? catatanKondisi;
-  final String? updatedBy;
-
-  const Borrowing({
-    required this.id,
-    required this.userId,
-    required this.itemId,
-    required this.namaPeminjam,
-    required this.namaBarang,
-    required this.jumlah,
-    required this.tglPinjam,
-    this.tglKembali,
-    required this.keperluan,
-    required this.status,
-    this.catatanKondisi,
-    this.updatedBy,
-  });
-
-  factory Borrowing.fromJson(Map<String, dynamic> json) {
-    return Borrowing(
-      id: json['id'] ?? '',
-      userId: json['user_id'] ?? '',
-      itemId: json['item_id'] ?? '',
-      namaPeminjam: json['nama_peminjam'] ?? '',
-      namaBarang: json['nama_barang'] ?? '',
-      jumlah: int.tryParse(json['jumlah']?.toString() ?? '0') ?? 0,
-      tglPinjam: DateTime.tryParse(json['tgl_pinjam'] ?? '') ?? DateTime.now(),
-      tglKembali: json['tgl_kembali'] != null
-          ? DateTime.tryParse(json['tgl_kembali'])
-          : null,
-      keperluan: json['keperluan'] ?? '',
-      status: json['status'] ?? 'pending',
-      catatanKondisi: json['catatan_kondisi'],
-      updatedBy: json['updated_by'],
-    );
-  }
-
-  bool get isPending => status == 'pending';
-  bool get isApproved => status == 'approved';
-  bool get isRejected => status == 'rejected';
-  bool get isReturned => status == 'returned';
-}
-
-// ============================================================
-// SAMPLE DATA - Temporary sampai konek Supabase
-// TODO: Ganti dengan fetch dari Supabase
-// ============================================================
-// SUPABASE SERVICES (REALTIME CLOUD DATABASE)
-// ============================================================
-
-class InventoryService {
-  // Data barang aktual laboratorium PTI FKIP Unila
-  static const List<InventoryItem> _dbDefaultItems = [
-    InventoryItem(
-      id: '0fe110a1-828f-4d1a-9106-e44107b944a3',
-      name: 'Proyektor Epson',
-      code: 'INV-ELK-0012',
-      category: 'Elektronik',
-      condition: 'Sangat Baik',
-      stock: 2,
-      location: 'Lemari A - Rak 2',
-    ),
-    InventoryItem(
-      id: 'd5812ce4-dee6-45fa-aa8a-51e0a95d952e',
-      name: 'Laptop Lenovo',
-      code: 'INV-CMP-0008',
-      category: 'Komputer',
-      condition: 'Baik',
-      stock: 4,
-      location: 'Lemari B - Rak 1',
-    ),
-    InventoryItem(
-      id: 'b4eb9973-96a3-4422-a20c-fef72138faef',
-      name: 'Kabel HDMI',
-      code: 'INV-AKS-0021',
-      category: 'Aksesoris',
-      condition: 'Baik',
-      stock: 6,
-      location: 'Lemari C - Rak 3',
-    ),
-    InventoryItem(
-      id: '235e9ed8-b705-424c-9a6b-6575589cdb69',
-      name: 'Speaker Aktif 15"',
-      code: 'INV-ELK-0017',
-      category: 'Elektronik',
-      condition: 'Baik',
-      stock: 3,
-      location: 'Lemari A - Rak 4',
-    ),
-  ];
-
-  // Ambil data barang dari tabel items di Supabase dengan timeout
-  static Future<List<InventoryItem>> getItems() async {
-    try {
-      final response = await supabase
-          .from('items')
-          .select()
-          .order('nama_barang', ascending: true)
-          .timeout(const Duration(seconds: 4));
-      final list = (response as List)
-          .map((json) => InventoryItem.fromJson(json))
-          .toList();
-      if (list.isNotEmpty) return list;
-    } catch (e) {
-      debugPrint('Supabase getItems: $e');
-    }
-    // Jika tabel Supabase kosong atau terhalang RLS, gunakan daftar barang aktual lab
-    return _dbDefaultItems;
-  }
-
-  // Tambah barang baru langsung ke tabel items Supabase
-  static Future<bool> addItem({
-    required String name,
-    required String code,
-    required String category,
-    required String condition,
-    required int stock,
-    required String location,
-  }) async {
-    try {
-      await supabase.from('items').insert({
-        'nama_barang': name,
-        'kode_barang': code,
-        'kategori': category,
-        'kondisi': condition,
-        'stok': stock,
-        'lokasi': location,
-      }).timeout(const Duration(seconds: 4));
-      return true;
-    } catch (e) {
-      debugPrint('Error addItem Supabase: $e');
-      return false;
-    }
-  }
-
-  // Ambil data peminjaman dari tabel borrowings Supabase dengan timeout
-  static Future<List<Borrowing>> getBorrowings({
-    String? status,
-    String? userId,
-  }) async {
-    try {
-      var query = supabase.from('borrowings').select();
-      if (status != null) {
-        query = query.eq('status', status);
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: sessionController,
+    builder: (context, _) {
+      switch (sessionController.status) {
+        case SessionStatus.loading:
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        case SessionStatus.signedOut:
+          return const LoginScreen();
+        case SessionStatus.failed:
+          return Scaffold(
+            body: LoadFailureView(
+              message: sessionController.error ?? 'Profil tidak dapat dimuat.',
+              onRetry: sessionController.refresh,
+              secondary: TextButton(
+                onPressed: () => signOut(context),
+                child: const Text('Keluar dari sesi'),
+              ),
+            ),
+          );
+        case SessionStatus.signedIn:
+          final profile = sessionController.requireProfile();
+          // Removing this nested Navigator disposes every protected route when
+          // a session expires, signs out, or its server profile changes.
+          return ProtectedShell(
+            key: ValueKey('${profile.id}:${profile.role}'),
+            isAdmin: profile.isAdmin,
+          );
       }
-      if (userId != null) {
-        query = query.eq('user_id', userId);
-      }
-      final response = await query
-          .order('created_at', ascending: false)
-          .timeout(const Duration(seconds: 4));
-      final list = (response as List)
-          .map((json) => Borrowing.fromJson(json))
-          .toList();
-      return list;
-    } catch (e) {
-      debugPrint('Error getBorrowings Supabase: $e');
-      return [];
-    }
-  }
+    },
+  );
+}
 
-  // Buat pengajuan peminjaman baru langsung ke Supabase PostgreSQL
-  static Future<String?> createBorrowing({
-    required String itemId,
-    required String namaBarang,
-    required String namaPeminjam,
-    required int jumlah,
-    required DateTime tglPinjam,
-    required DateTime tglKembali,
-    required String keperluan,
-  }) async {
-    final user = supabase.auth.currentUser;
-    final userId = user?.id ?? '00000000-0000-0000-0000-000000000000';
+class ProtectedShell extends StatefulWidget {
+  const ProtectedShell({super.key, required this.isAdmin});
+  final bool isAdmin;
+  @override
+  State<ProtectedShell> createState() => _ProtectedShellState();
+}
 
-    try {
-      await supabase.from('borrowings').insert({
-        'user_id': userId,
-        'item_id': itemId,
-        'nama_peminjam': namaPeminjam,
-        'nama_barang': namaBarang,
-        'jumlah': jumlah,
-        'tgl_pinjam': tglPinjam.toIso8601String(),
-        'tgl_kembali': tglKembali.toIso8601String(),
-        'keperluan': keperluan,
-        'status': 'pending',
-      }).timeout(const Duration(seconds: 5));
-      return null; // Berhasil masuk ke Supabase
-    } catch (e) {
-      debugPrint('Error createBorrowing Supabase: $e');
-      return e.toString();
-    }
-  }
+class _ProtectedShellState extends State<ProtectedShell> {
+  final navigatorKey = GlobalKey<NavigatorState>();
+  @override
+  Widget build(BuildContext context) => NavigatorPopHandler<Object?>(
+    onPopWithResult: (result) => navigatorKey.currentState!.pop(result),
+    child: Column(
+      children: [
+        if (!sessionController.requireProfile().transactionsEnabled)
+          Material(
+            color: Colors.amber.shade100,
+            child: const SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: EdgeInsets.all(8),
+                child: Text(
+                  'Mode baca: stok lama belum direkonsiliasi. Transaksi belum aktif.',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
+        Expanded(
+          child: Navigator(
+            key: navigatorKey,
+            onGenerateRoute: (_) => MaterialPageRoute(
+              builder: (_) => widget.isAdmin
+                  ? const AdminMainScreen()
+                  : const MahasiswaMainScreen(),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
-  // Update status peminjaman (approve, reject, returned) langsung di Supabase
-  static Future<bool> updateBorrowingStatus({
-    required String id,
-    required String status,
-    String? notes,
-  }) async {
-    try {
-      final updateData = <String, dynamic>{
-        'status': status,
-      };
-      if (notes != null) updateData['catatan_kondisi'] = notes;
-      await supabase
-          .from('borrowings')
-          .update(updateData)
-          .eq('id', id)
-          .timeout(const Duration(seconds: 5));
-      return true;
-    } catch (e) {
-      debugPrint('Error updateBorrowingStatus Supabase: $e');
-      return false;
+Future<void> signOut(BuildContext context) async {
+  final messenger = ScaffoldMessenger.of(context);
+  try {
+    await sessionController.signOut();
+  } catch (error) {
+    if (messenger.mounted) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(appFailure(error).message)),
+      );
     }
   }
 }
 
-// ============================================================
-// SPLASH SCREEN
-// ============================================================
+class LoadFailureView extends StatelessWidget {
+  const LoadFailureView({
+    super.key,
+    required this.message,
+    required this.onRetry,
+    this.secondary,
+  });
+  final String message;
+  final Future<void> Function() onRetry;
+  final Widget? secondary;
+  @override
+  Widget build(BuildContext context) => Center(
+    child: SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.cloud_off_outlined, size: 40),
+            const SizedBox(height: 12),
+            Text(message, textAlign: TextAlign.center),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: () => onRetry(),
+              child: const Text('Coba lagi'),
+            ),
+            ?secondary,
+          ],
+        ),
+      ),
+    ),
+  );
+}
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -363,17 +279,12 @@ class _SplashScreenState extends State<SplashScreen>
       duration: const Duration(milliseconds: 1200),
     );
 
-    _fadeAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeIn,
-    );
+    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
 
-    _scaleAnimation = Tween<double>(begin: 0.85, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOutBack,
-      ),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.85,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
 
     _controller.forward();
 
@@ -384,10 +295,8 @@ class _SplashScreenState extends State<SplashScreen>
         context,
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 700),
-          pageBuilder: (_, animation, secondaryAnimation) => FadeTransition(
-            opacity: animation,
-            child: const LoginScreen(),
-          ),
+          pageBuilder: (_, animation, secondaryAnimation) =>
+              FadeTransition(opacity: animation, child: const AuthGate()),
         ),
       );
     });
@@ -438,7 +347,7 @@ class _SplashScreenState extends State<SplashScreen>
                           borderRadius: BorderRadius.circular(28),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.25),
+                              color: Colors.black.withValues(alpha: 0.25),
                               blurRadius: 25,
                               offset: const Offset(0, 10),
                             ),
@@ -466,10 +375,10 @@ class _SplashScreenState extends State<SplashScreen>
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.12),
+                          color: Colors.white.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.22),
+                            color: Colors.white.withValues(alpha: 0.22),
                           ),
                         ),
                         child: const Text(
@@ -512,7 +421,7 @@ class _SplashScreenState extends State<SplashScreen>
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1.5,
-                          color: Colors.white.withOpacity(0.75),
+                          color: Colors.white.withValues(alpha: 0.75),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -520,7 +429,7 @@ class _SplashScreenState extends State<SplashScreen>
                         'v1.0.0',
                         style: TextStyle(
                           fontSize: 10,
-                          color: Colors.white.withOpacity(0.4),
+                          color: Colors.white.withValues(alpha: 0.4),
                         ),
                       ),
                     ],
@@ -563,103 +472,27 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> masuk() async {
+    if (isLoading) return;
     final email = emailController.text.trim();
     final password = passwordController.text;
-
-    if (email.isEmpty || password.isEmpty) {
-      setState(() => errorMessage = 'Email dan password harus diisi');
+    if (!isDemo && (email.isEmpty || password.isEmpty)) {
+      setState(() => errorMessage = 'Email dan password harus diisi.');
       return;
     }
-
     setState(() {
       isLoading = true;
       errorMessage = null;
     });
-
     try {
-      final response = await supabase.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
-
-      if (response.user == null) {
-        setState(() {
-          errorMessage = 'Login gagal';
-          isLoading = false;
-        });
-        return;
+      if (isDemo) {
+        (sessionController.gateway as DemoAuthGateway).admin =
+            selectedRole == 'Admin';
       }
-
-      if (!mounted) return;
-
-      final isAdminEmail = email.toLowerCase() == 'admin@lab.com';
-      final isStudentEmail = email.toLowerCase() == 'tes@1.com';
-      final isFinalAdmin =
-          isAdminEmail || (!isStudentEmail && selectedRole == 'Admin');
-
-      if (isFinalAdmin) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const AdminMainScreen()),
-        );
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const MahasiswaMainScreen()),
-        );
-      }
-    } on AuthException catch (e) {
-      final isAdminTest =
-          email.toLowerCase() == 'admin@lab.com' && password == 'admin123';
-      final isStudentTest =
-          email.toLowerCase() == 'tes@1.com' && password == '123456';
-
-      if (isAdminTest || isStudentTest) {
-        if (!mounted) return;
-        if (isAdminTest) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const AdminMainScreen()),
-          );
-        } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const MahasiswaMainScreen()),
-          );
-        }
-        return;
-      }
-
-      setState(() {
-        errorMessage = e.message;
-        isLoading = false;
-      });
-    } catch (e) {
-      final isAdminTest =
-          email.toLowerCase() == 'admin@lab.com' && password == 'admin123';
-      final isStudentTest =
-          email.toLowerCase() == 'tes@1.com' && password == '123456';
-
-      if (isAdminTest || isStudentTest) {
-        if (!mounted) return;
-        if (isAdminTest) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const AdminMainScreen()),
-          );
-        } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const MahasiswaMainScreen()),
-          );
-        }
-        return;
-      }
-
-      setState(() {
-        errorMessage = 'Terjadi kesalahan: $e';
-        isLoading = false;
-      });
+      await sessionController.signIn(email, password);
+    } catch (error) {
+      if (mounted) setState(() => errorMessage = appFailure(error).message);
+    } finally {
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
@@ -676,10 +509,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const Center(
                 child: Text(
                   'LabInventory',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(height: 22),
@@ -696,74 +526,78 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 25),
 
-              const Text(
-                'Email',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  hintText: 'Input email...',
-                  prefixIcon: Icon(Icons.email_outlined),
+              if (!isDemo)
+                const Text(
+                  'Email',
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-              ),
-
-              const SizedBox(height: 18),
-
-              const Text(
-                'Password',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
               const SizedBox(height: 8),
-              TextField(
-                controller: passwordController,
-                obscureText: !passwordVisible,
-                decoration: InputDecoration(
-                  hintText: 'Input password...',
-                  prefixIcon: const Icon(Icons.lock_outline),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      passwordVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        passwordVisible = !passwordVisible;
-                      });
-                    },
+              if (!isDemo) ...[
+                TextField(
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    hintText: 'Input email...',
+                    prefixIcon: Icon(Icons.email_outlined),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 18),
 
-              const Text(
-                'Masuk Sebagai:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
+                const Text(
+                  'Password',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: passwordController,
+                  obscureText: !passwordVisible,
+                  decoration: InputDecoration(
+                    hintText: 'Input password...',
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        passwordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          passwordVisible = !passwordVisible;
+                        });
+                      },
+                    ),
+                  ),
+                ),
 
-              RadioListTile<String>(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Mahasiswa'),
-                value: 'Mahasiswa',
-                groupValue: selectedRole,
-                onChanged: (value) {
-                  setState(() => selectedRole = value!);
-                },
-              ),
-              RadioListTile<String>(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Admin / Laboran'),
-                value: 'Admin',
-                groupValue: selectedRole,
-                onChanged: (value) {
-                  setState(() => selectedRole = value!);
-                },
-              ),
+                const SizedBox(height: 20),
+              ],
+              if (isDemo) ...[
+                const Text(
+                  'Peran untuk latihan:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                RadioGroup<String>(
+                  groupValue: selectedRole,
+                  onChanged: (value) => setState(() => selectedRole = value!),
+                  child: const Column(
+                    children: [
+                      RadioListTile<String>(
+                        title: Text('Mahasiswa Demo'),
+                        value: 'Mahasiswa',
+                      ),
+                      RadioListTile<String>(
+                        title: Text('Laboran Demo'),
+                        value: 'Admin',
+                      ),
+                    ],
+                  ),
+                ),
+              ] else
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 16),
+                  child: Text('Hak akses mengikuti akun yang terdaftar.'),
+                ),
 
               if (errorMessage != null) ...[
                 Container(
@@ -776,14 +610,19 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.error_outline,
-                          color: Colors.red.shade700, size: 20),
+                      Icon(
+                        Icons.error_outline,
+                        color: Colors.red.shade700,
+                        size: 20,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           errorMessage!,
                           style: TextStyle(
-                              color: Colors.red.shade700, fontSize: 13),
+                            color: Colors.red.shade700,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                     ],
@@ -816,30 +655,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-
-              Center(
-                child: TextButton.icon(
-                  onPressed: () {
-                    if (selectedRole == 'Mahasiswa') {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const MahasiswaMainScreen(),
-                        ),
-                      );
-                    } else {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const AdminMainScreen(),
-                        ),
-                      );
-                    }
-                  },
-                  icon: const Icon(Icons.play_circle_outline, size: 18),
-                  label: const Text('Masuk Mode Demo (Tanpa Akun)'),
-                ),
-              ),
             ],
           ),
         ),
@@ -855,17 +670,11 @@ class _LoginScreenState extends State<LoginScreen> {
 class LabDrawer extends StatelessWidget {
   final bool isAdmin;
 
-  const LabDrawer({
-    super.key,
-    required this.isAdmin,
-  });
+  const LabDrawer({super.key, required this.isAdmin});
 
   void openPage(BuildContext context, Widget page) {
     Navigator.pop(context);
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => page),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (_) => page));
   }
 
   @override
@@ -875,43 +684,38 @@ class LabDrawer extends StatelessWidget {
         child: Column(
           children: [
             Container(
-  width: double.infinity,
-  padding: const EdgeInsets.fromLTRB(20, 28, 20, 22),
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Container(
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(20, 28, 20, 22),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: Image.asset(
+                      'assets/images/lab_inventory_logo.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  const Text(
+                    'LabInventory',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  const Text('Sistem Informasi Inventaris Laboratorium'),
+                ],
+              ),
             ),
-            padding: const EdgeInsets.all(8),
-            child: Image.asset(
-              'assets/images/lab_inventory_logo.png',
-              fit: BoxFit.contain,
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          const Text(
-            'LabInventory',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(height: 4),
-
-          const Text(
-            'Sistem Informasi Inventaris Laboratorium',
-          ),
-        ],
-      ),
-    ),
             const Divider(),
 
             _drawerItem(
@@ -990,13 +794,7 @@ class LabDrawer extends StatelessWidget {
               title: const Text('Keluar'),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const LoginScreen(),
-                  ),
-                  (route) => false,
-                );
+                unawaited(signOut(context));
               },
             ),
 
@@ -1019,10 +817,7 @@ class LabDrawer extends StatelessWidget {
       trailing: const Icon(Icons.chevron_right, size: 20),
       onTap: () {
         Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => page),
-        );
+        Navigator.push(context, MaterialPageRoute(builder: (_) => page));
       },
     );
   }
@@ -1042,24 +837,32 @@ class MahasiswaMainScreen extends StatefulWidget {
 class _MahasiswaMainScreenState extends State<MahasiswaMainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = const [
-    DashboardMahasiswa(),
-    InventoryListScreen(isAdmin: false),
-    BorrowingHistoryScreen(),
+  final _dashboardKey = GlobalKey<_DashboardMahasiswaState>();
+  final _inventoryKey = GlobalKey<_InventoryListScreenState>();
+  final _historyKey = GlobalKey<_BorrowingHistoryScreenState>();
+  late final List<Widget> _pages = [
+    DashboardMahasiswa(key: _dashboardKey),
+    InventoryListScreen(key: _inventoryKey, isAdmin: false),
+    BorrowingHistoryScreen(key: _historyKey),
     ProfileScreen(isAdmin: false),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (index) {
           setState(() => _currentIndex = index);
+          switch (index) {
+            case 0:
+              _dashboardKey.currentState?._loadBorrowings();
+            case 1:
+              _inventoryKey.currentState?.loadItems();
+            case 2:
+              _historyKey.currentState?.loadHistory();
+          }
         },
         destinations: const [
           NavigationDestination(
@@ -1098,25 +901,36 @@ class AdminMainScreen extends StatefulWidget {
 class _AdminMainScreenState extends State<AdminMainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = const [
-    DashboardAdmin(),
-    InventoryListScreen(isAdmin: true),
-    ApprovalScreen(),
-    TransactionHistoryScreen(),
+  final _dashboardKey = GlobalKey<_DashboardAdminState>();
+  final _inventoryKey = GlobalKey<_InventoryListScreenState>();
+  final _approvalKey = GlobalKey<_ApprovalScreenState>();
+  final _historyKey = GlobalKey<_TransactionHistoryScreenState>();
+  late final List<Widget> _pages = [
+    DashboardAdmin(key: _dashboardKey),
+    InventoryListScreen(key: _inventoryKey, isAdmin: true),
+    ApprovalScreen(key: _approvalKey),
+    TransactionHistoryScreen(key: _historyKey),
     ProfileScreen(isAdmin: true),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (index) {
           setState(() => _currentIndex = index);
+          switch (index) {
+            case 0:
+              _dashboardKey.currentState?._loadAdminData();
+            case 1:
+              _inventoryKey.currentState?.loadItems();
+            case 2:
+              _approvalKey.currentState?.loadPending();
+            case 3:
+              _historyKey.currentState?.loadTransactions();
+          }
         },
         destinations: const [
           NavigationDestination(
@@ -1157,10 +971,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
 class ProfileScreen extends StatelessWidget {
   final bool isAdmin;
 
-  const ProfileScreen({
-    super.key,
-    required this.isAdmin,
-  });
+  const ProfileScreen({super.key, required this.isAdmin});
 
   @override
   Widget build(BuildContext context) {
@@ -1183,7 +994,7 @@ class ProfileScreen extends StatelessWidget {
                     radius: 48,
                     backgroundColor: Colors.blue.shade100,
                     child: Text(
-                      isAdmin ? 'AD' : 'NF',
+                      sessionController.requireProfile().initials,
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
@@ -1205,12 +1016,12 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              isAdmin ? 'Laboran Lab Komputer' : 'Naila Fathia',
+              sessionController.requireProfile().name,
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
-              isAdmin ? 'Administrator Sistem Inventaris' : 'NPM: 2413025076',
+              'NPM/NIP: ${sessionController.requireProfile().identityNumber}',
               style: TextStyle(color: Colors.grey.shade600, fontSize: 15),
             ),
             const SizedBox(height: 2),
@@ -1224,7 +1035,7 @@ class ProfileScreen extends StatelessWidget {
             _profileMenu(
               icon: Icons.person_outline,
               title: 'Informasi Akun',
-              subtitle: isAdmin ? 'Admin / Laboran PTI' : 'Mahasiswa PTI 2024 B',
+              subtitle: sessionController.requireProfile().email,
             ),
             _profileMenu(
               icon: Icons.computer_outlined,
@@ -1257,6 +1068,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 onPressed: () {
                   showDialog(
+                    useRootNavigator: false,
                     context: context,
                     builder: (ctx) => AlertDialog(
                       title: const Text('Konfirmasi Keluar'),
@@ -1274,13 +1086,7 @@ class ProfileScreen extends StatelessWidget {
                           ),
                           onPressed: () {
                             Navigator.pop(ctx);
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const LoginScreen(),
-                              ),
-                              (route) => false,
-                            );
+                            unawaited(signOut(context));
                           },
                           child: const Text('Keluar'),
                         ),
@@ -1357,6 +1163,8 @@ class DashboardMahasiswa extends StatefulWidget {
 }
 
 class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
+  String? loadError;
+
   bool _isLoading = false;
   List<Borrowing> _myBorrowings = [];
 
@@ -1368,15 +1176,23 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
 
   Future<void> _loadBorrowings() async {
     setState(() => _isLoading = true);
+    loadError = null;
     try {
-      final data = await InventoryService.getBorrowings();
+      final data = await inventoryRepository.getBorrowings(
+        userId: sessionController.requireProfile().id,
+      );
       if (mounted) {
         setState(() {
           _myBorrowings = data;
         });
       }
     } catch (e) {
-      debugPrint('Error _loadBorrowings: $e');
+      if (mounted) {
+        setState(() {
+          loadError = appFailure(e).message;
+          _myBorrowings = [];
+        });
+      }
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -1388,10 +1204,8 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => InventoryListScreen(
-          initialCategory: category,
-          isAdmin: false,
-        ),
+        builder: (_) =>
+            InventoryListScreen(initialCategory: category, isAdmin: false),
       ),
     );
   }
@@ -1416,7 +1230,10 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
                     color: Colors.blue.shade50,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.notifications_active, color: Colors.blue),
+                  child: const Icon(
+                    Icons.notifications_active,
+                    color: Colors.blue,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 const Text(
@@ -1447,7 +1264,9 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue.shade800,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
                 child: const Text('Tutup'),
               ),
@@ -1473,11 +1292,27 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
               const SizedBox(height: 3),
-              Text(description, style: TextStyle(color: Colors.grey.shade700, fontSize: 13, height: 1.3)),
+              Text(
+                description,
+                style: TextStyle(
+                  color: Colors.grey.shade700,
+                  fontSize: 13,
+                  height: 1.3,
+                ),
+              ),
               const SizedBox(height: 4),
-              Text(time, style: TextStyle(color: Colors.grey.shade500, fontSize: 11)),
+              Text(
+                time,
+                style: TextStyle(color: Colors.grey.shade500, fontSize: 11),
+              ),
             ],
           ),
         ),
@@ -1487,6 +1322,7 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
 
   void _showRulesModal() {
     showDialog(
+      useRootNavigator: false,
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -1577,12 +1413,19 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   desc,
-                  style: TextStyle(color: Colors.grey.shade700, fontSize: 12, height: 1.3),
+                  style: TextStyle(
+                    color: Colors.grey.shade700,
+                    fontSize: 12,
+                    height: 1.3,
+                  ),
                 ),
               ],
             ),
@@ -1611,8 +1454,8 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
             CircleAvatar(
               radius: 18,
               backgroundColor: Colors.blue.shade700,
-              child: const Text(
-                'NF',
+              child: Text(
+                sessionController.requireProfile().initials,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -1621,12 +1464,12 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
               ),
             ),
             const SizedBox(width: 12),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Halo, Naila Fathia! 👋',
+                    'Halo, ${sessionController.requireProfile().name}!',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -1634,11 +1477,8 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
                     ),
                   ),
                   Text(
-                    'NPM: 2413025076 • PTI FKIP Unila',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Color(0xFF64748B),
-                    ),
+                    'NPM: ${sessionController.requireProfile().identityNumber}',
+                    style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                   ),
                 ],
               ),
@@ -1650,7 +1490,10 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
             children: [
               IconButton(
                 onPressed: _showNotificationSheet,
-                icon: const Icon(Icons.notifications_none, color: Color(0xFF1E293B)),
+                icon: const Icon(
+                  Icons.notifications_none,
+                  color: Color(0xFF1E293B),
+                ),
                 tooltip: 'Pengumuman Lab',
               ),
               Positioned(
@@ -1670,97 +1513,112 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
           const SizedBox(width: 4),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: _loadBorrowings,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Hero Banner Lab
-              _buildHeroBanner(),
+      body: loadError != null
+          ? LoadFailureView(message: loadError!, onRetry: _loadBorrowings)
+          : RefreshIndicator(
+              onRefresh: _loadBorrowings,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Hero Banner Lab
+                    _buildHeroBanner(),
 
-              const SizedBox(height: 18),
+                    const SizedBox(height: 18),
 
-              // Status Peminjaman Terkini
-              _buildStatusCard(activeBorrowings),
+                    // Status Peminjaman Terkini
+                    _buildStatusCard(activeBorrowings),
 
-              const SizedBox(height: 22),
+                    const SizedBox(height: 22),
 
-              // Pintasan Cepat (Quick Actions)
-              _buildQuickActions(),
+                    // Pintasan Cepat (Quick Actions)
+                    _buildQuickActions(),
 
-              const SizedBox(height: 24),
+                    const SizedBox(height: 24),
 
-              // Kategori Pilihan Cepat
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Kategori Inventaris',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0F172A),
+                    // Kategori Pilihan Cepat
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Kategori Inventaris',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF0F172A),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => _openInventory(null),
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: const Size(50, 30),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: const Text(
+                            'Semua',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  TextButton(
-                    onPressed: () => _openInventory(null),
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: const Size(50, 30),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    const SizedBox(height: 12),
+                    _buildCategoryGrid(),
+
+                    const SizedBox(height: 26),
+
+                    // ALUR & PANDUAN PEMINJAMAN ALAT
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.route,
+                            size: 20,
+                            color: Colors.blue,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        const Text(
+                          'Alur Peminjaman Alat Lab',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF0F172A),
+                          ),
+                        ),
+                      ],
                     ),
-                    child: const Text('Semua', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                  ),
-                ],
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Ikuti 4 langkah mudah berikut untuk meminjam fasilitas laboratorium PTI:',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                    ),
+                    const SizedBox(height: 14),
+                    _buildBorrowingFlowCard(),
+
+                    const SizedBox(height: 24),
+
+                    // INFO OPERASIONAL & TATA TERTIB LAB
+                    _buildLabInfoCard(),
+
+                    const SizedBox(height: 24),
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
-              _buildCategoryGrid(),
-
-              const SizedBox(height: 26),
-
-              // ALUR & PANDUAN PEMINJAMAN ALAT
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.route, size: 20, color: Colors.blue),
-                  ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'Alur Peminjaman Alat Lab',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0F172A),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              const Text(
-                'Ikuti 4 langkah mudah berikut untuk meminjam fasilitas laboratorium PTI:',
-                style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
-              ),
-              const SizedBox(height: 14),
-              _buildBorrowingFlowCard(),
-
-              const SizedBox(height: 24),
-
-              // INFO OPERASIONAL & TATA TERTIB LAB
-              _buildLabInfoCard(),
-
-              const SizedBox(height: 24),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
@@ -1817,7 +1675,10 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
                 decoration: BoxDecoration(
                   color: const Color(0xFF10B981).withValues(alpha: 0.25),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFF34D399), width: 0.8),
+                  border: Border.all(
+                    color: const Color(0xFF34D399),
+                    width: 0.8,
+                  ),
                 ),
                 child: const Row(
                   children: [
@@ -1825,7 +1686,11 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
                     SizedBox(width: 5),
                     Text(
                       'Lab Buka',
-                      style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
@@ -1844,7 +1709,7 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
           ),
           const SizedBox(height: 6),
           Text(
-            'Cek stok proyektor, komputer, kabel, dan perangkat praktikum secara real-time langsung dari smartphone.',
+            'Cek stok proyektor, komputer, kabel, dan perangkat praktikum. Muat ulang untuk melihat data terbaru.',
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.88),
               fontSize: 12,
@@ -1904,8 +1769,12 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
-                  hasActive ? Icons.pending_actions : Icons.verified_user_outlined,
-                  color: hasActive ? Colors.amber.shade800 : Colors.blue.shade700,
+                  hasActive
+                      ? Icons.pending_actions
+                      : Icons.verified_user_outlined,
+                  color: hasActive
+                      ? Colors.amber.shade800
+                      : Colors.blue.shade700,
                   size: 22,
                 ),
               ),
@@ -1930,7 +1799,9 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: hasActive ? Colors.amber.shade900 : Colors.blue.shade900,
+                        color: hasActive
+                            ? Colors.amber.shade900
+                            : Colors.blue.shade900,
                       ),
                     ),
                   ],
@@ -1938,7 +1809,10 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
               ),
               if (hasActive)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.amber.shade100,
                     borderRadius: BorderRadius.circular(8),
@@ -1989,8 +1863,13 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    hasActive ? 'Lihat Rincian & Riwayat' : 'Buka Riwayat Peminjaman',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    hasActive
+                        ? 'Lihat Rincian & Riwayat'
+                        : 'Buka Riwayat Peminjaman',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
                   ),
                   const SizedBox(width: 6),
                   const Icon(Icons.arrow_forward, size: 15),
@@ -2271,11 +2150,7 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
       padding: const EdgeInsets.only(left: 15, top: 8, bottom: 8),
       child: Align(
         alignment: Alignment.centerLeft,
-        child: Container(
-          width: 2,
-          height: 16,
-          color: Colors.grey.shade300,
-        ),
+        child: Container(width: 2, height: 16, color: Colors.grey.shade300),
       ),
     );
   }
@@ -2354,7 +2229,11 @@ class _DashboardMahasiswaState extends State<DashboardMahasiswa> {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(fontSize: 12, color: Color(0xFF334155), height: 1.3),
+            style: const TextStyle(
+              fontSize: 12,
+              color: Color(0xFF334155),
+              height: 1.3,
+            ),
           ),
         ),
       ],
@@ -2374,6 +2253,8 @@ class DashboardAdmin extends StatefulWidget {
 }
 
 class _DashboardAdminState extends State<DashboardAdmin> {
+  String? loadError;
+
   int totalBarang = 0;
   int pendingCount = 0;
   List<Borrowing> pendingList = [];
@@ -2387,10 +2268,11 @@ class _DashboardAdminState extends State<DashboardAdmin> {
 
   Future<void> _loadAdminData() async {
     setState(() => isLoading = true);
+    loadError = null;
     try {
       final results = await Future.wait([
-        InventoryService.getItems(),
-        InventoryService.getBorrowings(status: 'pending'),
+        inventoryRepository.getItems(),
+        inventoryRepository.getBorrowings(status: 'pending'),
       ]);
       final items = results[0] as List<InventoryItem>;
       final pending = results[1] as List<Borrowing>;
@@ -2402,7 +2284,12 @@ class _DashboardAdminState extends State<DashboardAdmin> {
         });
       }
     } catch (e) {
-      debugPrint('Error _loadAdminData: $e');
+      if (mounted) {
+        setState(() {
+          loadError = appFailure(e).message;
+          pendingList = [];
+        });
+      }
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
@@ -2410,31 +2297,33 @@ class _DashboardAdminState extends State<DashboardAdmin> {
     }
   }
 
+  final Set<String> processingIds = {};
   Future<void> _processAction(String id, String newStatus, String item) async {
-    final success = await InventoryService.updateBorrowingStatus(
-      id: id,
-      status: newStatus,
-    );
-    if (!mounted) return;
-    if (success) {
+    if (!processingIds.add(id)) return;
+    setState(() {});
+    try {
+      await inventoryRepository.updateBorrowingStatus(
+        id: id,
+        status: newStatus,
+      );
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             newStatus == 'approved'
-                ? 'Pengajuan "$item" disetujui di Supabase.'
-                : 'Pengajuan "$item" ditolak di Supabase.',
+                ? 'Pengajuan disetujui dan stok dicadangkan.'
+                : 'Pengajuan ditolak.',
           ),
-          backgroundColor: newStatus == 'approved' ? Colors.green : Colors.red,
         ),
       );
-      _loadAdminData();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Gagal memperbarui status di Supabase.'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      await _loadAdminData();
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(appFailure(error).message)));
+      }
+    } finally {
+      if (mounted) setState(() => processingIds.remove(id));
     }
   }
 
@@ -2454,235 +2343,247 @@ class _DashboardAdminState extends State<DashboardAdmin> {
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: _loadAdminData,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: AdminStatCard(
-                      icon: Icons.inventory_2_outlined,
-                      title: 'Total Barang',
-                      value: isLoading ? '...' : totalBarang.toString(),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: AdminStatCard(
-                      icon: Icons.access_time,
-                      title: 'Pending',
-                      value: isLoading ? '...' : pendingCount.toString(),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              const Text(
-                'Aksi Cepat:',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () async {
-                        final res = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const AddItemScreen(),
+      body: loadError != null
+          ? LoadFailureView(message: loadError!, onRetry: _loadAdminData)
+          : RefreshIndicator(
+              onRefresh: _loadAdminData,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: AdminStatCard(
+                            icon: Icons.inventory_2_outlined,
+                            title: 'Total Barang',
+                            value: isLoading ? '...' : totalBarang.toString(),
                           ),
-                        );
-                        if (res == true) {
-                          _loadAdminData();
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 14,
-                          horizontal: 10,
                         ),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade50,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.blue.shade200),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: AdminStatCard(
+                            icon: Icons.access_time,
+                            title: 'Pending',
+                            value: isLoading ? '...' : pendingCount.toString(),
+                          ),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.add_box_outlined,
-                              color: Colors.blue.shade800,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'Tambah Barang',
-                              style: TextStyle(
-                                color: Colors.blue.shade800,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    const Text(
+                      'Aksi Cepat:',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () async {
-                        final res = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ReturnItemScreen(),
-                          ),
-                        );
-                        if (res == true) {
-                          _loadAdminData();
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 14,
-                          horizontal: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.orange.shade50,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.orange.shade200),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.assignment_return_outlined,
-                              color: Colors.orange.shade900,
-                              size: 20,
+                    const SizedBox(height: 10),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () async {
+                              final res = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const AddItemScreen(),
+                                ),
+                              );
+                              if (res == true) {
+                                _loadAdminData();
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                                horizontal: 10,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade50,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.blue.shade200),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.add_box_outlined,
+                                    color: Colors.blue.shade800,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Tambah Barang',
+                                    style: TextStyle(
+                                      color: Colors.blue.shade800,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'Pengembalian',
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () async {
+                              final res = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const ReturnItemScreen(),
+                                ),
+                              );
+                              if (res == true) {
+                                _loadAdminData();
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                                horizontal: 10,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.shade50,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.orange.shade200,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.assignment_return_outlined,
+                                    color: Colors.orange.shade900,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Pengembalian',
+                                    style: TextStyle(
+                                      color: Colors.orange.shade900,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 25),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Pengajuan Menunggu (Pending):',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (pendingList.isNotEmpty)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.shade100,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              '${pendingList.length} baru',
                               style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.orange.shade900,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+
+                    if (isLoading)
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(32),
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    else if (pendingList.isNotEmpty)
+                      ...pendingList.map(
+                        (b) => Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: PendingCard(
+                            busy: processingIds.contains(b.id),
+                            name: b.namaPeminjam.isNotEmpty
+                                ? b.namaPeminjam
+                                : 'Mahasiswa',
+                            item: b.namaBarang,
+                            amount: '${b.jumlah} Unit',
+                            onApprove: () =>
+                                _processAction(b.id, 'approved', b.namaBarang),
+                            onReject: () =>
+                                _processAction(b.id, 'rejected', b.namaBarang),
+                          ),
+                        ),
+                      )
+                    else
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.check_circle_outline,
+                              size: 44,
+                              color: Colors.green.shade500,
+                            ),
+                            const SizedBox(height: 10),
+                            const Text(
+                              'Semua Pengajuan Selesai',
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 13,
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Tidak ada pengajuan yang menunggu persetujuan.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontSize: 12,
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 25),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Pengajuan Menunggu (Pending):',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (pendingList.isNotEmpty)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.shade100,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        '${pendingList.length} baru',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange.shade900,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              if (isLoading)
-                const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(32),
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-              else if (pendingList.isNotEmpty)
-                ...pendingList.map(
-                  (b) => Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: PendingCard(
-                      name: b.namaPeminjam.isNotEmpty ? b.namaPeminjam : 'Mahasiswa',
-                      item: b.namaBarang,
-                      amount: '${b.jumlah} Unit',
-                      onApprove: () => _processAction(b.id, 'approved', b.namaBarang),
-                      onReject: () => _processAction(b.id, 'rejected', b.namaBarang),
-                    ),
-                  ),
-                )
-              else
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade300),
-                  ),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.check_circle_outline,
-                        size: 44,
-                        color: Colors.green.shade500,
-                      ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        'Semua Pengajuan Selesai',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Tidak ada antrean peminjaman berstatus pending di Supabase.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
+                  ],
                 ),
-            ],
-          ),
-        ),
-      ),
+              ),
+            ),
     );
   }
 }
@@ -2706,6 +2607,8 @@ class InventoryListScreen extends StatefulWidget {
 }
 
 class _InventoryListScreenState extends State<InventoryListScreen> {
+  String? loadError;
+
   final searchController = TextEditingController();
   String selectedCategory = 'Semua';
   List<InventoryItem> allItems = [];
@@ -2720,15 +2623,21 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
 
   Future<void> loadItems() async {
     setState(() => isLoading = true);
+    loadError = null;
     try {
-      final data = await InventoryService.getItems();
+      final data = await inventoryRepository.getItems();
       if (mounted) {
         setState(() {
           allItems = data;
         });
       }
     } catch (e) {
-      debugPrint('Error loadItems: $e');
+      if (mounted) {
+        setState(() {
+          loadError = appFailure(e).message;
+          allItems = [];
+        });
+      }
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
@@ -2747,8 +2656,8 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
 
     return allItems.where((item) {
       final matchSearch = item.name.toLowerCase().contains(query);
-      final matchCategory = selectedCategory == 'Semua' ||
-          item.category == selectedCategory;
+      final matchCategory =
+          selectedCategory == 'Semua' || item.category == selectedCategory;
       return matchSearch && matchCategory;
     }).toList();
   }
@@ -2841,86 +2750,83 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
               label: const Text('Tambah Barang'),
             )
           : null,
-      body: RefreshIndicator(
-        onRefresh: loadItems,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
-              child: TextField(
-                controller: searchController,
-                onChanged: (_) => setState(() {}),
-                decoration: const InputDecoration(
-                  hintText: 'Cari nama barang...',
-                  prefixIcon: Icon(Icons.search),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: DropdownButtonFormField<String>(
-                value: selectedCategory,
-                decoration: const InputDecoration(
-                  labelText: 'Filter Kategori',
-                ),
-                items: const [
-                  DropdownMenuItem(
-                    value: 'Semua',
-                    child: Text('Semua'),
+      body: loadError != null
+          ? LoadFailureView(message: loadError!, onRetry: loadItems)
+          : RefreshIndicator(
+              onRefresh: loadItems,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+                    child: TextField(
+                      controller: searchController,
+                      onChanged: (_) => setState(() {}),
+                      decoration: const InputDecoration(
+                        hintText: 'Cari nama barang...',
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                    ),
                   ),
-                  DropdownMenuItem(
-                    value: 'Elektronik',
-                    child: Text('Elektronik'),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: DropdownButtonFormField<String>(
+                      initialValue: selectedCategory,
+                      decoration: const InputDecoration(
+                        labelText: 'Filter Kategori',
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: 'Semua', child: Text('Semua')),
+                        DropdownMenuItem(
+                          value: 'Elektronik',
+                          child: Text('Elektronik'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Komputer',
+                          child: Text('Komputer'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Aksesoris',
+                          child: Text('Aksesoris'),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedCategory = value!;
+                        });
+                      },
+                    ),
                   ),
-                  DropdownMenuItem(
-                    value: 'Komputer',
-                    child: Text('Komputer'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'Aksesoris',
-                    child: Text('Aksesoris'),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : filteredItems.isEmpty
+                        ? const Center(child: Text('Barang tidak ditemukan.'))
+                        : ListView.separated(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: filteredItems.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 10),
+                            itemBuilder: (context, index) {
+                              final item = filteredItems[index];
+                              return InventoryCard(
+                                item: item,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          DetailItemScreen(item: item),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
                   ),
                 ],
-                onChanged: (value) {
-                  setState(() {
-                    selectedCategory = value!;
-                  });
-                },
               ),
             ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : filteredItems.isEmpty
-                      ? const Center(
-                          child: Text('Barang tidak ditemukan.'),
-                        )
-                      : ListView.separated(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: filteredItems.length,
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 10),
-                          itemBuilder: (context, index) {
-                            final item = filteredItems[index];
-                            return InventoryCard(
-                              item: item,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        DetailItemScreen(item: item),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -2932,10 +2838,7 @@ class _InventoryListScreenState extends State<InventoryListScreen> {
 class DetailItemScreen extends StatelessWidget {
   final InventoryItem item;
 
-  const DetailItemScreen({
-    super.key,
-    required this.item,
-  });
+  const DetailItemScreen({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -2951,28 +2854,13 @@ class DetailItemScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: double.infinity,
-              height: 215,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade400),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.image_outlined,
-                size: 80,
-                color: Colors.grey,
-              ),
-            ),
+            InventoryImage(item: item),
 
             const SizedBox(height: 18),
 
             Text(
               '${item.name} ${item.code}',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 18),
@@ -3009,13 +2897,12 @@ class DetailItemScreen extends StatelessWidget {
               width: double.infinity,
               height: 52,
               child: FilledButton(
-                onPressed: item.stock > 0
+                onPressed: item.canBorrow
                     ? () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                                BorrowingFormScreen(item: item),
+                            builder: (_) => BorrowingFormScreen(item: item),
                           ),
                         );
                       }
@@ -3040,14 +2927,10 @@ class DetailItemScreen extends StatelessWidget {
 class BorrowingFormScreen extends StatefulWidget {
   final InventoryItem item;
 
-  const BorrowingFormScreen({
-    super.key,
-    required this.item,
-  });
+  const BorrowingFormScreen({super.key, required this.item});
 
   @override
-  State<BorrowingFormScreen> createState() =>
-      _BorrowingFormScreenState();
+  State<BorrowingFormScreen> createState() => _BorrowingFormScreenState();
 }
 
 class _BorrowingFormScreenState extends State<BorrowingFormScreen> {
@@ -3055,6 +2938,8 @@ class _BorrowingFormScreenState extends State<BorrowingFormScreen> {
   DateTime? borrowDate;
   DateTime? returnDate;
   bool isSubmitting = false;
+  ({int amount, DateTime borrowDate, DateTime returnDate, String purpose})?
+  pendingSubmission;
 
   final purposeController = TextEditingController();
 
@@ -3065,82 +2950,89 @@ class _BorrowingFormScreenState extends State<BorrowingFormScreen> {
   }
 
   Future<void> submitBorrowing() async {
-    if (borrowDate == null || returnDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Pilih tanggal pinjam dan tanggal kembali terlebih dahulu!'),
-        ),
-      );
-      return;
-    }
-    if (purposeController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Silakan masukkan keperluan / alasan peminjaman!'),
-        ),
-      );
-      return;
-    }
-
-    setState(() => isSubmitting = true);
-    final user = supabase.auth.currentUser;
-    final userName = user?.email?.split('@').first ?? 'Naila Fathia';
-
-    final errorMsg = await InventoryService.createBorrowing(
-      itemId: widget.item.id.isNotEmpty ? widget.item.id : widget.item.code,
-      namaBarang: widget.item.name,
-      namaPeminjam: userName,
-      jumlah: amount,
-      tglPinjam: borrowDate!,
-      tglKembali: returnDate!,
-      keperluan: purposeController.text.trim(),
+    if (isSubmitting) return;
+    final validation = validateBorrowing(
+      item: widget.item,
+      amount: amount,
+      borrowDate: borrowDate,
+      returnDate: returnDate,
+      purpose: purposeController.text,
     );
-
-    if (!mounted) return;
-    setState(() => isSubmitting = false);
-
-    if (errorMsg == null) {
+    if (validation != null && pendingSubmission == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(validation)));
+      return;
+    }
+    final draft =
+        pendingSubmission ??
+        (
+          amount: amount,
+          borrowDate: borrowDate!,
+          returnDate: returnDate!,
+          purpose: purposeController.text.trim(),
+        );
+    setState(() {
+      isSubmitting = true;
+      pendingSubmission = draft;
+    });
+    try {
+      await inventoryRepository.createBorrowing(
+        itemId: widget.item.id,
+        jumlah: draft.amount,
+        tglPinjam: draft.borrowDate,
+        tglKembali: draft.returnDate,
+        keperluan: draft.purpose,
+      );
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: Colors.green,
-          content: Text('Pengajuan peminjaman berhasil masuk ke database Supabase!'),
-        ),
-      );
-      Navigator.pop(context, true);
-    } else {
-      final isRls = errorMsg.contains('42501') || errorMsg.contains('row-level security');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: isRls ? Colors.orange.shade900 : Colors.blue.shade800,
           content: Text(
-            isRls
-                ? 'Tersimpan di aplikasi (Supabase RLS aktif, silakan matikan RLS tabel borrowings)'
-                : 'Pengajuan tersimpan di aplikasi ($errorMsg)',
+            'Pengajuan berhasil dikirim. Menunggu persetujuan laboran.',
           ),
-          duration: const Duration(seconds: 4),
         ),
       );
       Navigator.pop(context, true);
+    } catch (error) {
+      if (!mounted) return;
+      final failure = appFailure(error);
+      if (!failure.uncertain) pendingSubmission = null;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(failure.message)));
+    } finally {
+      if (mounted) setState(() => isSubmitting = false);
     }
   }
 
   Future<void> pickDate(bool isBorrowDate) async {
+    if (isSubmitting || pendingSubmission != null) return;
+    final now = DateTime.now().toUtc().add(const Duration(hours: 7));
+    final today = DateTime(now.year, now.month, now.day);
+    final first =
+        !isBorrowDate && borrowDate != null && borrowDate!.isAfter(today)
+        ? borrowDate!
+        : today;
+    final current = isBorrowDate ? borrowDate : returnDate;
     final selected = await showDatePicker(
       context: context,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2035),
-      initialDate: DateTime.now(),
+      useRootNavigator: false,
+      firstDate: first,
+      lastDate: DateTime(today.year + 5, 12, 31),
+      initialDate: current != null && !current.isBefore(first)
+          ? current
+          : first,
     );
-
-    if (selected != null) {
-      setState(() {
-        if (isBorrowDate) {
-          borrowDate = selected;
-        } else {
-          returnDate = selected;
+    if (selected == null || !mounted) return;
+    setState(() {
+      if (isBorrowDate) {
+        borrowDate = selected;
+        if (returnDate != null && returnDate!.isBefore(selected)) {
+          returnDate = null;
         }
-      });
-    }
+      } else {
+        returnDate = selected;
+      }
+    });
   }
 
   String dateText(DateTime? date) {
@@ -3174,12 +3066,12 @@ class _BorrowingFormScreenState extends State<BorrowingFormScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  InventoryImage(item: widget.item, height: 160),
+                  const SizedBox(height: 8),
                   const Text('Barang'),
                   Text(
                     widget.item.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Text(widget.item.code),
                   const SizedBox(height: 8),
@@ -3199,7 +3091,8 @@ class _BorrowingFormScreenState extends State<BorrowingFormScreen> {
             Row(
               children: [
                 IconButton.filledTonal(
-                  onPressed: amount > 1
+                  onPressed:
+                      !isSubmitting && pendingSubmission == null && amount > 1
                       ? () => setState(() => amount--)
                       : null,
                   icon: const Icon(Icons.remove),
@@ -3222,7 +3115,10 @@ class _BorrowingFormScreenState extends State<BorrowingFormScreen> {
                   ),
                 ),
                 IconButton.filledTonal(
-                  onPressed: amount < widget.item.stock
+                  onPressed:
+                      !isSubmitting &&
+                          pendingSubmission == null &&
+                          amount < widget.item.stock
                       ? () => setState(() => amount++)
                       : null,
                   icon: const Icon(Icons.add),
@@ -3237,10 +3133,7 @@ class _BorrowingFormScreenState extends State<BorrowingFormScreen> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            _dateField(
-              text: dateText(borrowDate),
-              onTap: () => pickDate(true),
-            ),
+            _dateField(text: dateText(borrowDate), onTap: () => pickDate(true)),
 
             const SizedBox(height: 18),
 
@@ -3263,6 +3156,8 @@ class _BorrowingFormScreenState extends State<BorrowingFormScreen> {
             const SizedBox(height: 8),
             TextField(
               controller: purposeController,
+              readOnly: isSubmitting || pendingSubmission != null,
+              maxLength: 2000,
               maxLines: 5,
               decoration: const InputDecoration(
                 hintText: 'Input alasan / keperluan...',
@@ -3286,7 +3181,7 @@ class _BorrowingFormScreenState extends State<BorrowingFormScreen> {
                         ),
                       )
                     : const Text(
-                        'KIRIM PENGAJUAN',
+                        'KIRIM / COBA LAGI',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
               ),
@@ -3297,10 +3192,7 @@ class _BorrowingFormScreenState extends State<BorrowingFormScreen> {
     );
   }
 
-  Widget _dateField({
-    required String text,
-    required VoidCallback onTap,
-  }) {
+  Widget _dateField({required String text, required VoidCallback onTap}) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(10),
@@ -3326,6 +3218,8 @@ class ApprovalScreen extends StatefulWidget {
 }
 
 class _ApprovalScreenState extends State<ApprovalScreen> {
+  String? loadError;
+
   List<Borrowing> pendingList = [];
   bool isLoading = true;
 
@@ -3337,15 +3231,21 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
 
   Future<void> loadPending() async {
     setState(() => isLoading = true);
+    loadError = null;
     try {
-      final data = await InventoryService.getBorrowings(status: 'pending');
+      final data = await inventoryRepository.getBorrowings(status: 'pending');
       if (mounted) {
         setState(() {
           pendingList = data;
         });
       }
     } catch (e) {
-      debugPrint('Error loadPending: $e');
+      if (mounted) {
+        setState(() {
+          loadError = appFailure(e).message;
+          pendingList = [];
+        });
+      }
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
@@ -3353,28 +3253,37 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
     }
   }
 
-  Future<void> processAction(String id, String newStatus, String namaPeminjam) async {
-    final success = await InventoryService.updateBorrowingStatus(
-      id: id,
-      status: newStatus,
-    );
-    if (!mounted) return;
-    if (success) {
+  final Set<String> processingIds = {};
+  Future<void> processAction(
+    String id,
+    String newStatus,
+    String namaPeminjam,
+  ) async {
+    if (!processingIds.add(id)) return;
+    setState(() {});
+    try {
+      await inventoryRepository.updateBorrowingStatus(
+        id: id,
+        status: newStatus,
+      );
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: newStatus == 'approved' ? Colors.green : Colors.orange,
           content: Text(
             newStatus == 'approved'
-                ? 'Pengajuan dari $namaPeminjam telah disetujui!'
-                : 'Pengajuan dari $namaPeminjam ditolak.',
+                ? 'Pengajuan disetujui dan stok dicadangkan.'
+                : 'Pengajuan ditolak.',
           ),
         ),
       );
-      loadPending();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Status berhasil diubah (lokal).')),
-      );
+      await loadPending();
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(appFailure(error).message)));
+      }
+    } finally {
+      if (mounted) setState(() => processingIds.remove(id));
     }
   }
 
@@ -3394,7 +3303,9 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
           ),
         ],
       ),
-      body: isLoading
+      body: loadError != null
+          ? LoadFailureView(message: loadError!, onRetry: loadPending)
+          : isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: loadPending,
@@ -3407,6 +3318,7 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
                       itemBuilder: (context, index) {
                         final b = pendingList[index];
                         return PendingCard(
+                          busy: processingIds.contains(b.id),
                           name: b.namaPeminjam.isNotEmpty
                               ? b.namaPeminjam
                               : 'Mahasiswa',
@@ -3441,7 +3353,7 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
                         const SizedBox(height: 6),
                         Center(
                           child: Text(
-                            'Semua permohonan peminjaman di database Supabase telah diproses.',
+                            'Semua pengajuan yang dimuat telah diproses.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.grey.shade600,
@@ -3487,59 +3399,39 @@ class _AddItemScreenState extends State<AddItemScreen> {
   }
 
   Future<void> saveItem() async {
+    if (isSaving) return;
     final name = nameController.text.trim();
-    final stockText = stockController.text.trim();
-    final location = locationController.text.trim();
-
-    if (name.isEmpty) {
+    final stock = int.tryParse(stockController.text.trim());
+    if (name.isEmpty || name.length > 150 || stock == null || stock < 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nama barang harus diisi!')),
+        const SnackBar(
+          content: Text('Isi nama barang dan stok yang valid (minimal 0).'),
+        ),
       );
       return;
     }
-
-    final stock = int.tryParse(stockText);
-    if (stock == null || stock <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Stok harus berupa angka yang valid (> 0)!')),
-      );
-      return;
-    }
-
     setState(() => isSaving = true);
-
-    // Buat kode barang otomatis
-    final catCode = category.length >= 3 ? category.substring(0, 3).toUpperCase() : 'BRG';
-    final randomSuffix = (1000 + (DateTime.now().millisecondsSinceEpoch % 9000)).toString();
-    final code = 'INV-$catCode-$randomSuffix';
-
-    final success = await InventoryService.addItem(
-      name: name,
-      code: code,
-      category: category,
-      condition: condition,
-      stock: stock,
-      location: location.isNotEmpty ? location : 'Lemari Utama',
-    );
-
-    if (!mounted) return;
-    setState(() => isSaving = false);
-
-    if (success) {
+    try {
+      await inventoryRepository.addItem(
+        name: name,
+        category: category,
+        condition: condition,
+        stock: stock,
+        location: locationController.text.trim(),
+        description: descriptionController.text.trim(),
+      );
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          content: Text('Barang berhasil disimpan ke Supabase!'),
-        ),
+        const SnackBar(content: Text('Barang berhasil disimpan.')),
       );
       Navigator.pop(context, true);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Barang dicatat (lokal/RLS).'),
-        ),
-      );
-      Navigator.pop(context, true);
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(appFailure(error).message)));
+      }
+    } finally {
+      if (mounted) setState(() => isSaving = false);
     }
   }
 
@@ -3568,20 +3460,14 @@ class _AddItemScreenState extends State<AddItemScreen> {
             const SizedBox(height: 16),
             _label('Kategori'),
             DropdownButtonFormField<String>(
-              value: category,
+              initialValue: category,
               items: const [
                 DropdownMenuItem(
                   value: 'Elektronik',
                   child: Text('Elektronik'),
                 ),
-                DropdownMenuItem(
-                  value: 'Komputer',
-                  child: Text('Komputer'),
-                ),
-                DropdownMenuItem(
-                  value: 'Aksesoris',
-                  child: Text('Aksesoris'),
-                ),
+                DropdownMenuItem(value: 'Komputer', child: Text('Komputer')),
+                DropdownMenuItem(value: 'Aksesoris', child: Text('Aksesoris')),
               ],
               onChanged: (value) {
                 setState(() => category = value!);
@@ -3601,16 +3487,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
             const SizedBox(height: 16),
             _label('Kondisi'),
             DropdownButtonFormField<String>(
-              value: condition,
+              initialValue: condition,
               items: const [
                 DropdownMenuItem(
                   value: 'Sangat Baik',
                   child: Text('Sangat Baik'),
                 ),
-                DropdownMenuItem(
-                  value: 'Baik',
-                  child: Text('Baik'),
-                ),
+                DropdownMenuItem(value: 'Baik', child: Text('Baik')),
                 DropdownMenuItem(
                   value: 'Perlu Perbaikan',
                   child: Text('Perlu Perbaikan'),
@@ -3671,10 +3554,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
   Widget _label(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        text,
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
+      child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
     );
   }
 }
@@ -3692,6 +3572,8 @@ class ReturnItemScreen extends StatefulWidget {
 }
 
 class _ReturnItemScreenState extends State<ReturnItemScreen> {
+  String? loadError;
+
   String condition = 'Normal / Baik';
   final notesController = TextEditingController();
   List<Borrowing> activeBorrowings = [];
@@ -3707,25 +3589,30 @@ class _ReturnItemScreenState extends State<ReturnItemScreen> {
 
   Future<void> _loadBorrowings() async {
     setState(() => isLoading = true);
+    loadError = null;
     try {
-      final all = await InventoryService.getBorrowings();
-      final active = all
-          .where((b) =>
-              b.status.toLowerCase() == 'approved' ||
-              b.status.toLowerCase() == 'dipinjam')
-          .toList();
+      final all = await inventoryRepository.getBorrowings();
+      final active = all.where((b) => b.isApproved).toList();
       if (mounted) {
         setState(() {
           activeBorrowings = active;
           if (widget.initialBorrowing != null) {
-            selectedBorrowing = widget.initialBorrowing;
+            selectedBorrowing = active
+                .where((b) => b.id == widget.initialBorrowing!.id)
+                .firstOrNull;
           } else if (active.isNotEmpty) {
             selectedBorrowing = active.first;
           }
         });
       }
     } catch (e) {
-      debugPrint('Error _loadBorrowings in ReturnItemScreen: $e');
+      if (mounted) {
+        setState(() {
+          loadError = appFailure(e).message;
+          activeBorrowings = [];
+          selectedBorrowing = null;
+        });
+      }
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
@@ -3744,38 +3631,29 @@ class _ReturnItemScreenState extends State<ReturnItemScreen> {
   }
 
   Future<void> _submitReturn() async {
-    if (selectedBorrowing == null) return;
+    if (selectedBorrowing == null || isSubmitting) return;
     setState(() => isSubmitting = true);
-
-    final notes = notesController.text.trim();
-    final fullNotes = notes.isNotEmpty ? '$condition - $notes' : condition;
-
-    final success = await InventoryService.updateBorrowingStatus(
-      id: selectedBorrowing!.id,
-      status: 'returned',
-      notes: fullNotes,
-    );
-
-    if (!mounted) return;
-    setState(() => isSubmitting = false);
-
-    if (success) {
+    try {
+      await inventoryRepository.updateBorrowingStatus(
+        id: selectedBorrowing!.id,
+        status: 'returned',
+        notes: notesController.text.trim(),
+        returnedGood: condition == 'Normal / Baik',
+      );
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Barang "${selectedBorrowing!.namaBarang}" berhasil dikembalikan di Supabase.',
-          ),
-          backgroundColor: Colors.green,
+        const SnackBar(
+          content: Text('Pengembalian dan kondisi barang berhasil dicatat.'),
         ),
       );
       Navigator.pop(context, true);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Gagal memperbarui status pengembalian di Supabase.'),
-          backgroundColor: Colors.red,
-        ),
-      );
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(appFailure(error).message)));
+      }
+    } finally {
+      if (mounted) setState(() => isSubmitting = false);
     }
   }
 
@@ -3795,181 +3673,192 @@ class _ReturnItemScreenState extends State<ReturnItemScreen> {
           ),
         ],
       ),
-      body: isLoading
+      body: loadError != null
+          ? LoadFailureView(message: loadError!, onRetry: _loadBorrowings)
+          : isLoading
           ? const Center(child: CircularProgressIndicator())
           : activeBorrowings.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.assignment_turned_in_outlined,
+                      size: 60,
+                      color: Colors.green.shade400,
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Tidak Ada Peminjaman Aktif',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Seluruh barang yang dipinjam telah dikembalikan ke laboratorium.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Pilih Peminjaman yang Dikembalikan:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<Borrowing>(
+                    initialValue: selectedBorrowing,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
+                    isExpanded: true,
+                    items: activeBorrowings.map((b) {
+                      return DropdownMenuItem<Borrowing>(
+                        value: b,
+                        child: Text(
+                          '${b.namaBarang} (${b.namaPeminjam})',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: isSubmitting
+                        ? null
+                        : (val) {
+                            setState(() => selectedBorrowing = val);
+                          },
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  if (selectedBorrowing != null)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade400),
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey.shade50,
+                      ),
+                      child: Column(
+                        children: [
+                          InfoLine(
+                            label: 'Peminjam',
+                            value: selectedBorrowing!.namaPeminjam,
+                          ),
+                          InfoLine(
+                            label: 'Barang',
+                            value: selectedBorrowing!.namaBarang,
+                          ),
+                          InfoLine(
+                            label: 'Jumlah',
+                            value: '${selectedBorrowing!.jumlah} Unit',
+                          ),
+                          InfoLine(
+                            label: 'Tgl Pinjam',
+                            value: _formatDate(selectedBorrowing!.tglPinjam),
+                          ),
+                          if (selectedBorrowing!.tglKembali != null)
+                            InfoLine(
+                              label: 'Tgl Kembali',
+                              value: _formatDate(
+                                selectedBorrowing!.tglKembali!,
+                              ),
+                            ),
+                          InfoLine(
+                            label: 'Keperluan',
+                            value: selectedBorrowing!.keperluan,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                  const SizedBox(height: 22),
+
+                  const Text(
+                    'Kondisi Pengembalian:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 6),
+
+                  RadioGroup<String>(
+                    groupValue: condition,
+                    onChanged: (value) {
+                      if (!isSubmitting) setState(() => condition = value!);
+                    },
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.assignment_turned_in_outlined,
-                          size: 60,
-                          color: Colors.green.shade400,
+                        RadioListTile<String>(
+                          contentPadding: EdgeInsets.zero,
+                          enabled: !isSubmitting,
+                          title: const Text('Normal / Baik'),
+                          value: 'Normal / Baik',
                         ),
-                        const SizedBox(height: 14),
-                        const Text(
-                          'Tidak Ada Peminjaman Aktif',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          'Seluruh barang yang dipinjam telah dikembalikan ke laboratorium.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 13,
-                          ),
+                        RadioListTile<String>(
+                          contentPadding: EdgeInsets.zero,
+                          enabled: !isSubmitting,
+                          title: const Text('Rusak / Perlu Perbaikan'),
+                          value: 'Rusak',
                         ),
                       ],
                     ),
                   ),
-                )
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Pilih Peminjaman yang Dikembalikan:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<Borrowing>(
-                        initialValue: selectedBorrowing,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                        ),
-                        isExpanded: true,
-                        items: activeBorrowings.map((b) {
-                          return DropdownMenuItem<Borrowing>(
-                            value: b,
-                            child: Text(
-                              '${b.namaBarang} (${b.namaPeminjam})',
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (val) {
-                          setState(() => selectedBorrowing = val);
-                        },
-                      ),
 
-                      const SizedBox(height: 18),
+                  const SizedBox(height: 12),
 
-                      if (selectedBorrowing != null)
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade400),
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.grey.shade50,
-                          ),
-                          child: Column(
-                            children: [
-                              InfoLine(
-                                label: 'Peminjam',
-                                value: selectedBorrowing!.namaPeminjam,
-                              ),
-                              InfoLine(
-                                label: 'Barang',
-                                value: selectedBorrowing!.namaBarang,
-                              ),
-                              InfoLine(
-                                label: 'Jumlah',
-                                value: '${selectedBorrowing!.jumlah} Unit',
-                              ),
-                              InfoLine(
-                                label: 'Tgl Pinjam',
-                                value: _formatDate(selectedBorrowing!.tglPinjam),
-                              ),
-                              if (selectedBorrowing!.tglKembali != null)
-                                InfoLine(
-                                  label: 'Tgl Kembali',
-                                  value:
-                                      _formatDate(selectedBorrowing!.tglKembali!),
-                                ),
-                              InfoLine(
-                                label: 'Keperluan',
-                                value: selectedBorrowing!.keperluan,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                      const SizedBox(height: 22),
-
-                      const Text(
-                        'Kondisi Pengembalian:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 6),
-
-                      RadioListTile<String>(
-                        contentPadding: EdgeInsets.zero,
-                        title: const Text('Normal / Baik'),
-                        value: 'Normal / Baik',
-                        groupValue: condition,
-                        onChanged: (value) {
-                          setState(() => condition = value!);
-                        },
-                      ),
-                      RadioListTile<String>(
-                        contentPadding: EdgeInsets.zero,
-                        title: const Text('Rusak / Perlu Perbaikan'),
-                        value: 'Rusak',
-                        groupValue: condition,
-                        onChanged: (value) {
-                          setState(() => condition = value!);
-                        },
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      const Text(
-                        'Catatan Laboran',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: notesController,
-                        maxLines: 4,
-                        decoration: const InputDecoration(
-                          hintText: 'Input catatan kondisi fisik barang...',
-                        ),
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: FilledButton(
-                          onPressed: isSubmitting ? null : _submitReturn,
-                          child: isSubmitting
-                              ? const SizedBox(
-                                  height: 22,
-                                  width: 22,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Text(
-                                  'KONFIRMASI KEMBALI',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                        ),
-                      ),
-                    ],
+                  const Text(
+                    'Catatan Laboran',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: notesController,
+                    readOnly: isSubmitting,
+                    maxLength: 2000,
+                    maxLines: 4,
+                    decoration: const InputDecoration(
+                      hintText: 'Input catatan kondisi fisik barang...',
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: FilledButton(
+                      onPressed: isSubmitting ? null : _submitReturn,
+                      child: isSubmitting
+                          ? const SizedBox(
+                              height: 22,
+                              width: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text(
+                              'KONFIRMASI KEMBALI',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 }
@@ -3986,6 +3875,8 @@ class BorrowingHistoryScreen extends StatefulWidget {
 }
 
 class _BorrowingHistoryScreenState extends State<BorrowingHistoryScreen> {
+  String? loadError;
+
   List<Borrowing> historyList = [];
   bool isLoading = true;
 
@@ -3997,15 +3888,23 @@ class _BorrowingHistoryScreenState extends State<BorrowingHistoryScreen> {
 
   Future<void> loadHistory() async {
     setState(() => isLoading = true);
+    loadError = null;
     try {
-      final data = await InventoryService.getBorrowings();
+      final data = await inventoryRepository.getBorrowings(
+        userId: sessionController.requireProfile().id,
+      );
       if (mounted) {
         setState(() {
           historyList = data;
         });
       }
     } catch (e) {
-      debugPrint('Error loadHistory: $e');
+      if (mounted) {
+        setState(() {
+          loadError = appFailure(e).message;
+          historyList = [];
+        });
+      }
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
@@ -4033,7 +3932,9 @@ class _BorrowingHistoryScreenState extends State<BorrowingHistoryScreen> {
           ),
         ],
       ),
-      body: isLoading
+      body: loadError != null
+          ? LoadFailureView(message: loadError!, onRetry: loadHistory)
+          : isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: loadHistory,
@@ -4077,7 +3978,7 @@ class _BorrowingHistoryScreenState extends State<BorrowingHistoryScreen> {
                         const SizedBox(height: 6),
                         Center(
                           child: Text(
-                            'Data riwayat peminjaman Anda di database Supabase masih kosong.',
+                            'Anda belum memiliki riwayat peminjaman.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.grey.shade600,
@@ -4096,10 +3997,13 @@ class TransactionHistoryScreen extends StatefulWidget {
   const TransactionHistoryScreen({super.key});
 
   @override
-  State<TransactionHistoryScreen> createState() => _TransactionHistoryScreenState();
+  State<TransactionHistoryScreen> createState() =>
+      _TransactionHistoryScreenState();
 }
 
 class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
+  String? loadError;
+
   List<Borrowing> transactions = [];
   bool isLoading = true;
 
@@ -4111,15 +4015,21 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
 
   Future<void> loadTransactions() async {
     setState(() => isLoading = true);
+    loadError = null;
     try {
-      final data = await InventoryService.getBorrowings();
+      final data = await inventoryRepository.getBorrowings();
       if (mounted) {
         setState(() {
           transactions = data;
         });
       }
     } catch (e) {
-      debugPrint('Error loadTransactions: $e');
+      if (mounted) {
+        setState(() {
+          loadError = appFailure(e).message;
+          transactions = [];
+        });
+      }
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
@@ -4147,7 +4057,9 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
           ),
         ],
       ),
-      body: isLoading
+      body: loadError != null
+          ? LoadFailureView(message: loadError!, onRetry: loadTransactions)
+          : isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: loadTransactions,
@@ -4191,7 +4103,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                         const SizedBox(height: 6),
                         Center(
                           child: Text(
-                            'Seluruh transaksi peminjaman lab dari Supabase akan ditampilkan di sini.',
+                            'Riwayat transaksi peminjaman lab akan ditampilkan di sini.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.grey.shade600,
@@ -4240,10 +4152,7 @@ class CategoryCard extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
             ),
           ],
         ),
@@ -4256,11 +4165,7 @@ class InventoryCard extends StatelessWidget {
   final InventoryItem item;
   final VoidCallback onTap;
 
-  const InventoryCard({
-    super.key,
-    required this.item,
-    required this.onTap,
-  });
+  const InventoryCard({super.key, required this.item, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -4276,18 +4181,9 @@ class InventoryCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
+            SizedBox(
               width: 70,
-              height: 70,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(
-                Icons.image_outlined,
-                color: Colors.grey,
-              ),
+              child: InventoryImage(item: item, height: 70, compact: true),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -4296,15 +4192,11 @@ class InventoryCard extends StatelessWidget {
                 children: [
                   Text(
                     item.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Text(
                     item.code,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 4),
                   Text('Kategori: ${item.category}'),
@@ -4349,10 +4241,7 @@ class AdminStatCard extends StatelessWidget {
           Text(title),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -4366,6 +4255,7 @@ class PendingCard extends StatelessWidget {
   final String amount;
   final VoidCallback? onApprove;
   final VoidCallback? onReject;
+  final bool busy;
 
   const PendingCard({
     super.key,
@@ -4374,6 +4264,7 @@ class PendingCard extends StatelessWidget {
     required this.amount,
     this.onApprove,
     this.onReject,
+    this.busy = false,
   });
 
   @override
@@ -4386,21 +4277,13 @@ class PendingCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const CircleAvatar(
-            radius: 23,
-            child: Icon(Icons.person_outline),
-          ),
+          const CircleAvatar(radius: 23, child: Icon(Icons.person_outline)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
                 const Text('Mahasiswa'),
                 Text('Barang: $item'),
                 Text('Jumlah: $amount'),
@@ -4410,25 +4293,11 @@ class PendingCard extends StatelessWidget {
           Column(
             children: [
               OutlinedButton(
-                onPressed: onApprove ??
-                    () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Pengajuan disetujui (sementara).'),
-                        ),
-                      );
-                    },
+                onPressed: busy ? null : onApprove,
                 child: const Text('Setujui'),
               ),
               OutlinedButton(
-                onPressed: onReject ??
-                    () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Pengajuan ditolak (sementara).'),
-                        ),
-                      );
-                    },
+                onPressed: busy ? null : onReject,
                 child: const Text('Tolak'),
               ),
             ],
@@ -4477,22 +4346,23 @@ class InfoLine extends StatelessWidget {
   final String label;
   final String value;
 
-  const InfoLine({
-    super.key,
-    required this.label,
-    required this.value,
-  });
+  const InfoLine({super.key, required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 7),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(child: Text(label)),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.w500),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
           ),
         ],
       ),
@@ -4528,23 +4398,13 @@ class HistoryCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  item,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                Text(item, style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 5),
                 Text(date),
               ],
             ),
           ),
-          Text(
-            status,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          Text(status, style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
     );

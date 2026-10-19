@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.13.3
+  sdk: ^3.13.2
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -34,9 +34,12 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  supabase_flutter: ^2.5.0
+  supabase_flutter: ^2.18.3
+  shared_preferences: ^2.5.6
+  url_launcher: ^6.3.3
 
 dev_dependencies:
+  http: ^1.6.0
   flutter_test:
     sdk: flutter
 
@@ -53,14 +56,21 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
 
+  # Match lib/main.dart when flutter run/build omits --flavor.
+  default-flavor: production
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
 
   assets:
+    # Public client configuration only; *.local.json remains gitignored.
+    # The directory exists via the example even on a fresh checkout.
+    - config/
     - assets/images/lab_inventory_logo.png
     - assets/images/app_icon.png
+    - assets/images/inventory/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
