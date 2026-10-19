@@ -289,42 +289,90 @@ def create_minggu_2():
     )
 
     # BAB I
-    add_bab_heading(doc, "I", "PENDAHULUAN & DESAIN ANTARMUKA")
+    add_bab_heading(doc, "I", "PENDAHULUAN & PRINSIP DESAIN UI/UX")
     add_subbab_heading(doc, "1.1", "Latar Belakang Perancangan UI/UX")
     add_body_paragraph(
         doc,
         "Keberhasilan adopsi sistem informasi berbasis mobile sangat ditentukan oleh kualitas pengalaman pengguna (User Experience) "
         "dan estetika antarmuka (User Interface). Pada sistem inventaris laboratorium kampus, antarmuka dituntut tidak hanya "
-        "menarik secara visual, namun juga harus intuitif, memiliki kontras tinggi untuk keterbacaan di dalam ruang laboratorium, "
+        "menarik secara visual, namun juga harus intuitif, memiliki kontras tinggi untuk keterbacaan di dalam ruang laboratorium komputer, "
         "serta memiliki alur navigasi yang tegas antara peran mahasiswa peminjam dan peran laboran pengelola."
     )
+    add_body_paragraph(
+        doc,
+        "Pada tahapan Minggu II, fokus rekayasa perangkat lunak diarahkan pada transformasi hasil analisis kebutuhan Minggu I "
+        "menjadi komponen antarmuka nyata (slicing UI). Penerapan sistem desain yang konsisten mutlak diperlukan agar interaksi civitas akademika "
+        "berjalan mulus, efisien, dan bebas hambatan visual."
+    )
 
-    add_subbab_heading(doc, "1.2", "Tujuan Praktikum Minggu II")
+    add_subbab_heading(doc, "1.2", "Rumusan Masalah Desain Antarmuka")
+    add_body_paragraph(
+        doc,
+        "Rumusan masalah yang diselesaikan pada tahapan desain antarmuka meliputi:"
+    )
+    add_bullet_item(doc, "Bagaimana merancang tema visual mobile yang selaras dengan identitas formal institusi Universitas Lampung?")
+    add_bullet_item(doc, "Bagaimana membangun struktur navigasi multi-role yang membedakan menu Mahasiswa (4 tab) dan Laboran (5 tab) tanpa terjadi reload data yang membebani memori?")
+    add_bullet_item(doc, "Bagaimana mengatasi kendala tumpang tindih layout antarmuka (bottom overflow) saat keyboard virtual Android aktif pada formulir pengajuan pinjam?")
+    add_bullet_item(doc, "Bagaimana menyediakan mekanisme evaluasi antarmuka yang independen (Mode Demo) agar dapat diuji tanpa ketergantungan koneksi jaringan backend?")
+
+    add_subbab_heading(doc, "1.3", "Batasan Desain Antarmuka")
+    add_body_paragraph(
+        doc,
+        "Batasan implementasi antarmuka pada Minggu II mencakup:"
+    )
+    add_bullet_item(doc, "Sistem desain mengadopsi spesifikasi Google Material Design 3 dengan kurasi palet warna resmi Unila.")
+    add_bullet_item(doc, "Manajemen state navigasi halaman menggunakan pola widget IndexedStack untuk preservasi status.")
+    add_bullet_item(doc, "Target orientasi layar dikunci pada mode potret (Portrait Mode) dengan penanganan Safe Area notch dan navigasi sistem.")
+
+    add_subbab_heading(doc, "1.4", "Tujuan Praktikum Minggu II")
     add_body_paragraph(
         doc,
         "Tujuan pelaksanaan praktikum Minggu II meliputi:"
     )
     add_bullet_item(doc, "Menerapkan sistem desain Google Material Design 3 dengan palet warna resmi almamater Universitas Lampung.")
     add_bullet_item(doc, "Mengembangkan animasi pembuka (Animated Splash Screen) yang elegan menggunakan logo Unila.")
-    add_bullet_item(doc, "Membangun Bottom Navigation Bar adaptif berbasis `IndexedStack` guna mempertahankan status data antar-tab.")
+    add_bullet_item(doc, "Membangun Bottom Navigation Bar adaptif berbasis IndexedStack guna mempertahankan status data antar-tab.")
     add_bullet_item(doc, "Mengembangkan halaman katalog alat real-time dengan kemampuan pencarian instan dan filter kategori.")
     add_bullet_item(doc, "Merancang formulir digital pengajuan peminjaman alat dengan DatePicker kalender WIB.")
     add_bullet_item(doc, "Menyediakan fitur Mode Demo In-Memory untuk pengujian visual instan tanpa jaringan.")
 
-    # BAB II
-    add_bab_heading(doc, "II", "KAJIAN TEORI & ARSITEKTUR NAVIGASI")
-    add_subbab_heading(doc, "2.1", "Sistem Desain Material 3 & Unila Palette")
+    add_subbab_heading(doc, "1.5", "Manfaat Praktikum")
     add_body_paragraph(
         doc,
-        "Aplikasi menerapkan kurasi palet warna formal institusional: Primer Unila Navy (`0xFF0F3B7A`), Sekunder Sapphire Blue "
-        "(`0xFF1E60B8`), Permukaan Kartu Slate Clean (`0xFFF8FAFC`), dan Teks Kontras Dark Charcoal (`0xFF1E293B`). "
-        "Kombinasi ini menghadirkan wibawa institusional sekaligus kenyamanan visual pada mata pengguna."
+        "Praktikum ini memberikan pengalaman komprehensif dalam slicing UI modern, penanganan responsive layout pada Android, "
+        "serta menghasilkan prototype visual yang sangat representatif dan mudah digunakan oleh seluruh pengguna laboratorium."
     )
 
-    add_subbab_heading(doc, "2.2", "Pola Navigasi Multi-Role Menggunakan IndexedStack")
+    # BAB II
+    add_bab_heading(doc, "II", "LANDASAN TEORI & ARSITEKTUR DESAIN ANTARMUKA")
+    add_subbab_heading(doc, "2.1", "Konsep Google Material Design 3 & Tipografi Modern")
     add_body_paragraph(
         doc,
-        "Untuk mencegah terjadinya reload halaman yang boros memori saat berpindah tab, navigasi dibangun menggunakan widget "
+        "Material Design 3 (Material You) merupakan evolusi desain antarmuka terbaru dari Google yang menitikberatkan pada personalisasi, "
+        "kontras warna adaptif, serta hierarki visual yang tegas. Pada aplikasi LabInventory, elemen kartu (Card) diberi elevasi halus "
+        "dengan radius sudut melengkung 16px, efek sentuhan ripple responsif, dan tipografi berbasis Google Fonts Poppins/Inter yang memiliki tingkat legibilitas tinggi."
+    )
+
+    add_subbab_heading(doc, "2.2", "Desain Sistem & Kurasi Palet Warna Resmi Universitas Lampung")
+    add_body_paragraph(
+        doc,
+        "Aplikasi menerapkan kurasi palet warna formal institusional Universitas Lampung guna membangun ikatan identitas kampus yang kuat:"
+    )
+    tabel_color_headers = ["Nama Token Warna", "Kode Heksadesimal", "Peranan Visual & Semantik"]
+    tabel_color_data = [
+        ["Primary Navy Unila", "#0F3B7A", "Warna identitas almamater utama pada AppBar, tombol aksi utama, dan kartu aktif."],
+        ["Secondary Sapphire", "#1E60B8", "Warna aksen pendukung pada indikator navigasi dan ikon interaktif."],
+        ["Accent Gold Unila", "#F59E0B", "Warna penegas pada badge status 'Pending' dan bintang rating alat."],
+        ["Surface Slate Clean", "#F8FAFC", "Warna latar belakang aplikasi yang bersih, modern, dan tidak melelahkan mata."],
+        ["Text Charcoal High", "#1E293B", "Warna teks judul dan body untuk memastikan rasio kontras rasio WCAG AAA."],
+        ["Error Crimson Alert", "#EF4444", "Warna peringatan stok habis, validasi error form, dan barang kondisi rusak."]
+    ]
+    add_academic_table(doc, "Tabel 2.1: Spesifikasi Token Warna Sistem Desain Aplikasi LabInventory", tabel_color_headers, tabel_color_data, col_widths=[1.8, 1.4, 3.8])
+
+    add_subbab_heading(doc, "2.3", "Pola Navigasi Multi-Role Menggunakan IndexedStack")
+    add_body_paragraph(
+        doc,
+        "Untuk mencegah terjadinya reload halaman yang boros memori dan menghilangkan input form saat berpindah tab, navigasi dibangun menggunakan widget "
         "`IndexedStack`. Melalui pendekatan ini, state input form maupun posisi scroll tetap dipertahankan (*preserve state*). "
         "Pembagian tab navigasi diuraikan pada tabel berikut:"
     )
@@ -333,7 +381,14 @@ def create_minggu_2():
         ["Mahasiswa", "4 Tab", "Beranda, Inventaris, Peminjaman, Profil", "Mengecek status, mencari alat, mengajukan pinjam, melihat akun."],
         ["Laboran / Admin", "5 Tab", "Dashboard, Inventaris, Pengajuan, Riwayat, Profil", "Memantau metrik lab, tambah barang, verifikasi permohonan, audit log."]
     ]
-    add_academic_table(doc, "Tabel 2.1: Spesifikasi Pembagian Tab Bottom Navigation Bar per Role", tabel_nav_headers, tabel_nav_data, col_widths=[1.3, 1.0, 2.5, 2.2])
+    add_academic_table(doc, "Tabel 2.2: Spesifikasi Pembagian Tab Bottom Navigation Bar per Role", tabel_nav_headers, tabel_nav_data, col_widths=[1.3, 1.0, 2.5, 2.2])
+
+    add_subbab_heading(doc, "2.4", "Perancangan Formulir Digital & Sanitasi Input")
+    add_body_paragraph(
+        doc,
+        "Formulir permohonan peminjaman dirancang dengan komponen validasi interaktif: DatePicker waktu lokal Indonesia Barat (WIB), "
+        "stepper kuota jumlah barang dengan pembatas stok maksimal, serta sanitasi teks pada kolom keperluan praktikum untuk mencegah input kosong."
+    )
 
     # BAB III
     add_bab_heading(doc, "III", "IMPLEMENTASI MODUL & HASIL TANGKAPAN LAYAR")
@@ -356,29 +411,46 @@ def create_minggu_2():
     add_academic_image(doc, os.path.join(IMG_DEV, "10-catalog-search.png"), "Gambar 2.2: Katalog Alat Real-time Dilengkapi Fitur Pencarian & Chip Kategori", width=Inches(3.1))
     add_academic_image(doc, os.path.join(IMG_DEV, "08-laptop-detail.png"), "Gambar 2.3: Halaman Rincian Spesifikasi Alat, Status Kondisi, dan Posisi Lemari/Rak", width=Inches(3.1))
 
-    add_subbab_heading(doc, "3.3", "Formulir Digital Peminjaman & Solusi Safe Area Keyboard")
+    add_subbab_heading(doc, "3.3", "Formulir Digital Pengajuan Peminjaman")
     add_body_paragraph(
         doc,
-        "Formulir pengajuan peminjaman menyediakan komponen DatePicker kalender (WIB), pengatur jumlah unit, dan kolom keperluan. "
-        "Saat pengujian pada smartphone Android, ditemukan kendala di mana keyboard virtual menutupi tombol submit. "
-        "Solusi dilakukan dengan membungkus antarmuka ke dalam `SafeArea` dan `SingleChildScrollView`, sehingga layout bergeser ke atas secara proporsional saat input teks aktif."
+        "Formulir pengajuan peminjaman menyediakan komponen DatePicker kalender (WIB), pengatur kuota jumlah unit, dan kolom deskripsi keperluan praktikum. "
+        "Pengguna dipandu dengan petunjuk visual batas maksimal stok alat yang masih tersedia di laboratorium."
     )
     add_academic_image(doc, os.path.join(IMG_DEV, "02-student-form.png"), "Gambar 2.4: Formulir Digital Pengajuan Peminjaman Alat Mahasiswa", width=Inches(3.1))
-    add_academic_image(doc, os.path.join(IMG_DEV, "05-form-safe-area-fixed.png"), "Gambar 2.5: Bukti Perbaikan Layout Safe Area: Bidang Input Bebas Tumpang Tindih Keyboard", width=Inches(3.1))
+
+    add_subbab_heading(doc, "3.4", "Pemecahan Masalah Layout: Perbaikan Keyboard Overflow dengan SafeArea")
+    add_body_paragraph(
+        doc,
+        "Kendala Teknis: Saat pengujian pada smartphone Android fisik, ketika pengguna mengklik kolom teks keperluan, soft-keyboard "
+        "virtual muncul dan menutupi separuh bawah layar, memicu galat 'A RenderFlex overflowed by XX pixels' pada konsol Flutter.\n\n"
+        "Solusi Problem-Solving: Seluruh struktur formulir dibungkus kembali dengan widget `SafeArea` dan `SingleChildScrollView` "
+        "dengan physics `ClampingScrollPhysics()`. Dengan perbaikan ini, layout secara otomatis bergeser ke atas secara proporsional "
+        "ketika keyboard virtual aktif, menjamin seluruh bidang input dan tombol submit tetap dapat diakses dengan nyaman."
+    )
+
+    before_safe_img = os.path.join(IMG_DEV, "02-student-form-before-safe-area.png")
+    if os.path.exists(before_safe_img):
+        add_academic_image(doc, before_safe_img, "Gambar 2.5: Tampilan Formulir Sebelum Perbaikan (Layout Tertekan / Tertutup Keyboard)", width=Inches(3.1))
+
+    fixed_safe_img = os.path.join(IMG_DEV, "05-form-safe-area-fixed.png")
+    if os.path.exists(fixed_safe_img):
+        add_academic_image(doc, fixed_safe_img, "Gambar 2.6: Bukti Perbaikan Layout Safe Area: Bidang Input Bebas Tumpang Tindih Keyboard", width=Inches(3.1))
 
     # BAB IV
     add_bab_heading(doc, "IV", "PENUTUP")
     add_subbab_heading(doc, "4.1", "Kesimpulan Keterlaksanaan Minggu II")
     add_body_paragraph(
         doc,
-        "Seluruh kebutuhan desain antarmuka Material Design 3, Bottom Navigation Bar multi-role, katalog pencarian, "
-        "dan formulir peminjaman telah berhasil diwujudkan secara tuntas (100%)."
+        "Seluruh kebutuhan desain antarmuka Material Design 3 (Unila Palette), Bottom Navigation Bar multi-role berbasis IndexedStack, "
+        "katalog pencarian interaktif, serta penanganan masalah responsive layout dan keyboard overflow pada Minggu II "
+        "telah berhasil diwujudkan secara paripurna (100%)."
     )
     add_subbab_heading(doc, "4.2", "Rencana Tindak Lanjut Minggu III")
     add_body_paragraph(
         doc,
         "Pada Minggu III, antarmuka yang telah dibangun akan diintegrasikan secara langsung ke Cloud Database Supabase "
-        "(PostgreSQL 15), menerapkan autentikasi GoTrue JWT, dan mengonfigurasi Row Level Security (RLS) serta membersihkan dummy data."
+        "(PostgreSQL 15), menerapkan autentikasi GoTrue JWT, mengonfigurasi Row Level Security (RLS), serta membersihkan seluruh data tiruan (dummy data)."
     )
 
     add_daftar_pustaka(doc, DAFTAR_PUSTAKA_STANDARD)
