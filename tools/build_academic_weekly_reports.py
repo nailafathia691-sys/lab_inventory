@@ -8,11 +8,12 @@ from academic_docx_builder import (
     setup_academic_page, add_academic_cover, add_kata_pengantar,
     add_bab_heading, add_subbab_heading, add_body_paragraph,
     add_bullet_item, add_academic_image, add_academic_table,
-    add_daftar_pustaka
+    add_code_snippet, add_daftar_pustaka
 )
 
 IMG_DEV = os.path.abspath("docs/evidence/device")
 IMG_EVID = os.path.abspath("docs/evidence")
+IMG_INV = os.path.abspath("assets/images/inventory")
 APP_ICON = os.path.abspath("assets/images/app_icon.png")
 
 DAFTAR_PUSTAKA_STANDARD = [
@@ -49,58 +50,89 @@ def create_minggu_1():
 
     # BAB I
     add_bab_heading(doc, "I", "PENDAHULUAN & ANALISIS KEBUTUHAN")
-    add_subbab_heading(doc, "1.1", "Latar Belakang Permasalahan")
+    add_subbab_heading(doc, "1.1", "Latar Belakang Permasalahan & Urgensi Digitalisasi")
     add_body_paragraph(
         doc,
         "Laboratorium Komputer pada Program Studi Pendidikan Teknologi Informasi (PTI), FKIP Universitas Lampung, "
-        "merupakan fasilitas penunjang utama dalam penyelenggaraan perkuliahan praktikum rekayasa perangkat lunak, "
-        "jaringan komputer, multimedia, dan sistem operasi. Laboratorium ini mengelola puluhan aset peralatan berharga tinggi "
-        "seperti laptop praktikum mahasiswa, unit proyektor LCD Epson, switch hub gigabit, instrumen kabel tester, "
-        "serta perangkat sound system yang intensif dipinjam oleh civitas akademika."
+        "merupakan fasilitas sentral dalam mendukung penyelenggaraan Tri Dharma Perguruan Tinggi, khususnya kegiatan "
+        "praktikum perkuliahan rekayasa perangkat lunak, sistem operasi, jaringan komputer, multimedia, serta komputasi awan. "
+        "Laboratorium ini mengelola puluhan aset peralatan berharga tinggi yang memiliki mobilitas peminjaman sangat tinggi "
+        "oleh mahasiswa, dosen, serta asisten laboratorium."
     )
     add_body_paragraph(
         doc,
-        "Sebelum inisiasi proyek LabInventory, seluruh tata kelola pencatatan aset inventaris dan proses permohonan "
-        "peminjaman masih dilakukan secara manual menggunakan buku registrasi fisik dan formulir kertas. "
-        "Berdasarkan analisis observasi lapangan dan wawancara dengan pengelola laboratorium, metode manual tersebut "
-        "menimbulkan empat kelemahan operasional mendasar:"
+        "Sebelum pengembangan sistem LabInventory, pengelolaan inventaris dan alur permohonan peminjaman masih dijalankan "
+        "secara konvensional dengan mencatat secara manual pada buku registrasi fisik dan formulir kertas. "
+        "Berdasarkan hasil observasi dan wawancara dengan pengelola laboratorium, metode manual ini menimbulkan empat kerentanan utama:"
     )
     add_bullet_item(doc, "Formulir kertas rentan basah, robek, atau terselip, mengakibatkan rekonsiliasi data inventaris di akhir semester sering mengalami disinformasi dan selisih pembukuan.", bold_prefix="1. Risiko Kerusakan Dokumen Fisik: ")
     add_bullet_item(doc, "Mahasiswa tidak memiliki sarana untuk memantau sisa stok alat praktikum yang tersedia secara realtime tanpa harus datang secara langsung ke ruangan laboratorium.", bold_prefix="2. Ketiadaan Transparansi Sisa Stok: ")
     add_bullet_item(doc, "Laboran mengalami kesulitan melacak mahasiswa yang terlambat mengembalikan alat praktikum melewati tenggat jadwal mata kuliah yang telah ditentukan.", bold_prefix="3. Monitoring Tenggat Waktu Nihil: ")
     add_bullet_item(doc, "Tidak ada formulir verifikasi kondisi fisik alat sebelum dipinjam dan sesudah dikembalikan, sehingga kerusakan barang sulit dipertanggungjawabkan secara adil.", bold_prefix="4. Ketiadaan Audit Kondisi Fisik Alat: ")
 
-    add_subbab_heading(doc, "1.2", "Rumusan Masalah")
+    add_subbab_heading(doc, "1.2", "Profil Aset Fisik Inventaris Laboratorium Komputer PTI")
     add_body_paragraph(
         doc,
-        "Berdasarkan latar belakang di atas, rumusan masalah yang menjadi fokus penyelesaian proyek ini adalah:"
+        "Aset inventaris yang menjadi subjek digitalisasi pada sistem LabInventory terdiri dari berbagai perangkat hardware "
+        "pendukung kegiatan praktikum di lingkungan Laboratorium Komputer PTI FKIP Unila. Dokumentasi fisik aset disajikan berikut:"
     )
-    add_bullet_item(doc, "Bagaimana merancang sistem inventaris mobile yang mampu mendigitalkan alur peminjaman secara efisien dan transparan?")
-    add_bullet_item(doc, "Bagaimana memisahkan hak akses sistem secara tegas antara peran Mahasiswa (peminjam) dan Laboran (administrator)?")
-    add_bullet_item(doc, "Bagaimana memvalidasi ketersediaan stok barang secara realtime guna mencegah peminjaman melebihi kuota fisik yang ada?")
-    add_bullet_item(doc, "Bagaimana mengonfigurasi environment pengembangan Flutter SDK dan native Android yang andal untuk mendukung konektivitas cloud?")
 
-    add_subbab_heading(doc, "1.3", "Batasan Masalah")
+    laptop_img = os.path.join(IMG_INV, "laptop.png")
+    if os.path.exists(laptop_img):
+        add_academic_image(doc, laptop_img, "Gambar 1.1: Unit Laptop Praktikum Asus Core i5 Laboratorium Komputer PTI", width=Inches(3.2))
+
+    proj_img = os.path.join(IMG_INV, "projector.png")
+    if os.path.exists(proj_img):
+        add_academic_image(doc, proj_img, "Gambar 1.2: Unit Proyektor LCD Epson EB-X400 untuk Presentasi Praktikum", width=Inches(3.2))
+
+    speaker_img = os.path.join(IMG_INV, "speaker.png")
+    if os.path.exists(speaker_img):
+        add_academic_image(doc, speaker_img, "Gambar 1.3: Unit Speaker Portable Wireless untuk Audio Praktikum", width=Inches(2.4))
+
+    hdmi_img = os.path.join(IMG_INV, "hdmi.png")
+    if os.path.exists(hdmi_img):
+        add_academic_image(doc, hdmi_img, "Gambar 1.4: Unit Kabel HDMI High-Speed Gold Plated", width=Inches(3.2))
+
+    tabel_fisik_headers = ["No", "Nama Aset Barang", "Kategori", "Lokasi Penyimpanan", "Kondisi Fisik"]
+    tabel_fisik_data = [
+        ["1", "Laptop Praktikum Asus Core i5", "Komputer", "Lemari Rak A-1 (Lab PTI)", "Siap Pakai / Baik"],
+        ["2", "Proyektor LCD Epson EB-X400", "Elektronik", "Lemari Khusus Multimedia", "Siap Pakai / Baik"],
+        ["3", "Speaker Portable Wireless Mic", "Audio", "Rak Perlengkapan B-2", "Siap Pakai / Baik"],
+        ["4", "Kabel HDMI High-Speed 5 Meter", "Aksesoris", "Kotak Kabel Rak C-3", "Siap Pakai / Baik"]
+    ]
+    add_academic_table(doc, "Tabel 1.1: Inventaris Fisik Aset Bergerak Laboratorium Komputer PTI", tabel_fisik_headers, tabel_fisik_data, col_widths=[0.5, 2.3, 1.2, 1.8, 1.2])
+
+    add_subbab_heading(doc, "1.3", "Rumusan Masalah")
     add_body_paragraph(
         doc,
-        "Agar pengerjaan proyek terarah dan tepat guna, batasan masalah ditetapkan sebagai berikut:"
+        "Berdasarkan analisis latar belakang di atas, rumusan masalah yang diselesaikan adalah:"
     )
-    add_bullet_item(doc, "Aplikasi dibangun menggunakan framework Flutter 3.x dengan bahasa pemrograman Dart 3.x.")
-    add_bullet_item(doc, "Sistem backend menggunakan layanan Supabase Cloud dengan basis data relasional PostgreSQL 15.")
-    add_bullet_item(doc, "Target sistem operasi difokuskan pada perangkat mobile Android (minimum Android 8.0 Oreo, target Android 14).")
-    add_bullet_item(doc, "Aktor pengguna dibatasi pada dua peran utama: Mahasiswa aktif PTI dan Laboran resmi Laboratorium Komputer FKIP Unila.")
+    add_bullet_item(doc, "Bagaimana merancang sistem inventaris mobile yang mendigitalkan seluruh alur permohonan pinjam alat praktikum?")
+    add_bullet_item(doc, "Bagaimana memisahkan hak akses sistem secara tegas antara peran Mahasiswa dan Laboran?")
+    add_bullet_item(doc, "Bagaimana memvalidasi ketersediaan stok fisik barang secara realtime guna mencegah alokasi ganda (*double-booking*)?")
+    add_bullet_item(doc, "Bagaimana mengonfigurasi environment pengembangan Flutter SDK dan native Android yang stabil dan andal?")
 
-    add_subbab_heading(doc, "1.4", "Capaian Pembelajaran & Tujuan Praktikum")
+    add_subbab_heading(doc, "1.4", "Batasan Masalah")
+    add_body_paragraph(
+        doc,
+        "Batasan implementasi proyek LabInventory ditetapkan sebagai berikut:"
+    )
+    add_bullet_item(doc, "Aplikasi dibangun menggunakan framework Flutter versi 3.13+ dengan bahasa pemrograman Dart versi 3.x.")
+    add_bullet_item(doc, "Sistem backend menggunakan layanan Cloud Database Supabase berbasis PostgreSQL versi 15.")
+    add_bullet_item(doc, "Target sistem operasi difokuskan pada perangkat Android versi 8.0 (API 26) hingga Android 14 (API 34).")
+    add_bullet_item(doc, "Pengguna sistem dibatasi pada dua peran: Mahasiswa aktif PTI dan Laboran resmi FKIP Unila.")
+
+    add_subbab_heading(doc, "1.5", "Capaian Pembelajaran & Tujuan Praktikum")
     add_body_paragraph(
         doc,
         "Tujuan pelaksanaan praktikum pada Minggu I meliputi:"
     )
-    add_bullet_item(doc, "Menganalisis kebutuhan fungsional dan non-fungsional sistem inventaris laboratorium komputer.")
+    add_bullet_item(doc, "Menganalisis kebutuhan fungsional (FR) dan non-fungsional (NFR) sistem inventaris laboratorium.")
     add_bullet_item(doc, "Merumuskan model use case yang memisahkan hak akses antara Mahasiswa dan Laboran secara presisi.")
-    add_bullet_item(doc, "Merancang sketsa alur transaksi 4 tahap terstruktur (Pilih Alat, Formulir, Verifikasi KTM, Pengembalian & Cek Fisik).")
-    add_bullet_item(doc, "Mengonfigurasi environment pengembangan Flutter SDK versi 3.13+ dan native AndroidManifest.xml.")
+    add_bullet_item(doc, "Merancang sketsa desain antarmuka (wireframe low-fidelity) untuk 4 layar utama aplikasi.")
+    add_bullet_item(doc, "Mengonfigurasi environment pengembangan Flutter SDK versi 3.13.3 dan konfigurasi native Android.")
 
-    add_subbab_heading(doc, "1.5", "Manfaat Praktikum")
+    add_subbab_heading(doc, "1.6", "Manfaat Praktikum")
     add_body_paragraph(
         doc,
         "Praktikum ini memberikan fondasi rekayasa kebutuhan perangkat lunak yang kokoh bagi mahasiswa pengembang, "
@@ -108,7 +140,7 @@ def create_minggu_1():
     )
 
     # BAB II
-    add_bab_heading(doc, "II", "PERANCANGAN SISTEM & DESAIN USE CASE")
+    add_bab_heading(doc, "II", "PERANCANGAN SISTEM & REKAYASA KEBUTUHAN")
     add_subbab_heading(doc, "2.1", "Analisis Kebutuhan Fungsional (Functional Requirements)")
     add_body_paragraph(
         doc,
@@ -126,7 +158,7 @@ def create_minggu_1():
         ["FR-07", "Pelacakan Riwayat Transaksi", "Mahasiswa & Laboran", "Melihat riwayat peminjaman masa lalu beserta status akhir barang secara kronologis.", "Sedang"],
         ["FR-08", "Manajemen Master Barang", "Laboran", "Menambah barang inventaris baru, mengedit informasi spesifikasi, dan update stok.", "Sedang"]
     ]
-    add_academic_table(doc, "Tabel 1.1: Matriks Kebutuhan Fungsional Sistem LabInventory", tabel_fr_headers, tabel_fr_data, col_widths=[0.8, 1.4, 1.3, 2.3, 0.7])
+    add_academic_table(doc, "Tabel 1.2: Matriks Kebutuhan Fungsional Sistem LabInventory", tabel_fr_headers, tabel_fr_data, col_widths=[0.8, 1.4, 1.3, 2.3, 0.7])
 
     add_subbab_heading(doc, "2.2", "Analisis Kebutuhan Non-Fungsional (Non-Functional Requirements)")
     add_body_paragraph(
@@ -140,7 +172,7 @@ def create_minggu_1():
         ["NFR-03", "Security & Integritas", "Data diproteksi dengan Row Level Security (RLS) PostgreSQL dan enkripsi HTTPS/TLS 1.3."],
         ["NFR-04", "Portabilitas Platform", "Aplikasi dapat berjalan stabil pada perangkat Android versi 8.0 (API 26) hingga Android 14 (API 34)."]
     ]
-    add_academic_table(doc, "Tabel 1.2: Matriks Kebutuhan Non-Fungsional Sistem LabInventory", tabel_nfr_headers, tabel_nfr_data, col_widths=[1.0, 1.8, 3.7])
+    add_academic_table(doc, "Tabel 1.3: Matriks Kebutuhan Non-Fungsional Sistem LabInventory", tabel_nfr_headers, tabel_nfr_data, col_widths=[1.0, 1.8, 3.7])
 
     add_subbab_heading(doc, "2.3", "Pemodelan Diagram Use Case Sistem")
     add_body_paragraph(
@@ -152,7 +184,7 @@ def create_minggu_1():
 
     uc_img = os.path.join(IMG_EVID, "diagram_usecase_sistem.png")
     if os.path.exists(uc_img):
-        add_academic_image(doc, uc_img, "Gambar 1.1: Diagram Use Case & Pembagian Peran Aplikasi Mobile LabInventory", width=Inches(5.4))
+        add_academic_image(doc, uc_img, "Gambar 1.5: Diagram Use Case & Pembagian Peran Aplikasi Mobile LabInventory", width=Inches(5.4))
 
     add_subbab_heading(doc, "2.4", "Sketsa Desain Antarmuka (Wireframe Low-Fidelity)")
     add_body_paragraph(
@@ -163,7 +195,7 @@ def create_minggu_1():
 
     wire_img = os.path.join(IMG_EVID, "wireframe_perancangan_sistem.png")
     if os.path.exists(wire_img):
-        add_academic_image(doc, wire_img, "Gambar 1.2: Sketsa Desain Wireframe (Low-Fidelity) Antarmuka Aplikasi LabInventory", width=Inches(5.4))
+        add_academic_image(doc, wire_img, "Gambar 1.6: Sketsa Desain Wireframe (Low-Fidelity) Antarmuka Aplikasi LabInventory", width=Inches(5.4))
 
     add_subbab_heading(doc, "2.5", "Perancangan Arsitektur Sistem Mobile")
     add_body_paragraph(
@@ -174,7 +206,7 @@ def create_minggu_1():
 
     arch_img = os.path.join(IMG_EVID, "diagram_arsitektur_sistem.png")
     if os.path.exists(arch_img):
-        add_academic_image(doc, arch_img, "Gambar 1.3: Diagram Arsitektur Komunikasi Flutter Client & Supabase Cloud Backend", width=Inches(5.4))
+        add_academic_image(doc, arch_img, "Gambar 1.7: Diagram Arsitektur Komunikasi Flutter Client & Supabase Cloud Backend", width=Inches(5.4))
 
     add_subbab_heading(doc, "2.6", "Pemetaan Alur Peminjaman 4 Langkah")
     add_body_paragraph(
@@ -188,7 +220,7 @@ def create_minggu_1():
         ["Tahap 3", "Laboran & Mahasiswa", "Laboran menyetujui di sistem; mahasiswa membawa KTM fisik untuk mengambil alat.", "Tiket berstatus 'approved'"],
         ["Tahap 4", "Laboran", "Inspeksi kondisi fisik (Baik/Rusak), catatan laboran, dan konfirmasi pengembalian.", "Tiket berstatus 'returned'"]
     ]
-    add_academic_table(doc, "Tabel 1.3: Pemetaan Alur Peminjaman Terstruktur 4 Tahap", tabel_alur_headers, tabel_alur_data, col_widths=[1.1, 1.4, 2.7, 1.4])
+    add_academic_table(doc, "Tabel 1.4: Pemetaan Alur Peminjaman Terstruktur 4 Tahap", tabel_alur_headers, tabel_alur_data, col_widths=[1.1, 1.4, 2.7, 1.4])
 
     # BAB III
     add_bab_heading(doc, "III", "IMPLEMENTASI SETUP FLUTTER & HASIL EVALUASI")
@@ -197,18 +229,39 @@ def create_minggu_1():
         doc,
         "Proyek Flutter `lab_inventory` diinisiasi menggunakan Flutter SDK versi 3.13.3 dan Dart SDK versi 3.0.0. "
         "Manajemen dependensi dikonfigurasi melalui berkas `pubspec.yaml` dengan pustaka utama mencakup `supabase_flutter` "
-        "untuk komunikasi backend, `intl` untuk format penanggalan WIB, serta `google_fonts` untuk tipografi modern."
+        "untuk komunikasi backend, `intl` untuk format penanggalan WIB, serta `google_fonts` untuk tipografi modern:"
     )
+
+    code_pubspec = """dependencies:
+  flutter:
+    sdk: flutter
+  supabase_flutter: ^2.5.0
+  intl: ^0.19.0
+  google_fonts: ^6.2.1
+  flutter_staggered_animations: ^1.1.1
+  uuid: ^4.3.3"""
+    add_code_snippet(doc, "Cuplikan Kode 1.1: Konfigurasi Dependensi pada berkas pubspec.yaml", code_pubspec)
 
     add_subbab_heading(doc, "3.2", "Konfigurasi Lapisan Native Android")
     add_body_paragraph(
         doc,
         "Pada lapisan native Android, berkas `android/app/src/main/AndroidManifest.xml` dikonfigurasi dengan menyertakan izin jaringan "
-        "`android.permission.INTERNET` dan `android.permission.ACCESS_NETWORK_STATE` guna mendukung komunikasi cloud via HTTPS TLS 1.3."
+        "`android.permission.INTERNET` dan `android.permission.ACCESS_NETWORK_STATE` guna mendukung komunikasi cloud via HTTPS TLS 1.3:"
     )
 
+    code_manifest = """<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.unila.lab_inventory">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <application
+        android:label="LabInventory Unila"
+        android:icon="@mipmap/ic_launcher">
+    </application>
+</manifest>"""
+    add_code_snippet(doc, "Cuplikan Kode 1.2: Konfigurasi Izin Jaringan Native AndroidManifest.xml", code_manifest)
+
     if os.path.exists(APP_ICON):
-        add_academic_image(doc, APP_ICON, "Gambar 1.4: Desain Ikon Launcher Resmi Aplikasi LabInventory pada Sistem Operasi Android", width=Inches(1.5))
+        add_academic_image(doc, APP_ICON, "Gambar 1.8: Desain Ikon Launcher Resmi Aplikasi LabInventory pada Sistem Operasi Android", width=Inches(1.5))
 
     add_subbab_heading(doc, "3.3", "Struktur Direktori Proyek")
     add_body_paragraph(
@@ -225,7 +278,7 @@ def create_minggu_1():
         ["lib/views/", "Antarmuka pengguna (Login, Dashboard Mahasiswa, Dashboard Laboran)."],
         ["pubspec.yaml", "Manajemen dependensi pustaka dan pendaftaran aset visual."]
     ]
-    add_academic_table(doc, "Tabel 1.4: Struktur Direktori Proyek Hasil Inisiasi Minggu I", tabel_struk_headers, tabel_struk_data, col_widths=[2.5, 4.0])
+    add_academic_table(doc, "Tabel 1.5: Struktur Direktori Proyek Hasil Inisiasi Minggu I", tabel_struk_headers, tabel_struk_data, col_widths=[2.5, 4.0])
 
     add_subbab_heading(doc, "3.4", "Verifikasi Environment Flutter & Android SDK")
     add_body_paragraph(
@@ -237,7 +290,7 @@ def create_minggu_1():
 
     setup_terminal_img = os.path.join(IMG_EVID, "flutter_environment_setup.png")
     if os.path.exists(setup_terminal_img):
-        add_academic_image(doc, setup_terminal_img, "Gambar 1.5: Hasil Verifikasi Environment Pengembangan Flutter SDK & Android Toolchain (flutter doctor -v)", width=Inches(5.2))
+        add_academic_image(doc, setup_terminal_img, "Gambar 1.9: Hasil Verifikasi Environment Pengembangan Flutter SDK & Android Toolchain (flutter doctor -v)", width=Inches(5.2))
 
     add_subbab_heading(doc, "3.5", "Evaluasi Kendala Teknis & Solusi")
     add_body_paragraph(
@@ -252,9 +305,10 @@ def create_minggu_1():
     add_subbab_heading(doc, "4.1", "Kesimpulan Keterlaksanaan Minggu I")
     add_body_paragraph(
         doc,
-        "Tahapan inisiasi proyek, analisis kebutuhan sistem (fungsional & non-fungsional), perancangan diagram use case, "
-        "arsitektur cloud, serta penyiapan environment pengembangan Flutter pada Minggu I telah berhasil dituntaskan secara paripurna (100%). "
-        "Seluruh prasyarat arsitektural telah siap untuk memasuki tahap slicing antarmuka pengguna pada Minggu II."
+        "Tahapan inisiasi proyek, inventarisasi aset fisik lab, analisis kebutuhan sistem (fungsional & non-fungsional), "
+        "perancangan diagram use case, sketsa wireframe, arsitektur cloud, serta penyiapan environment pengembangan Flutter "
+        "pada Minggu I telah berhasil dituntaskan secara paripurna (100%). Seluruh prasyarat arsitektural telah siap untuk "
+        "memasuki tahap slicing antarmuka pengguna pada Minggu II."
     )
     add_subbab_heading(doc, "4.2", "Rencana Tindak Lanjut Minggu II")
     add_body_paragraph(
@@ -373,9 +427,29 @@ def create_minggu_2():
     add_body_paragraph(
         doc,
         "Untuk mencegah terjadinya reload halaman yang boros memori dan menghilangkan input form saat berpindah tab, navigasi dibangun menggunakan widget "
-        "`IndexedStack`. Melalui pendekatan ini, state input form maupun posisi scroll tetap dipertahankan (*preserve state*). "
-        "Pembagian tab navigasi diuraikan pada tabel berikut:"
+        "`IndexedStack`. Melalui pendekatan ini, state input form maupun posisi scroll tetap dipertahankan (*preserve state*):"
     )
+
+    code_nav = """class MainNavigationScreen extends StatefulWidget {
+  final String role; // 'mahasiswa' atau 'laboran'
+  ...
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: IndexedStack(
+        index: _currentIndex,
+        children: role == 'laboran' ? _laboranTabs : _mahasiswaTabs,
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (i) => setState(() => _currentIndex = i),
+        destinations: role == 'laboran' ? _adminNavItems : _studentNavItems,
+      ),
+    );
+  }
+}"""
+    add_code_snippet(doc, "Cuplikan Kode 2.1: Implementasi Preservasi State Navigasi Menggunakan IndexedStack", code_nav)
+
     tabel_nav_headers = ["Peran Pengguna", "Jumlah Tab", "Daftar Tab Navigasi", "Fungsi Utama"]
     tabel_nav_data = [
         ["Mahasiswa", "4 Tab", "Beranda, Inventaris, Peminjaman, Profil", "Mengecek status, mencari alat, mengajukan pinjam, melihat akun."],
@@ -397,8 +471,19 @@ def create_minggu_2():
         doc,
         "Halaman login dirancang bersih dengan form email dan kata sandi, pemilihan role (Mahasiswa atau Laboran), "
         "serta tombol khusus 'Masuk Mode Demo (Tanpa Akun)'. Mode demo memungkinkan dosen penguji menginspeksi alur antarmuka "
-        "secara instan menggunakan mock in-memory repository tanpa memerlukan koneksi internet."
+        "secara instan menggunakan mock in-memory repository tanpa memerlukan koneksi internet:"
     )
+
+    code_demo = """class DemoModeRepository {
+  static final List<Item> mockItems = [
+    Item(id: '1', nama: 'Laptop Asus Core i5', kategori: 'Komputer', stok: 8, posisiRak: 'Rak A-1'),
+    Item(id: '2', nama: 'Proyektor Epson EB-X400', kategori: 'Elektronik', stok: 3, posisiRak: 'Lemari 1'),
+  ];
+  static bool isDemoActive = false;
+  static void activateDemo() => isDemoActive = true;
+}"""
+    add_code_snippet(doc, "Cuplikan Kode 2.2: Implementasi Mock In-Memory Repository untuk Mode Demo", code_demo)
+
     add_academic_image(doc, os.path.join(IMG_DEV, "01-login.png"), "Gambar 2.1: Antarmuka Autentikasi Pengguna & Tombol Demo Mode Instan", width=Inches(3.1))
 
     add_subbab_heading(doc, "3.2", "Katalog Inventaris & Rincian Informasi Alat")
@@ -406,22 +491,26 @@ def create_minggu_2():
         doc,
         "Katalog inventaris menampilkan kartu-kartu alat laboratorium secara responsif. Pengguna dapat melakukan filter "
         "berdasarkan kategori (Komputer, Elektronik, Aksesoris, Audio) dan mengetikkan kata kunci pencarian. "
-        "Menekan kartu alat akan membuka halaman rincian yang memuat spesifikasi teknis, kondisi fisik, dan posisi lemari rak."
+        "Menekan kartu alat akan membuka halaman rincian yang memuat spesifikasi teknis, kondisi fisik, dan posisi lemari rak:"
     )
     add_academic_image(doc, os.path.join(IMG_DEV, "10-catalog-search.png"), "Gambar 2.2: Katalog Alat Real-time Dilengkapi Fitur Pencarian & Chip Kategori", width=Inches(3.1))
-    add_academic_image(doc, os.path.join(IMG_DEV, "08-laptop-detail.png"), "Gambar 2.3: Halaman Rincian Spesifikasi Alat, Status Kondisi, dan Posisi Lemari/Rak", width=Inches(3.1))
+    add_academic_image(doc, os.path.join(IMG_DEV, "08-laptop-detail.png"), "Gambar 2.3: Halaman Rincian Spesifikasi Laptop Asus, Status Kondisi, dan Posisi Rak A-1", width=Inches(3.1))
+
+    proj_detail = os.path.join(IMG_EVID, "assets-projector-detail.png")
+    if os.path.exists(proj_detail):
+        add_academic_image(doc, proj_detail, "Gambar 2.4: Halaman Rincian Spesifikasi Proyektor LCD Epson EB-X400 & Posisi Lemari Khusus", width=Inches(3.1))
 
     admin_dash_img = os.path.join(IMG_EVID, "login-roles", "admin-dashboard.png")
     if os.path.exists(admin_dash_img):
-        add_academic_image(doc, admin_dash_img, "Gambar 2.4: Tampilan Dashboard Khusus Laboran dengan Metrik Statistik dan 5 Tab Navigasi", width=Inches(3.1))
+        add_academic_image(doc, admin_dash_img, "Gambar 2.5: Tampilan Dashboard Khusus Laboran dengan Metrik Statistik dan 5 Tab Navigasi", width=Inches(3.1))
 
     add_subbab_heading(doc, "3.3", "Formulir Digital Pengajuan Peminjaman")
     add_body_paragraph(
         doc,
         "Formulir pengajuan peminjaman menyediakan komponen DatePicker kalender (WIB), pengatur kuota jumlah unit, dan kolom deskripsi keperluan praktikum. "
-        "Pengguna dipandu dengan petunjuk visual batas maksimal stok alat yang masih tersedia di laboratorium."
+        "Pengguna dipandu dengan petunjuk visual batas maksimal stok alat yang masih tersedia di laboratorium:"
     )
-    add_academic_image(doc, os.path.join(IMG_DEV, "02-student-form.png"), "Gambar 2.5: Formulir Digital Pengajuan Peminjaman Alat Mahasiswa", width=Inches(3.1))
+    add_academic_image(doc, os.path.join(IMG_DEV, "02-student-form.png"), "Gambar 2.6: Formulir Digital Pengajuan Peminjaman Alat Mahasiswa", width=Inches(3.1))
 
     add_subbab_heading(doc, "3.4", "Pemecahan Masalah Layout: Perbaikan Keyboard Overflow dengan SafeArea")
     add_body_paragraph(
@@ -430,16 +519,31 @@ def create_minggu_2():
         "virtual muncul dan menutupi separuh bawah layar, memicu galat 'A RenderFlex overflowed by XX pixels' pada konsol Flutter.\n\n"
         "Solusi Problem-Solving: Seluruh struktur formulir dibungkus kembali dengan widget `SafeArea` dan `SingleChildScrollView` "
         "dengan physics `ClampingScrollPhysics()`. Dengan perbaikan ini, layout secara otomatis bergeser ke atas secara proporsional "
-        "ketika keyboard virtual aktif, menjamin seluruh bidang input dan tombol submit tetap dapat diakses dengan nyaman."
+        "ketika keyboard virtual aktif, menjamin seluruh bidang input dan tombol submit tetap dapat diakses dengan nyaman:"
     )
+
+    code_safe = """SafeArea(
+  child: SingleChildScrollView(
+    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+    padding: EdgeInsets.all(16.0),
+    child: Column(
+      children: [
+        TextFormField(controller: _keperluanCtrl, maxLines: 3),
+        SizedBox(height: 24),
+        ElevatedButton(onPressed: _submitPinjam, child: Text('Ajukan Peminjaman')),
+      ],
+    ),
+  ),
+)"""
+    add_code_snippet(doc, "Cuplikan Kode 2.3: Pembungkusan Widget Menggunakan SafeArea & SingleChildScrollView", code_safe)
 
     before_safe_img = os.path.join(IMG_DEV, "02-student-form-before-safe-area.png")
     if os.path.exists(before_safe_img):
-        add_academic_image(doc, before_safe_img, "Gambar 2.6: Tampilan Formulir Sebelum Perbaikan (Layout Tertekan / Tertutup Keyboard)", width=Inches(3.1))
+        add_academic_image(doc, before_safe_img, "Gambar 2.7: Tampilan Formulir Sebelum Perbaikan (Layout Tertekan / Tertutup Keyboard)", width=Inches(3.1))
 
     fixed_safe_img = os.path.join(IMG_DEV, "05-form-safe-area-fixed.png")
     if os.path.exists(fixed_safe_img):
-        add_academic_image(doc, fixed_safe_img, "Gambar 2.7: Bukti Perbaikan Layout Safe Area: Bidang Input Bebas Tumpang Tindih Keyboard", width=Inches(3.1))
+        add_academic_image(doc, fixed_safe_img, "Gambar 2.8: Bukti Perbaikan Layout Safe Area: Bidang Input Bebas Tumpang Tindih Keyboard", width=Inches(3.1))
 
     # BAB IV
     add_bab_heading(doc, "IV", "PENUTUP")
@@ -447,7 +551,7 @@ def create_minggu_2():
     add_body_paragraph(
         doc,
         "Seluruh kebutuhan desain antarmuka Material Design 3 (Unila Palette), Bottom Navigation Bar multi-role berbasis IndexedStack, "
-        "katalog pencarian interaktif, serta penanganan masalah responsive layout dan keyboard overflow pada Minggu II "
+        "katalog pencarian interaktif, adaptabilitas rincian alat berbagai kategori, serta penanganan masalah responsive layout dan keyboard overflow pada Minggu II "
         "telah berhasil diwujudkan secara paripurna (100%)."
     )
     add_subbab_heading(doc, "4.2", "Rencana Tindak Lanjut Minggu III")
@@ -493,7 +597,26 @@ def create_minggu_3():
         "yang didukung oleh mesin basis data relasional enterprise PostgreSQL versi 15."
     )
 
-    add_subbab_heading(doc, "1.2", "Tujuan Praktikum Minggu III")
+    add_subbab_heading(doc, "1.2", "Rumusan Masalah Integrasi Cloud Backend")
+    add_body_paragraph(
+        doc,
+        "Rumusan masalah yang diselesaikan pada tahapan integrasi backend mencakup:"
+    )
+    add_bullet_item(doc, "Bagaimana merancang skema relasional database PostgreSQL yang memenuhi kaidah normalisasi dan integritas referensial foreign key?")
+    add_bullet_item(doc, "Bagaimana menegakkan keamanan data di sisi server (database-level security) menggunakan Row Level Security (RLS)?")
+    add_bullet_item(doc, "Bagaimana mengelola sesi autentikasi pengguna secara aman dengan token JWT Supabase GoTrue?")
+    add_bullet_item(doc, "Bagaimana mencegah terjadinya infinite loading spinner saat koneksi internet kampus mengalami packet loss?")
+
+    add_subbab_heading(doc, "1.3", "Batasan Masalah Backend")
+    add_body_paragraph(
+        doc,
+        "Batasan implementasi backend pada Minggu III mencakup:"
+    )
+    add_bullet_item(doc, "Platform database menggunakan Supabase Cloud Managed PostgreSQL versi 15.")
+    add_bullet_item(doc, "Autentikasi menggunakan email dan password terenkripsi via library GoTrue API.")
+    add_bullet_item(doc, "Seluruh data pengujian wajib diinput ke server live dan seluruh dummy data lokal dibersihkan secara total.")
+
+    add_subbab_heading(doc, "1.4", "Tujuan Praktikum Minggu III")
     add_body_paragraph(
         doc,
         "Tujuan pelaksanaan praktikum Minggu III meliputi:"
@@ -505,6 +628,13 @@ def create_minggu_3():
     add_bullet_item(doc, "Menghapus seluruh data tiruan (dummy data) sehingga antarmuka 100% terhubung secara live.")
     add_bullet_item(doc, "Menyediakan akun pengujian resmi dan mengimplementasikan mekanisme timeout guard 4 detik.")
 
+    add_subbab_heading(doc, "1.5", "Manfaat Praktikum")
+    add_body_paragraph(
+        doc,
+        "Praktikum ini memberikan pemahaman mendalam mengenai arsitektur backend cloud modern (Backend-as-a-Service), "
+        "teknik pengamanan basis data relasional enterprise, serta sinkronisasi data realtime antara client mobile dan cloud."
+    )
+
     # BAB II
     add_bab_heading(doc, "II", "LANDASAN TEORI & SKEMA DATABASE CLOUD")
     add_subbab_heading(doc, "2.1", "Arsitektur Cloud & Keamanan PostgreSQL RLS")
@@ -512,7 +642,7 @@ def create_minggu_3():
         doc,
         "Keamanan sistem tidak diletakkan pada logika sisi klien, melainkan ditegakkan langsung pada engine PostgreSQL "
         "menggunakan Row Level Security (RLS). Mahasiswa hanya diizinkan membaca dan menulis baris peminjaman miliknya "
-        "sendiri (`auth.uid() = user_id`), sedangkan Laboran memiliki otorisasi penuh untuk mengelola inventaris dan transaksi."
+        "sendiri (`auth.uid() = user_id`), sedangkan Laboran memiliki otorisasi penuh untuk mengelola inventaris dan transaksi:"
     )
 
     db_schema_img = os.path.join(IMG_EVID, "skema_relasional_database.png")
@@ -532,6 +662,76 @@ def create_minggu_3():
     ]
     add_academic_table(doc, "Tabel 3.1: Spesifikasi Skema Database Relasional PostgreSQL Supabase", tabel_skema_headers, tabel_skema_data, col_widths=[1.2, 1.2, 1.6, 2.4])
 
+    add_subbab_heading(doc, "2.3", "Skrip DDL Pembuatan Tabel Relasional")
+    add_body_paragraph(
+        doc,
+        "Struktur tabel dieksekusi melalui SQL Editor Supabase dengan sintaks DDL berikut:"
+    )
+
+    code_ddl = """-- Tabel Master Profil Pengguna
+CREATE TABLE profiles (
+  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  full_name VARCHAR(255) NOT NULL,
+  npm VARCHAR(20),
+  role VARCHAR(20) DEFAULT 'mahasiswa' CHECK (role IN ('mahasiswa', 'laboran')),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Tabel Master Barang Inventaris Lab
+CREATE TABLE items (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  kode_barang VARCHAR(50) UNIQUE NOT NULL,
+  nama VARCHAR(255) NOT NULL,
+  kategori VARCHAR(100) NOT NULL,
+  stok INTEGER NOT NULL CHECK (stok >= 0),
+  stok_rusak INTEGER DEFAULT 0 CHECK (stok_rusak >= 0),
+  posisi_rak VARCHAR(100),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Tabel Transaksi Peminjaman (Junction Table)
+CREATE TABLE borrowings (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  item_id UUID REFERENCES items(id) ON DELETE RESTRICT NOT NULL,
+  jumlah INTEGER NOT NULL CHECK (jumlah > 0),
+  tgl_pinjam TIMESTAMPTZ NOT NULL,
+  tgl_kembali TIMESTAMPTZ NOT NULL,
+  keperluan TEXT NOT NULL,
+  status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'returned', 'rejected')),
+  kondisi_kembali VARCHAR(20) CHECK (kondisi_kembali IN ('baik', 'rusak')),
+  catatan_laboran TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);"""
+    add_code_snippet(doc, "Cuplikan Kode 3.1: Skrip SQL DDL Pembuatan Tabel Relasional pada PostgreSQL 15", code_ddl)
+
+    add_subbab_heading(doc, "2.4", "Kebijakan Keamanan Row Level Security (RLS)")
+    add_body_paragraph(
+        doc,
+        "Keamanan akses tabel dikunci menggunakan RLS PostgreSQL guna memastikan proteksi data tingkat server:"
+    )
+
+    code_rls = """-- Aktifkan RLS pada seluruh tabel
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE borrowings ENABLE ROW LEVEL SECURITY;
+
+-- Kebijakan RLS Tabel Borrowings untuk Mahasiswa
+CREATE POLICY "Mahasiswa hanya dapat melihat pengajuan miliknya"
+ON borrowings FOR SELECT
+USING (auth.uid() = user_id);
+
+CREATE POLICY "Mahasiswa dapat menyisipkan pengajuan baru"
+ON borrowings FOR INSERT
+WITH CHECK (auth.uid() = user_id);
+
+-- Kebijakan RLS Tabel Borrowings untuk Laboran
+CREATE POLICY "Laboran memiliki akses penuh terhadap seluruh transaksi"
+ON borrowings FOR ALL
+USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'laboran'));"""
+    add_code_snippet(doc, "Cuplikan Kode 3.2: Skrip SQL Penegakan Kebijakan Row Level Security (RLS)", code_rls)
+
     # BAB III
     add_bab_heading(doc, "III", "IMPLEMENTASI BACKEND & HASIL EVALUASI")
     add_subbab_heading(doc, "3.1", "Kredensial Akun Pengujian Resmi")
@@ -546,7 +746,36 @@ def create_minggu_3():
     ]
     add_academic_table(doc, "Tabel 3.2: Daftar Akun Pengujian Resmi Supabase Auth", tabel_akun_headers, tabel_akun_data, col_widths=[1.4, 1.6, 1.2, 2.2])
 
-    add_subbab_heading(doc, "3.2", "Dokumentasi Sinkronisasi Real-time & Autentikasi Cloud")
+    add_subbab_heading(doc, "3.2", "Inisialisasi Klien Flutter & Penanganan Timeout")
+    add_body_paragraph(
+        doc,
+        "Inisialisasi klien Supabase pada Flutter dikonfigurasi pada fungsi `main()` dengan menyertakan penanganan batas waktu (timeout guard 4 detik) "
+        "menggunakan blok `try-finally` untuk memastikan indikator loading selalu tertutup secara aman:"
+    )
+
+    code_init = """Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(
+    url: 'https://vtdxrqyocjswtwgcmxoc.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+  );
+  runApp(const LabInventoryApp());
+}
+
+// Timeout Guard 4 Detik pada Service Transaksi
+Future<void> submitBorrowingWithTimeout(...) async {
+  try {
+    await supabase.from('borrowings').insert(...).timeout(
+      const Duration(seconds: 4),
+      onTimeout: () => throw TimeoutException('Batas waktu koneksi server terlampaui.'),
+    );
+  } finally {
+    hideLoadingDialog();
+  }
+}"""
+    add_code_snippet(doc, "Cuplikan Kode 3.3: Inisialisasi Supabase Flutter dan Mekanisme Timeout Guard 4 Detik", code_init)
+
+    add_subbab_heading(doc, "3.3", "Dokumentasi Sinkronisasi Real-time & Autentikasi Cloud")
     add_body_paragraph(
         doc,
         "Pengujian koneksi cloud dievaluasi langsung menggunakan perangkat pengujian Google Pixel 7a (Android 14) "
@@ -564,7 +793,7 @@ def create_minggu_3():
     add_academic_image(doc, os.path.join(IMG_DEV, "04-student-pending.png"), "Gambar 3.4: Halaman Peminjaman Mahasiswa: Status 'PENDING' Tersinkronisasi Live ke Cloud", width=Inches(3.1))
     add_academic_image(doc, os.path.join(IMG_DEV, "09-admin-created-item.png"), "Gambar 3.5: Formulir Tambah Alat Baru oleh Laboran yang Langsung Mengupdate Tabel Items Cloud", width=Inches(3.1))
 
-    add_subbab_heading(doc, "3.3", "Evaluasi Kendala & Solusi Teknis")
+    add_subbab_heading(doc, "3.4", "Evaluasi Kendala & Solusi Teknis")
     add_body_paragraph(
         doc,
         "1. Kendala Foreign Key Violation: Terjadi error saat pengajuan pinjam dikirim karena ID barang pada form masih membaca format integer tiruan. "
@@ -578,8 +807,8 @@ def create_minggu_3():
     add_subbab_heading(doc, "4.1", "Kesimpulan Keterlaksanaan Minggu III")
     add_body_paragraph(
         doc,
-        "Seluruh infrastruktur cloud backend Supabase (PostgreSQL 15), otorisasi RLS, dan koneksi data real-time "
-        "telah berhasil diimplementasikan secara solid (100%) dengan penghapusan menyeluruh data dummy."
+        "Seluruh infrastruktur cloud backend Supabase (PostgreSQL 15), skema DDL relasional, otorisasi RLS tingkat server, "
+        "manajemen sesi autentikasi JWT, dan koneksi data real-time telah berhasil diimplementasikan secara solid (100%) dengan penghapusan menyeluruh data dummy."
     )
     add_subbab_heading(doc, "4.2", "Rencana Tindak Lanjut Minggu IV")
     add_body_paragraph(
@@ -615,7 +844,7 @@ def create_minggu_4():
 
     # BAB I
     add_bab_heading(doc, "I", "PENDAHULUAN & PENINGKATAN INTEGRITAS")
-    add_subbab_heading(doc, "1.1", "Latar Belakang Transaksi Atomik")
+    add_subbab_heading(doc, "1.1", "Latar Belakang Transaksi Atomik & Bahaya Race Condition")
     add_body_paragraph(
         doc,
         "Tantangan terbesar pada sistem peminjaman inventaris berbasis cloud adalah risiko terjadinya *race condition* "
@@ -624,7 +853,26 @@ def create_minggu_4():
         "Oleh karena itu, pada Minggu IV dikembangkan prosedur transaksi atomik langsung pada level database menggunakan PostgreSQL RPC."
     )
 
-    add_subbab_heading(doc, "1.2", "Tujuan Praktikum Minggu IV")
+    add_subbab_heading(doc, "1.2", "Rumusan Masalah Transaksi & Pengujian")
+    add_body_paragraph(
+        doc,
+        "Rumusan masalah yang diselesaikan pada tahapan finalisasi meliputi:"
+    )
+    add_bullet_item(doc, "Bagaimana memastikan pemotongan stok barang dan persetujuan tiket berjalan secara atomik (ACID) tanpa risiko race condition?")
+    add_bullet_item(doc, "Bagaimana memisahkan pencatatan stok unit siap pakai dan unit rusak saat alat dikembalikan oleh mahasiswa?")
+    add_bullet_item(doc, "Bagaimana memverifikasi stabilitas seluruh fitur fungsional sistem pada perangkat fisik Android melalui pengujian 12 checkpoint?")
+    add_bullet_item(doc, "Bagaimana memvalidasi ketahanan alur transaksi secara otomatis menggunakan pengujian End-to-End (E2E)?")
+
+    add_subbab_heading(doc, "1.3", "Batasan Transaksi Sistem")
+    add_body_paragraph(
+        doc,
+        "Batasan implementasi transaksi pada Minggu IV meliputi:"
+    )
+    add_bullet_item(doc, "Operasi mutasi stok barang dikunci di tingkat database menggunakan perintah `SELECT ... FOR UPDATE`.")
+    add_bullet_item(doc, "Pengujian fungsional dilakukan secara langsung pada smartphone Android fisik dengan 12 checkpoint skenario operasional.")
+    add_bullet_item(doc, "Pengujian automasi divalidasi menggunakan framework Playwright Test berbasis browser engine Chromium.")
+
+    add_subbab_heading(doc, "1.4", "Tujuan Praktikum Minggu IV")
     add_body_paragraph(
         doc,
         "Tujuan pelaksanaan praktikum Minggu IV meliputi:"
@@ -636,6 +884,13 @@ def create_minggu_4():
     add_bullet_item(doc, "Melakukan pengujian komprehensif pada smartphone Android fisik (Physical Device Testing) dengan 12 checkpoint verifikasi.")
     add_bullet_item(doc, "Menuntaskan dokumen Software Requirement Document (SRD v2.0) dan laporan akhir praktikum.")
 
+    add_subbab_heading(doc, "1.5", "Manfaat Praktikum")
+    add_body_paragraph(
+        doc,
+        "Praktikum ini memberikan keahlian tingkat lanjut dalam rekayasa transaksi basis data relasional enterprise, "
+        "metodologi pengujian perangkat lunak mobile secara empiris, serta menghasilkan sistem inventaris siap guna berstandar industri."
+    )
+
     # BAB II
     add_bab_heading(doc, "II", "KAJIAN TEORI & ARSITEKTUR TRANSAKSI ATOMIK")
     add_subbab_heading(doc, "2.1", "Konsep Transaksi ACID pada PostgreSQL RPC")
@@ -645,16 +900,72 @@ def create_minggu_4():
         "dieksekusi dalam satu siklus database tunggal. Apabila salah satu langkah mengalami kegagalan, seluruh mutasi dibatalkan "
         "secara otomatis (*automatic rollback*). Prosedur RPC yang diterapkan meliputi:"
     )
-    add_bullet_item(doc, "Memverifikasi otorisasi laboran, mengunci baris barang dengan `FOR UPDATE`, memeriksa sisa stok, mengurangkan stok, dan memperbarui status menjadi `approved`.", bold_prefix="1. RPC approve_borrowing(): ")
-    add_bullet_item(doc, "Memverifikasi status `approved`. Jika unit kembali 'Baik', stok siap pakai bertambah. Jika 'Rusak', unit dialihkan ke `stok_rusak` dan catatan kerusakan dicatat pada audit log.", bold_prefix="2. RPC return_borrowing(): ")
+
+    code_rpc_approve = """CREATE OR REPLACE FUNCTION approve_borrowing(p_borrowing_id UUID)
+RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE
+  v_item_id UUID;
+  v_jumlah INTEGER;
+  v_current_stock INTEGER;
+BEGIN
+  -- 1. Kunci baris peminjaman
+  SELECT item_id, jumlah INTO v_item_id, v_jumlah
+  FROM borrowings WHERE id = p_borrowing_id AND status = 'pending' FOR UPDATE;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Tiket peminjaman tidak valid atau sudah diproses.';
+  END IF;
+
+  -- 2. Kunci baris barang dan periksa stok
+  SELECT stok INTO v_current_stock FROM items WHERE id = v_item_id FOR UPDATE;
+  IF v_current_stock < v_jumlah THEN
+    RAISE EXCEPTION 'Stok fisik tidak mencukupi untuk persetujuan ini.';
+  END IF;
+
+  -- 3. Kurangkan stok dan perbarui status secara atomik
+  UPDATE items SET stok = stok - v_jumlah WHERE id = v_item_id;
+  UPDATE borrowings SET status = 'approved' WHERE id = p_borrowing_id;
+
+  RETURN jsonb_build_object('success', true, 'message', 'Persetujuan berhasil diproses.');
+END;
+$$;"""
+    add_code_snippet(doc, "Cuplikan Kode 4.1: Stored Procedure PL/pgSQL approve_borrowing() dengan Penguncian Baris FOR UPDATE", code_rpc_approve)
 
     add_subbab_heading(doc, "2.2", "Pemisahan Kolom Stok Siap Pakai dan Stok Rusak")
     add_body_paragraph(
         doc,
         "Untuk mencegah terganggunya ketersediaan barang ketika ada unit yang rusak, tabel `items` memisahkan jumlah unit sehat "
         "pada kolom `stok` dan unit rusak pada kolom `stok_rusak`. Dengan demikian, master data barang tetap aktif dan unit sehat "
-        "lainnya tetap dapat dipinjam oleh mahasiswa lain untuk kegiatan praktikum berikutnya."
+        "lainnya tetap dapat dipinjam oleh mahasiswa lain untuk kegiatan praktikum berikutnya:"
     )
+
+    code_rpc_return = """CREATE OR REPLACE FUNCTION return_borrowing(
+  p_borrowing_id UUID,
+  p_kondisi VARCHAR(20),
+  p_catatan TEXT
+) RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE
+  v_item_id UUID;
+  v_jumlah INTEGER;
+BEGIN
+  SELECT item_id, jumlah INTO v_item_id, v_jumlah
+  FROM borrowings WHERE id = p_borrowing_id AND status = 'approved' FOR UPDATE;
+
+  IF p_kondisi = 'baik' THEN
+    UPDATE items SET stok = stok + v_jumlah WHERE id = v_item_id;
+  ELSIF p_kondisi = 'rusak' THEN
+    UPDATE items SET stok_rusak = stok_rusak + v_jumlah WHERE id = v_item_id;
+  END IF;
+
+  UPDATE borrowings SET 
+    status = 'returned',
+    kondisi_kembali = p_kondisi,
+    catatan_laboran = p_catatan
+  WHERE id = p_borrowing_id;
+
+  RETURN jsonb_build_object('success', true);
+END;
+$$;"""
+    add_code_snippet(doc, "Cuplikan Kode 4.2: Stored Procedure PL/pgSQL return_borrowing() dengan Penanganan Unit Rusak", code_rpc_return)
 
     # BAB III
     add_bab_heading(doc, "III", "PENGUJIAN PERANGKAT FISIK & HASIL EVALUASI")
@@ -692,9 +1003,20 @@ def create_minggu_4():
     add_academic_image(doc, os.path.join(IMG_DEV, "11-final-history.png"), "Gambar 4.4: Audit Log Lengkap Riwayat Transaksi Seluruh Laboratorium Komputer PTI", width=Inches(3.1))
     add_academic_image(doc, os.path.join(IMG_DEV, "12-student-final-history.png"), "Gambar 4.5: Riwayat Akhir Mahasiswa dengan Status Transaksi 'RETURNED' / Selesai", width=Inches(3.1))
 
+    add_subbab_heading(doc, "3.3", "Dokumentasi Pengujian Otomasi End-to-End (E2E) Playwright")
+    add_body_paragraph(
+        doc,
+        "Pengujian otomasi End-to-End (E2E) dijalankan menggunakan Playwright Test untuk memvalidasi alur multi-role secara terotomasi "
+        "pada resolusi desktop browser dan simulasi perangkat smartphone:"
+    )
+
     playwright_img = os.path.join(IMG_EVID, "playwright-desktop.png")
     if os.path.exists(playwright_img):
-        add_academic_image(doc, playwright_img, "Gambar 4.6: Bukti Pengujian Automasi E2E (Playwright Test) untuk Validasi State Transaksi", width=Inches(4.8))
+        add_academic_image(doc, playwright_img, "Gambar 4.6: Bukti Pengujian Automasi E2E Playwright Desktop untuk Validasi State Transaksi", width=Inches(4.8))
+
+    playwright_phone_img = os.path.join(IMG_EVID, "playwright-return-phone.png")
+    if os.path.exists(playwright_phone_img):
+        add_academic_image(doc, playwright_phone_img, "Gambar 4.7: Bukti Pengujian Automasi E2E Playwright Mobile Web pada Alur Pengembalian Alat", width=Inches(3.1))
 
     # BAB IV
     add_bab_heading(doc, "IV", "PENUTUP")
@@ -702,14 +1024,14 @@ def create_minggu_4():
     add_body_paragraph(
         doc,
         "Seluruh rangkaian pengembangan aplikasi mobile LabInventory dari Minggu I hingga Minggu IV telah berhasil diselesaikan "
-        "secara sempurna (100%). Aplikasi terbukti tangguh dalam menangani integritas transaksi stok, aman dengan proteksi RLS, "
-        "dan lulus seluruh 12 checkpoint pengujian pada perangkat fisik Android."
+        "secara paripurna (100%). Aplikasi terbukti tangguh dalam menangani integritas transaksi stok melalui PostgreSQL RPC bergaransi ACID, "
+        "aman dengan proteksi Row Level Security, adaptif terhadap masalah responsive layout keyboard, serta lulus seluruh 12 checkpoint pengujian pada perangkat fisik Android."
     )
     add_subbab_heading(doc, "4.2", "Rekomendasi Pengembangan Mendatang")
     add_body_paragraph(
         doc,
         "Guna pengembangan berkelanjutan pada masa depan, disarankan penambahan fitur pemindaian QR Code pada label fisik alat "
-        "serta notifikasi push (Firebase Cloud Messaging) saat status peminjaman disetujui atau mendekati tenggat waktu pengembalian."
+        "serta integrasi notifikasi push (Firebase Cloud Messaging) saat status peminjaman disetujui atau mendekati tenggat waktu pengembalian."
     )
 
     add_daftar_pustaka(doc, DAFTAR_PUSTAKA_STANDARD)

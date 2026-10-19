@@ -349,6 +349,43 @@ def add_academic_table(doc, table_title, headers, data, col_widths=None):
     doc.add_paragraph().paragraph_format.space_after = Pt(8)
     return table
 
+def add_code_snippet(doc, snippet_title, code_text):
+    p_t = doc.add_paragraph()
+    p_t.paragraph_format.space_before = Pt(8)
+    p_t.paragraph_format.space_after = Pt(2)
+    p_t.paragraph_format.keep_with_next = True
+    r_t = p_t.add_run(snippet_title)
+    r_t.font.name = "Times New Roman"
+    r_t.font.size = Pt(10)
+    r_t.bold = True
+
+    table = doc.add_table(rows=1, cols=1)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    cell = table.cell(0, 0)
+    cell.width = Inches(6.3)
+    set_cell_background(cell, "F1F5F9")
+    set_cell_margins(cell, top=100, bottom=100, left=140, right=140)
+
+    borders = parse_xml(
+        f'<w:tcBorders {nsdecls("w")}>'
+        f'  <w:top w:val="single" w:sz="6" w:space="0" w:color="94A3B8"/>'
+        f'  <w:left w:val="single" w:sz="24" w:space="0" w:color="1E3A8A"/>'
+        f'  <w:bottom w:val="single" w:sz="6" w:space="0" w:color="94A3B8"/>'
+        f'  <w:right w:val="single" w:sz="6" w:space="0" w:color="94A3B8"/>'
+        f'</w:tcBorders>'
+    )
+    cell._tc.get_or_add_tcPr().append(borders)
+
+    p = cell.paragraphs[0]
+    p.paragraph_format.line_spacing = 1.05
+    p.paragraph_format.space_after = Pt(0)
+    r = p.add_run(code_text)
+    r.font.name = "Consolas"
+    r.font.size = Pt(8.5)
+    r.font.color.rgb = RGBColor(30, 41, 59)
+
+    doc.add_paragraph().paragraph_format.space_after = Pt(6)
+
 def add_daftar_pustaka(doc, daftar_items):
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
