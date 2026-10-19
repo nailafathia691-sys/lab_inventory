@@ -37,13 +37,13 @@ def create_minggu_1():
         doc,
         jenis_dokumen="LAPORAN PRAKTIKUM KEMAJUAN PROYEK MINGGU I",
         judul_utama="PEMROGRAMAN MOBILE (MOBILE PROGRAMMING)",
-        sub_judul="Inisiasi Proyek, Analisis Kebutuhan Sistem, Perancangan Use Case, Wireframe, dan Setup Environment Flutter pada Aplikasi LabInventory",
+        sub_judul="Inisiasi Proyek, Analisis Kebutuhan Sistem, Pemodelan Use Case, Wireframe, dan Setup Environment Flutter pada Aplikasi LabInventory",
         tgl_tahun="2026"
     )
 
     add_kata_pengantar(
         doc,
-        judul_dokumen="Laporan Praktikum Kemajuan Proyek Minggu I: Inisiasi Proyek, Analisis Kebutuhan Sistem, Perancangan Use Case, Wireframe, dan Setup Environment Flutter pada Aplikasi LabInventory",
+        judul_dokumen="Laporan Praktikum Kemajuan Proyek Minggu I: Inisiasi Proyek, Analisis Kebutuhan Sistem, Pemodelan Use Case, Wireframe, dan Setup Environment Flutter pada Aplikasi LabInventory",
         tgl_str="09 September 2026"
     )
 
@@ -62,33 +62,87 @@ def create_minggu_1():
         doc,
         "Sebelum inisiasi proyek LabInventory, seluruh tata kelola pencatatan aset inventaris dan proses permohonan "
         "peminjaman masih dilakukan secara manual menggunakan buku registrasi fisik dan formulir kertas. "
-        "Berdasarkan analisis observasi lapangan, metode manual ini menimbulkan empat kelemahan mendasar:"
+        "Berdasarkan analisis observasi lapangan dan wawancara dengan pengelola laboratorium, metode manual tersebut "
+        "menimbulkan empat kelemahan operasional mendasar:"
     )
-    add_bullet_item(doc, "Formulir kertas rentan basah, robek, atau terselip, mengakibatkan rekonsiliasi stok di akhir semester mengalami disinformasi.", bold_prefix="1. Risiko Kehilangan Dokumen: ")
-    add_bullet_item(doc, "Mahasiswa tidak memiliki sarana untuk memantau sisa stok alat praktikum yang tersedia tanpa harus datang langsung ke ruangan laboratorium.", bold_prefix="2. Ketiadaan Transparansi Stok: ")
-    add_bullet_item(doc, "Laboran mengalami kesulitan melacak mahasiswa yang terlambat mengembalikan alat praktikum melewati tenggat jadwal perkuliahan.", bold_prefix="3. Monitoring Tenggat Waktu Nihil: ")
-    add_bullet_item(doc, "Tidak ada formulir verifikasi kondisi fisik alat sebelum dipinjam dan setelah dikembalikan, sehingga kerusakan sulit dipertanggungjawabkan.", bold_prefix="4. Ketiadaan Inspeksi Fisik: ")
+    add_bullet_item(doc, "Formulir kertas rentan basah, robek, atau terselip, mengakibatkan rekonsiliasi data inventaris di akhir semester sering mengalami disinformasi dan selisih pembukuan.", bold_prefix="1. Risiko Kerusakan Dokumen Fisik: ")
+    add_bullet_item(doc, "Mahasiswa tidak memiliki sarana untuk memantau sisa stok alat praktikum yang tersedia secara realtime tanpa harus datang secara langsung ke ruangan laboratorium.", bold_prefix="2. Ketiadaan Transparansi Sisa Stok: ")
+    add_bullet_item(doc, "Laboran mengalami kesulitan melacak mahasiswa yang terlambat mengembalikan alat praktikum melewati tenggat jadwal mata kuliah yang telah ditentukan.", bold_prefix="3. Monitoring Tenggat Waktu Nihil: ")
+    add_bullet_item(doc, "Tidak ada formulir verifikasi kondisi fisik alat sebelum dipinjam dan sesudah dikembalikan, sehingga kerusakan barang sulit dipertanggungjawabkan secara adil.", bold_prefix="4. Ketiadaan Audit Kondisi Fisik Alat: ")
 
-    add_subbab_heading(doc, "1.2", "Capaian Pembelajaran & Tujuan Praktikum")
+    add_subbab_heading(doc, "1.2", "Rumusan Masalah")
+    add_body_paragraph(
+        doc,
+        "Berdasarkan latar belakang di atas, rumusan masalah yang menjadi fokus penyelesaian proyek ini adalah:"
+    )
+    add_bullet_item(doc, "Bagaimana merancang sistem inventaris mobile yang mampu mendigitalkan alur peminjaman secara efisien dan transparan?")
+    add_bullet_item(doc, "Bagaimana memisahkan hak akses sistem secara tegas antara peran Mahasiswa (peminjam) dan Laboran (administrator)?")
+    add_bullet_item(doc, "Bagaimana memvalidasi ketersediaan stok barang secara realtime guna mencegah peminjaman melebihi kuota fisik yang ada?")
+    add_bullet_item(doc, "Bagaimana mengonfigurasi environment pengembangan Flutter SDK dan native Android yang andal untuk mendukung konektivitas cloud?")
+
+    add_subbab_heading(doc, "1.3", "Batasan Masalah")
+    add_body_paragraph(
+        doc,
+        "Agar pengerjaan proyek terarah dan tepat guna, batasan masalah ditetapkan sebagai berikut:"
+    )
+    add_bullet_item(doc, "Aplikasi dibangun menggunakan framework Flutter 3.x dengan bahasa pemrograman Dart 3.x.")
+    add_bullet_item(doc, "Sistem backend menggunakan layanan Supabase Cloud dengan basis data relasional PostgreSQL 15.")
+    add_bullet_item(doc, "Target sistem operasi difokuskan pada perangkat mobile Android (minimum Android 8.0 Oreo, target Android 14).")
+    add_bullet_item(doc, "Aktor pengguna dibatasi pada dua peran utama: Mahasiswa aktif PTI dan Laboran resmi Laboratorium Komputer FKIP Unila.")
+
+    add_subbab_heading(doc, "1.4", "Capaian Pembelajaran & Tujuan Praktikum")
     add_body_paragraph(
         doc,
         "Tujuan pelaksanaan praktikum pada Minggu I meliputi:"
     )
     add_bullet_item(doc, "Menganalisis kebutuhan fungsional dan non-fungsional sistem inventaris laboratorium komputer.")
-    add_bullet_item(doc, "Merumuskan model use case yang memisahkan hak akses antara Mahasiswa (peminjam) dan Laboran (administrator).")
-    add_bullet_item(doc, "Merancang sketsa alur 4 langkah peminjaman digital (Pilih Alat, Formulir, Verifikasi KTM, Pengembalian & Cek Fisik).")
+    add_bullet_item(doc, "Merumuskan model use case yang memisahkan hak akses antara Mahasiswa dan Laboran secara presisi.")
+    add_bullet_item(doc, "Merancang sketsa alur transaksi 4 tahap terstruktur (Pilih Alat, Formulir, Verifikasi KTM, Pengembalian & Cek Fisik).")
     add_bullet_item(doc, "Mengonfigurasi environment pengembangan Flutter SDK versi 3.13+ dan native AndroidManifest.xml.")
 
-    add_subbab_heading(doc, "1.3", "Manfaat Praktikum")
+    add_subbab_heading(doc, "1.5", "Manfaat Praktikum")
     add_body_paragraph(
         doc,
         "Praktikum ini memberikan fondasi rekayasa kebutuhan perangkat lunak yang kokoh bagi mahasiswa pengembang, "
-        "sekaligus merancang solusi digitalisasi yang tepat guna bagi laboratorium komputer PTI FKIP Unila."
+        "sekaligus merancang solusi digitalisasi yang tepat guna dan bernilai guna tinggi bagi Laboratorium Komputer PTI FKIP Unila."
     )
 
     # BAB II
     add_bab_heading(doc, "II", "PERANCANGAN SISTEM & DESAIN USE CASE")
-    add_subbab_heading(doc, "2.1", "Konsep Arsitektur Mobile & Use Case")
+    add_subbab_heading(doc, "2.1", "Analisis Kebutuhan Fungsional (Functional Requirements)")
+    add_body_paragraph(
+        doc,
+        "Kebutuhan fungsional mendefinisikan kapabilitas dan fitur operasional yang wajib disediakan oleh sistem mobile LabInventory. "
+        "Matriks kebutuhan fungsional dirumuskan pada tabel berikut:"
+    )
+    tabel_fr_headers = ["Kode FR", "Nama Fitur", "Aktor Pelaksana", "Deskripsi Fungsional", "Prioritas"]
+    tabel_fr_data = [
+        ["FR-01", "Otentikasi Pengguna", "Mahasiswa & Laboran", "Masuk ke sistem dengan email & password terenkripsi via Supabase Auth.", "Tinggi"],
+        ["FR-02", "Pemisahan Hak Akses Role", "Sistem", "Mengarahkan antarmuka (dashboard) sesuai role pengguna (Mahasiswa vs Laboran).", "Tinggi"],
+        ["FR-03", "Katalog & Pencarian Barang", "Mahasiswa", "Menampilkan daftar alat lab, sisa stok realtime, dan filter pencarian nama barang.", "Tinggi"],
+        ["FR-04", "Pengajuan Formulir Pinjam", "Mahasiswa", "Menginput jumlah pinjam, memilih tanggal WIB, dan mencantumkan keperluan praktikum.", "Tinggi"],
+        ["FR-05", "Persetujuan Tiket Peminjaman", "Laboran", "Memverifikasi tiket status pending, memeriksa KTM fisik mahasiswa, dan approval.", "Tinggi"],
+        ["FR-06", "Pengembalian & Cek Fisik", "Laboran", "Memeriksa kondisi fisik alat (Baik/Rusak), input catatan, dan konfirmasi kembali.", "Tinggi"],
+        ["FR-07", "Pelacakan Riwayat Transaksi", "Mahasiswa & Laboran", "Melihat riwayat peminjaman masa lalu beserta status akhir barang secara kronologis.", "Sedang"],
+        ["FR-08", "Manajemen Master Barang", "Laboran", "Menambah barang inventaris baru, mengedit informasi spesifikasi, dan update stok.", "Sedang"]
+    ]
+    add_academic_table(doc, "Tabel 1.1: Matriks Kebutuhan Fungsional Sistem LabInventory", tabel_fr_headers, tabel_fr_data, col_widths=[0.8, 1.4, 1.3, 2.3, 0.7])
+
+    add_subbab_heading(doc, "2.2", "Analisis Kebutuhan Non-Fungsional (Non-Functional Requirements)")
+    add_body_paragraph(
+        doc,
+        "Kebutuhan non-fungsional menitikberatkan pada standar kualitas, keandalan, dan batasan kinerja sistem perangkat lunak mobile:"
+    )
+    tabel_nfr_headers = ["Parameter", "Kategori Kebutuhan", "Spesifikasi & Standar Teknis"]
+    tabel_nfr_data = [
+        ["NFR-01", "Usability & UI/UX", "Antarmuka mengadopsi standar Google Material Design 3 dengan identitas warna resmi Unila."],
+        ["NFR-02", "Performance & Kecepatan", "Waktu respons navigasi antarmuka dan fetching data cloud rata-rata di bawah 1,5 detik."],
+        ["NFR-03", "Security & Integritas", "Data diproteksi dengan Row Level Security (RLS) PostgreSQL dan enkripsi HTTPS/TLS 1.3."],
+        ["NFR-04", "Portabilitas Platform", "Aplikasi dapat berjalan stabil pada perangkat Android versi 8.0 (API 26) hingga Android 14 (API 34)."]
+    ]
+    add_academic_table(doc, "Tabel 1.2: Matriks Kebutuhan Non-Fungsional Sistem LabInventory", tabel_nfr_headers, tabel_nfr_data, col_widths=[1.0, 1.8, 3.7])
+
+    add_subbab_heading(doc, "2.3", "Pemodelan Diagram Use Case Sistem")
     add_body_paragraph(
         doc,
         "Aplikasi dirancang menggunakan paradigma Object-Oriented Programming (OOP) pada bahasa pemrograman Dart "
@@ -100,34 +154,60 @@ def create_minggu_1():
     if os.path.exists(uc_img):
         add_academic_image(doc, uc_img, "Gambar 1.1: Diagram Use Case & Pembagian Peran Aplikasi Mobile LabInventory", width=Inches(5.4))
 
-    add_subbab_heading(doc, "2.2", "Pemetaan Alur Peminjaman 4 Langkah")
+    add_subbab_heading(doc, "2.4", "Deskripsi & Skenario Use Case")
     add_body_paragraph(
         doc,
-        "Proses peminjaman dikonstruksikan ke dalam alur transaksi empat tahap terstruktur:"
+        "Berdasarkan Gambar 1.1, sistem mendefinisikan dua aktor utama dengan hak istimewa yang saling melengkapi:"
+    )
+    add_bullet_item(doc, "Aktor Mahasiswa berwenang melakukan otentikasi login, mengeksplorasi katalog inventaris, memeriksa ketersediaan stok fisik barang, mengisi formulir peminjaman dengan kuota valid, serta memantau status persetujuan tiket secara personal.", bold_prefix="1. Aktor Mahasiswa: ")
+    add_bullet_item(doc, "Aktor Laboran bertindak sebagai administrator yang memiliki wewenang penuh dalam memverifikasi permohonan pinjam, memeriksa jaminan KTM fisik, menginspeksi kondisi fisik saat pengembalian barang, serta mengelola ketersediaan inventaris laboratorium.", bold_prefix="2. Aktor Laboran: ")
+
+    add_subbab_heading(doc, "2.5", "Perancangan Arsitektur Sistem Mobile")
+    add_body_paragraph(
+        doc,
+        "Arsitektur sistem LabInventory memadukan client mobile Flutter dengan infrastruktur cloud Supabase melalui protokol "
+        "komunikasi RESTful API dan WebSocket Realtime yang aman, sebagaimana diilustrasikan pada diagram berikut:"
+    )
+
+    arch_img = os.path.join(IMG_EVID, "diagram_arsitektur_sistem.png")
+    if os.path.exists(arch_img):
+        add_academic_image(doc, arch_img, "Gambar 1.2: Diagram Arsitektur Komunikasi Flutter Client & Supabase Cloud Backend", width=Inches(5.4))
+
+    add_subbab_heading(doc, "2.6", "Pemetaan Alur Peminjaman 4 Langkah")
+    add_body_paragraph(
+        doc,
+        "Proses peminjaman dikonstruksikan ke dalam alur transaksi empat tahap terstruktur guna menjamin akuntabilitas aset:"
     )
     tabel_alur_headers = ["Tahap Alur", "Aktor Pelaksana", "Aktivitas Teknis", "Output Sistem"]
     tabel_alur_data = [
-        ["Tahap 1", "Mahasiswa", "Menelusuri katalog digital dan mengecek stok live barang siap pakai.", "Barang dipilih"],
-        ["Tahap 2", "Mahasiswa", "Mengisi jumlah unit, memilih tanggal (DatePicker WIB), dan input keperluan.", "Tiket 'pending'"],
-        ["Tahap 3", "Laboran & Mahasiswa", "Laboran menyetujui di sistem; mahasiswa membawa KTM fisik untuk mengambil alat.", "Tiket 'approved'"],
-        ["Tahap 4", "Laboran", "Inspeksi kondisi fisik (Baik/Rusak), catatan laboran, dan konfirmasi pengembalian.", "Tiket 'returned'"]
+        ["Tahap 1", "Mahasiswa", "Menelusuri katalog digital dan mengecek sisa stok live barang siap pakai.", "Barang dipilih"],
+        ["Tahap 2", "Mahasiswa", "Mengisi jumlah unit, memilih tanggal (DatePicker WIB), dan input keperluan.", "Tiket berstatus 'pending'"],
+        ["Tahap 3", "Laboran & Mahasiswa", "Laboran menyetujui di sistem; mahasiswa membawa KTM fisik untuk mengambil alat.", "Tiket berstatus 'approved'"],
+        ["Tahap 4", "Laboran", "Inspeksi kondisi fisik (Baik/Rusak), catatan laboran, dan konfirmasi pengembalian.", "Tiket berstatus 'returned'"]
     ]
-    add_academic_table(doc, "Tabel 1.1: Pemetaan Alur Peminjaman Terstruktur 4 Tahap", tabel_alur_headers, tabel_alur_data, col_widths=[1.1, 1.4, 2.7, 1.4])
+    add_academic_table(doc, "Tabel 1.3: Pemetaan Alur Peminjaman Terstruktur 4 Tahap", tabel_alur_headers, tabel_alur_data, col_widths=[1.1, 1.4, 2.7, 1.4])
 
     # BAB III
     add_bab_heading(doc, "III", "IMPLEMENTASI SETUP FLUTTER & HASIL EVALUASI")
-    add_subbab_heading(doc, "3.1", "Konfigurasi Proyek & Aset Grafis")
+    add_subbab_heading(doc, "3.1", "Konfigurasi Proyek & Dependensi Flutter")
     add_body_paragraph(
         doc,
         "Proyek Flutter `lab_inventory` diinisiasi menggunakan Flutter SDK versi 3.13.3 dan Dart SDK versi 3.0.0. "
-        "Pada lapisan native Android, berkas `AndroidManifest.xml` dikonfigurasi dengan menyertakan izin jaringan "
-        "`android.permission.INTERNET` dan `android.permission.ACCESS_NETWORK_STATE` guna mendukung komunikasi cloud."
+        "Manajemen dependensi dikonfigurasi melalui berkas `pubspec.yaml` dengan pustaka utama mencakup `supabase_flutter` "
+        "untuk komunikasi backend, `intl` untuk format penanggalan WIB, serta `google_fonts` untuk tipografi modern."
+    )
+
+    add_subbab_heading(doc, "3.2", "Konfigurasi Lapisan Native Android")
+    add_body_paragraph(
+        doc,
+        "Pada lapisan native Android, berkas `android/app/src/main/AndroidManifest.xml` dikonfigurasi dengan menyertakan izin jaringan "
+        "`android.permission.INTERNET` dan `android.permission.ACCESS_NETWORK_STATE` guna mendukung komunikasi cloud via HTTPS TLS 1.3."
     )
 
     if os.path.exists(APP_ICON):
-        add_academic_image(doc, APP_ICON, "Gambar 1.2: Aset Ikon Launcher Resmi Aplikasi LabInventory pada Perangkat Android", width=Inches(1.5))
+        add_academic_image(doc, APP_ICON, "Gambar 1.3: Desain Ikon Launcher Resmi Aplikasi LabInventory pada Sistem Operasi Android", width=Inches(1.5))
 
-    add_subbab_heading(doc, "3.2", "Struktur Direktori Proyek")
+    add_subbab_heading(doc, "3.3", "Struktur Direktori Proyek")
     add_body_paragraph(
         doc,
         "Struktur direktori ditata mengikuti arsitektur modular Flutter untuk mempermudah skalabilitas pengembangan:"
@@ -137,12 +217,29 @@ def create_minggu_1():
         ["android/app/src/main/AndroidManifest.xml", "Konfigurasi izin jaringan native dan nama aplikasi resmi."],
         ["android/app/src/main/res/mipmap-*/", "Ikon aplikasi Android adaptive pada seluruh resolusi perangkat."],
         ["assets/images/lab_inventory_logo.png", "Aset visual lambang resmi Universitas Lampung resolusi tinggi."],
-        ["lib/main.dart", "Titik masuk (entry point) eksekusi aplikasi dan navigasi awal."],
-        ["pubspec.yaml", "Manajemen dependensi pustaka dan pendaftaran aset gambar."]
+        ["lib/main.dart", "Titik masuk (entry point) eksekusi aplikasi dan konfigurasi tema utama."],
+        ["lib/models/", "Definisi kelas entitas data (Item, Borrowing, UserProfile)."],
+        ["lib/views/", "Antarmuka pengguna (Login, Dashboard Mahasiswa, Dashboard Laboran)."],
+        ["pubspec.yaml", "Manajemen dependensi pustaka dan pendaftaran aset visual."]
     ]
-    add_academic_table(doc, "Tabel 1.2: Struktur Direktori Proyek Hasil Inisiasi Minggu I", tabel_struk_headers, tabel_struk_data, col_widths=[2.5, 4.0])
+    add_academic_table(doc, "Tabel 1.4: Struktur Direktori Proyek Hasil Inisiasi Minggu I", tabel_struk_headers, tabel_struk_data, col_widths=[2.5, 4.0])
 
-    add_subbab_heading(doc, "3.3", "Evaluasi Kendala & Solusi Teknis")
+    add_subbab_heading(doc, "3.4", "Pengujian Build Perdana & Tampilan Awal Login")
+    add_body_paragraph(
+        doc,
+        "Kompilasi binary APK perdana berhasil dilakukan melalui perintah `flutter build apk --debug`. Hasil eksekusi aplikasi "
+        "diuji secara langsung pada perangkat fisik dan emulator untuk memvalidasi rendering layar login perdana:"
+    )
+
+    login_device_img = os.path.join(IMG_DEV, "01-login.png")
+    if os.path.exists(login_device_img):
+        add_academic_image(doc, login_device_img, "Gambar 1.4: Tampilan Inisialisasi Layar Masuk / Login pada Layar Perangkat Fisik", width=Inches(2.5))
+
+    pixel_login_img = os.path.join(IMG_EVID, "configuration", "production-login-pixel7a.png")
+    if os.path.exists(pixel_login_img):
+        add_academic_image(doc, pixel_login_img, "Gambar 1.5: Hasil Pengujian Rendering Layar Awal pada Google Pixel 7a Android 14", width=Inches(2.5))
+
+    add_subbab_heading(doc, "3.5", "Evaluasi Kendala Teknis & Solusi")
     add_body_paragraph(
         doc,
         "Kendala Teknis: Muncul peringatan ketidaksesuaian versi Gradle pada lingkungan Android Studio saat proses build awal.\n"
@@ -155,15 +252,15 @@ def create_minggu_1():
     add_subbab_heading(doc, "4.1", "Kesimpulan Keterlaksanaan Minggu I")
     add_body_paragraph(
         doc,
-        "Tahapan inisiasi proyek, analisis kebutuhan sistem, perancangan use case, dan penyiapan environment pengembangan "
-        "pada Minggu I telah berhasil dituntaskan secara paripurna (100%). Seluruh prasyarat arsitektural telah siap untuk "
-        "memasuki tahap slicing antarmuka pengguna pada Minggu II."
+        "Tahapan inisiasi proyek, analisis kebutuhan sistem (fungsional & non-fungsional), perancangan diagram use case, "
+        "arsitektur cloud, serta penyiapan environment pengembangan Flutter pada Minggu I telah berhasil dituntaskan secara paripurna (100%). "
+        "Seluruh prasyarat arsitektural telah siap untuk memasuki tahap slicing antarmuka pengguna pada Minggu II."
     )
     add_subbab_heading(doc, "4.2", "Rencana Tindak Lanjut Minggu II")
     add_body_paragraph(
         doc,
         "Rencana pada Minggu II difokuskan pada implementasi sistem desain Material 3 (Unila Palette), pembuatan Animated "
-        "Splash Screen, Mobile Bottom Navigation Bar (4 tab Mahasiswa dan 5 tab Laboran), serta antarmuka katalog inventaris."
+        "Splash Screen, Mobile Bottom Navigation Bar (4 tab Mahasiswa dan 5 tab Laboran), serta antarmuka formulir peminjaman."
     )
 
     add_daftar_pustaka(doc, DAFTAR_PUSTAKA_STANDARD)
@@ -536,7 +633,6 @@ def create_minggu_4():
 
 def main():
     print("Building formal academic weekly reports matching Unila PDF specification...")
-    out_dir = os.path.abspath("docs/laporan")
     
     docs_to_build = [
         ("Laporan_Minggu_1_LabInventory_Naila_Fathia.docx", create_minggu_1()),
@@ -546,27 +642,16 @@ def main():
     ]
     
     for filename, d in docs_to_build:
-        path_in_laporan = os.path.join(out_dir, filename)
         path_in_root = os.path.abspath(filename)
         
-        # Save to root
+        # Save to root only
         try:
             d.save(path_in_root)
             print(f"Saved in root: {filename} ({os.path.getsize(path_in_root)} bytes)")
         except Exception as e:
             print(f"Could not save in root {filename}: {e}")
-
-        # Save to docs/laporan/ (with fallback name if open in Word)
-        try:
-            d.save(path_in_laporan)
-            print(f"Saved in docs/laporan: {filename}")
-        except PermissionError:
-            alt_name = filename.replace(".docx", "_v2.docx")
-            alt_path = os.path.join(out_dir, alt_name)
-            d.save(alt_path)
-            print(f"File locked by Word! Saved to alternative: {alt_name}")
         
-    print("All 4 academic reports successfully generated and verified!")
+    print("All 4 academic reports successfully generated and verified in root directory!")
 
 if __name__ == "__main__":
     main()
