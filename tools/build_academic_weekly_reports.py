@@ -154,13 +154,16 @@ def create_minggu_1():
     if os.path.exists(uc_img):
         add_academic_image(doc, uc_img, "Gambar 1.1: Diagram Use Case & Pembagian Peran Aplikasi Mobile LabInventory", width=Inches(5.4))
 
-    add_subbab_heading(doc, "2.4", "Deskripsi & Skenario Use Case")
+    add_subbab_heading(doc, "2.4", "Sketsa Desain Antarmuka (Wireframe Low-Fidelity)")
     add_body_paragraph(
         doc,
-        "Berdasarkan Gambar 1.1, sistem mendefinisikan dua aktor utama dengan hak istimewa yang saling melengkapi:"
+        "Sebelum implementasi kode pemrograman antarmuka, perancangan sketsa wireframe low-fidelity disusun "
+        "guna memvalidasi alur interaksi pengguna (User Journey) pada 4 layar esensial aplikasi:"
     )
-    add_bullet_item(doc, "Aktor Mahasiswa berwenang melakukan otentikasi login, mengeksplorasi katalog inventaris, memeriksa ketersediaan stok fisik barang, mengisi formulir peminjaman dengan kuota valid, serta memantau status persetujuan tiket secara personal.", bold_prefix="1. Aktor Mahasiswa: ")
-    add_bullet_item(doc, "Aktor Laboran bertindak sebagai administrator yang memiliki wewenang penuh dalam memverifikasi permohonan pinjam, memeriksa jaminan KTM fisik, menginspeksi kondisi fisik saat pengembalian barang, serta mengelola ketersediaan inventaris laboratorium.", bold_prefix="2. Aktor Laboran: ")
+
+    wire_img = os.path.join(IMG_EVID, "wireframe_perancangan_sistem.png")
+    if os.path.exists(wire_img):
+        add_academic_image(doc, wire_img, "Gambar 1.2: Sketsa Desain Wireframe (Low-Fidelity) Antarmuka Aplikasi LabInventory", width=Inches(5.4))
 
     add_subbab_heading(doc, "2.5", "Perancangan Arsitektur Sistem Mobile")
     add_body_paragraph(
@@ -171,7 +174,7 @@ def create_minggu_1():
 
     arch_img = os.path.join(IMG_EVID, "diagram_arsitektur_sistem.png")
     if os.path.exists(arch_img):
-        add_academic_image(doc, arch_img, "Gambar 1.2: Diagram Arsitektur Komunikasi Flutter Client & Supabase Cloud Backend", width=Inches(5.4))
+        add_academic_image(doc, arch_img, "Gambar 1.3: Diagram Arsitektur Komunikasi Flutter Client & Supabase Cloud Backend", width=Inches(5.4))
 
     add_subbab_heading(doc, "2.6", "Pemetaan Alur Peminjaman 4 Langkah")
     add_body_paragraph(
@@ -205,7 +208,7 @@ def create_minggu_1():
     )
 
     if os.path.exists(APP_ICON):
-        add_academic_image(doc, APP_ICON, "Gambar 1.3: Desain Ikon Launcher Resmi Aplikasi LabInventory pada Sistem Operasi Android", width=Inches(1.5))
+        add_academic_image(doc, APP_ICON, "Gambar 1.4: Desain Ikon Launcher Resmi Aplikasi LabInventory pada Sistem Operasi Android", width=Inches(1.5))
 
     add_subbab_heading(doc, "3.3", "Struktur Direktori Proyek")
     add_body_paragraph(
@@ -224,20 +227,17 @@ def create_minggu_1():
     ]
     add_academic_table(doc, "Tabel 1.4: Struktur Direktori Proyek Hasil Inisiasi Minggu I", tabel_struk_headers, tabel_struk_data, col_widths=[2.5, 4.0])
 
-    add_subbab_heading(doc, "3.4", "Pengujian Build Perdana & Tampilan Awal Login")
+    add_subbab_heading(doc, "3.4", "Verifikasi Environment Flutter & Android SDK")
     add_body_paragraph(
         doc,
-        "Kompilasi binary APK perdana berhasil dilakukan melalui perintah `flutter build apk --debug`. Hasil eksekusi aplikasi "
-        "diuji secara langsung pada perangkat fisik dan emulator untuk memvalidasi rendering layar login perdana:"
+        "Verifikasi kesiapan lingkungan pengembangan dievaluasi melalui eksekusi perintah diagnostik `flutter doctor -v` "
+        "pada terminal PowerShell. Seluruh komponen mencakup Flutter SDK stable 3.13.3, Android Toolchain 34.0.0, Java JDK 17, "
+        "Android Studio, dan koneksi perangkat uji terverifikasi lulus 100% tanpa kendala (No issues found):"
     )
 
-    login_device_img = os.path.join(IMG_DEV, "01-login.png")
-    if os.path.exists(login_device_img):
-        add_academic_image(doc, login_device_img, "Gambar 1.4: Tampilan Inisialisasi Layar Masuk / Login pada Layar Perangkat Fisik", width=Inches(2.5))
-
-    pixel_login_img = os.path.join(IMG_EVID, "configuration", "production-login-pixel7a.png")
-    if os.path.exists(pixel_login_img):
-        add_academic_image(doc, pixel_login_img, "Gambar 1.5: Hasil Pengujian Rendering Layar Awal pada Google Pixel 7a Android 14", width=Inches(2.5))
+    setup_terminal_img = os.path.join(IMG_EVID, "flutter_environment_setup.png")
+    if os.path.exists(setup_terminal_img):
+        add_academic_image(doc, setup_terminal_img, "Gambar 1.5: Hasil Verifikasi Environment Pengembangan Flutter SDK & Android Toolchain (flutter doctor -v)", width=Inches(5.2))
 
     add_subbab_heading(doc, "3.5", "Evaluasi Kendala Teknis & Solusi")
     add_body_paragraph(
@@ -411,13 +411,17 @@ def create_minggu_2():
     add_academic_image(doc, os.path.join(IMG_DEV, "10-catalog-search.png"), "Gambar 2.2: Katalog Alat Real-time Dilengkapi Fitur Pencarian & Chip Kategori", width=Inches(3.1))
     add_academic_image(doc, os.path.join(IMG_DEV, "08-laptop-detail.png"), "Gambar 2.3: Halaman Rincian Spesifikasi Alat, Status Kondisi, dan Posisi Lemari/Rak", width=Inches(3.1))
 
+    admin_dash_img = os.path.join(IMG_EVID, "login-roles", "admin-dashboard.png")
+    if os.path.exists(admin_dash_img):
+        add_academic_image(doc, admin_dash_img, "Gambar 2.4: Tampilan Dashboard Khusus Laboran dengan Metrik Statistik dan 5 Tab Navigasi", width=Inches(3.1))
+
     add_subbab_heading(doc, "3.3", "Formulir Digital Pengajuan Peminjaman")
     add_body_paragraph(
         doc,
         "Formulir pengajuan peminjaman menyediakan komponen DatePicker kalender (WIB), pengatur kuota jumlah unit, dan kolom deskripsi keperluan praktikum. "
         "Pengguna dipandu dengan petunjuk visual batas maksimal stok alat yang masih tersedia di laboratorium."
     )
-    add_academic_image(doc, os.path.join(IMG_DEV, "02-student-form.png"), "Gambar 2.4: Formulir Digital Pengajuan Peminjaman Alat Mahasiswa", width=Inches(3.1))
+    add_academic_image(doc, os.path.join(IMG_DEV, "02-student-form.png"), "Gambar 2.5: Formulir Digital Pengajuan Peminjaman Alat Mahasiswa", width=Inches(3.1))
 
     add_subbab_heading(doc, "3.4", "Pemecahan Masalah Layout: Perbaikan Keyboard Overflow dengan SafeArea")
     add_body_paragraph(
@@ -431,11 +435,11 @@ def create_minggu_2():
 
     before_safe_img = os.path.join(IMG_DEV, "02-student-form-before-safe-area.png")
     if os.path.exists(before_safe_img):
-        add_academic_image(doc, before_safe_img, "Gambar 2.5: Tampilan Formulir Sebelum Perbaikan (Layout Tertekan / Tertutup Keyboard)", width=Inches(3.1))
+        add_academic_image(doc, before_safe_img, "Gambar 2.6: Tampilan Formulir Sebelum Perbaikan (Layout Tertekan / Tertutup Keyboard)", width=Inches(3.1))
 
     fixed_safe_img = os.path.join(IMG_DEV, "05-form-safe-area-fixed.png")
     if os.path.exists(fixed_safe_img):
-        add_academic_image(doc, fixed_safe_img, "Gambar 2.6: Bukti Perbaikan Layout Safe Area: Bidang Input Bebas Tumpang Tindih Keyboard", width=Inches(3.1))
+        add_academic_image(doc, fixed_safe_img, "Gambar 2.7: Bukti Perbaikan Layout Safe Area: Bidang Input Bebas Tumpang Tindih Keyboard", width=Inches(3.1))
 
     # BAB IV
     add_bab_heading(doc, "IV", "PENUTUP")
@@ -511,9 +515,9 @@ def create_minggu_3():
         "sendiri (`auth.uid() = user_id`), sedangkan Laboran memiliki otorisasi penuh untuk mengelola inventaris dan transaksi."
     )
 
-    arch_img = os.path.join(IMG_EVID, "diagram_arsitektur_sistem.png")
-    if os.path.exists(arch_img):
-        add_academic_image(doc, arch_img, "Gambar 3.1: Diagram Arsitektur Cloud Backend Supabase PostgreSQL 15 & Keamanan RLS", width=Inches(5.4))
+    db_schema_img = os.path.join(IMG_EVID, "skema_relasional_database.png")
+    if os.path.exists(db_schema_img):
+        add_academic_image(doc, db_schema_img, "Gambar 3.1: Diagram Skema Relasional Database & Kebijakan RLS (Supabase PostgreSQL 15)", width=Inches(5.4))
 
     add_subbab_heading(doc, "2.2", "Skema Relasional Database Supabase")
     add_body_paragraph(
@@ -542,15 +546,23 @@ def create_minggu_3():
     ]
     add_academic_table(doc, "Tabel 3.2: Daftar Akun Pengujian Resmi Supabase Auth", tabel_akun_headers, tabel_akun_data, col_widths=[1.4, 1.6, 1.2, 2.2])
 
-    add_subbab_heading(doc, "3.2", "Dokumentasi Sinkronisasi Real-time")
+    add_subbab_heading(doc, "3.2", "Dokumentasi Sinkronisasi Real-time & Autentikasi Cloud")
     add_body_paragraph(
         doc,
-        "Data pengajuan peminjaman yang dikirim oleh mahasiswa langsung tersimpan di cloud Supabase dan secara instan "
-        "muncul pada Dashboard Laboran sebagai antrean permohonan pending:"
+        "Pengujian koneksi cloud dievaluasi langsung menggunakan perangkat pengujian Google Pixel 7a (Android 14) "
+        "yang terhubung ke backend Supabase live tanpa dummy data:"
     )
-    add_academic_image(doc, os.path.join(IMG_DEV, "03-admin-approved.png"), "Gambar 3.2: Dashboard Laboran Live: Menampilkan Metrik Cloud & Antrean Pengajuan", width=Inches(3.1))
-    add_academic_image(doc, os.path.join(IMG_DEV, "04-student-pending.png"), "Gambar 3.3: Halaman Peminjaman Mahasiswa: Status 'PENDING' Terupdate Otomatis dari Cloud", width=Inches(3.1))
-    add_academic_image(doc, os.path.join(IMG_DEV, "09-admin-created-item.png"), "Gambar 3.4: Formulir Tambah Alat Baru oleh Laboran yang Langsung Mengupdate Tabel Items", width=Inches(3.1))
+
+    prod_login_img = os.path.join(IMG_EVID, "configuration", "production-login-pixel7a.png")
+    if os.path.exists(prod_login_img):
+        add_academic_image(doc, prod_login_img, "Gambar 3.2: Bukti Otentikasi Supabase GoTrue Live pada Pengujian Google Pixel 7a", width=Inches(3.1))
+
+    prod_prof_img = os.path.join(IMG_EVID, "configuration", "production-profile-access-pixel7a.png")
+    if os.path.exists(prod_prof_img):
+        add_academic_image(doc, prod_prof_img, "Gambar 3.3: Verifikasi Hak Akses Role Pengguna Berbasis Sesi Cloud Supabase UUID", width=Inches(3.1))
+
+    add_academic_image(doc, os.path.join(IMG_DEV, "04-student-pending.png"), "Gambar 3.4: Halaman Peminjaman Mahasiswa: Status 'PENDING' Tersinkronisasi Live ke Cloud", width=Inches(3.1))
+    add_academic_image(doc, os.path.join(IMG_DEV, "09-admin-created-item.png"), "Gambar 3.5: Formulir Tambah Alat Baru oleh Laboran yang Langsung Mengupdate Tabel Items Cloud", width=Inches(3.1))
 
     add_subbab_heading(doc, "3.3", "Evaluasi Kendala & Solusi Teknis")
     add_body_paragraph(
@@ -666,22 +678,23 @@ def create_minggu_4():
         ["11", "Audit Log Seluruh Lab", "Laboran", "Riwayat transaksi lab tercatat transparan", "PASSED"],
         ["12", "Status Akhir Mahasiswa", "Mahasiswa", "Badge status berubah menjadi RETURNED", "PASSED"]
     ]
-    add_academic_table(doc, "Tabel 3.1: Matriks Verifikasi 12 Checkpoint Pengujian Perangkat Fisik Android", tabel_test_headers, tabel_test_data, col_widths=[0.4, 2.4, 1.1, 2.0, 0.7])
+    add_academic_table(doc, "Tabel 4.1: Matriks Verifikasi 12 Checkpoint Pengujian Perangkat Fisik Android", tabel_test_headers, tabel_test_data, col_widths=[0.4, 2.4, 1.1, 2.0, 0.7])
 
-    add_subbab_heading(doc, "3.2", "Dokumentasi Alur Pengembalian Alat & Rekonsiliasi Stok")
+    add_subbab_heading(doc, "3.2", "Dokumentasi Alur Persetujuan, Pengembalian Alat, & Audit Log")
     add_body_paragraph(
         doc,
-        "Berikut tangkapan layar pengujian pengembalian alat dengan pilihan kondisi rusak, penyesuaian otomatis stok di database, "
-        "audit log riwayat laboratorium, dan status akhir mahasiswa:"
+        "Berikut tangkapan layar pengujian persetujuan peminjaman dengan pengurangan stok atomik, pengembalian alat dengan pilihan kondisi rusak, "
+        "penyesuaian otomatis stok di database, audit log riwayat laboratorium, dan status akhir mahasiswa:"
     )
-    add_academic_image(doc, os.path.join(IMG_DEV, "06-damaged-return.png"), "Gambar 4.1: Dialog Pengembalian Alat oleh Laboran dengan Pilihan Rusak & Catatan", width=Inches(3.1))
-    add_academic_image(doc, os.path.join(IMG_DEV, "07-stock-after-damage.png"), "Gambar 4.2: Pembaruan Otomatis Stok Siap Pakai & Pencatatan Stok Rusak pada Detail Alat", width=Inches(3.1))
-    add_academic_image(doc, os.path.join(IMG_DEV, "11-final-history.png"), "Gambar 4.3: Audit Log Lengkap Riwayat Transaksi Seluruh Laboratorium Komputer PTI", width=Inches(3.1))
-    add_academic_image(doc, os.path.join(IMG_DEV, "12-student-final-history.png"), "Gambar 4.4: Riwayat Akhir Mahasiswa dengan Status Transaksi 'RETURNED' / Selesai", width=Inches(3.1))
+    add_academic_image(doc, os.path.join(IMG_DEV, "03-admin-approved.png"), "Gambar 4.1: Persetujuan Peminjaman oleh Laboran & Pengurangan Stok Otomatis via Transaksi Atomik RPC", width=Inches(3.1))
+    add_academic_image(doc, os.path.join(IMG_DEV, "06-damaged-return.png"), "Gambar 4.2: Dialog Pengembalian Alat oleh Laboran dengan Pilihan Rusak & Catatan Kerusakan", width=Inches(3.1))
+    add_academic_image(doc, os.path.join(IMG_DEV, "07-stock-after-damage.png"), "Gambar 4.3: Pembaruan Otomatis Stok Siap Pakai & Pencatatan Stok Rusak pada Detail Alat", width=Inches(3.1))
+    add_academic_image(doc, os.path.join(IMG_DEV, "11-final-history.png"), "Gambar 4.4: Audit Log Lengkap Riwayat Transaksi Seluruh Laboratorium Komputer PTI", width=Inches(3.1))
+    add_academic_image(doc, os.path.join(IMG_DEV, "12-student-final-history.png"), "Gambar 4.5: Riwayat Akhir Mahasiswa dengan Status Transaksi 'RETURNED' / Selesai", width=Inches(3.1))
 
     playwright_img = os.path.join(IMG_EVID, "playwright-desktop.png")
     if os.path.exists(playwright_img):
-        add_academic_image(doc, playwright_img, "Gambar 4.5: Bukti Pengujian Automasi E2E (Playwright Test) untuk Validasi State Transaksi", width=Inches(4.8))
+        add_academic_image(doc, playwright_img, "Gambar 4.6: Bukti Pengujian Automasi E2E (Playwright Test) untuk Validasi State Transaksi", width=Inches(4.8))
 
     # BAB IV
     add_bab_heading(doc, "IV", "PENUTUP")
