@@ -1,6 +1,6 @@
 # LabInventory
 
-Aplikasi Android Flutter untuk inventaris dan peminjaman barang Laboratorium Komputer PTI FKIP Universitas Lampung.
+Aplikasi Android Flutter untuk inventaris dan peminjaman barang Laboratorium Komputer .
 
 Backend yang dipakai adalah **Supabase Auth dan PostgreSQL**. Acuan terbaru ada di [SRD v2](docs/SRD_V2.md); dokumen Word SRD v1 di root disimpan sebagai riwayat rancangan awal PHP/MySQL.
 
