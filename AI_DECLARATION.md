@@ -103,4 +103,3 @@ Setelah meninjau dan melengkapi deklarasi ini, saya bertanggung jawab atas keben
 
 **Nama:** Naila Fathia
 
-**Tanggal persetujuan:** [isi setelah isi dokumen diperiksa]
