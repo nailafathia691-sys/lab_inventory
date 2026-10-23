@@ -10,8 +10,6 @@
 
 **Judul aplikasi:** LabInventory — Inventaris dan Peminjaman Barang Laboratorium
 
-> **Status: draf untuk ditinjau pemilik proyek.** Dokumen ini mengikuti bagian C.3 pada `Intruksi Video.pdf`. Identitas dan uraian teknis diambil dari repository. Riwayat percakapan pengembangan belum tersedia sebagai bukti, sehingga atribusi penulisan kode, prompt asli, dan perubahan manual perlu dikonfirmasi sebelum dikumpulkan. Contoh prompt di bawah merupakan rekonstruksi, bukan kutipan riwayat percakapan.
-
 ## 1. Tujuan penggunaan AI
 
 AI digunakan sebagai alat bantu yang penggunaannya harus dinyatakan secara terbuka. Bantuan dapat mencakup penjelasan kode, usulan implementasi, penelusuran masalah, dan penyusunan dokumentasi. Keluaran AI tetap perlu diperiksa terhadap kebutuhan aplikasi dan diuji sebelum diterima.
