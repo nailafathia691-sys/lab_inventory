@@ -98,6 +98,16 @@ class Borrowing {
     required this.status,
     this.catatanKondisi,
     this.updatedBy,
+    this.createdAt,
+    this.approvedAt,
+    this.returnedAt,
+    this.returnedGood,
+    this.updatedAt,
+    this.relatedStudentName,
+    this.studentIdentityNumber,
+    this.relatedItemName,
+    this.relatedItemCode,
+    this.relatedItemCategory,
   });
 
   final String id;
@@ -112,27 +122,69 @@ class Borrowing {
   final String status;
   final String? catatanKondisi;
   final String? updatedBy;
+  final DateTime? createdAt;
+  final DateTime? approvedAt;
+  final DateTime? returnedAt;
+  final bool? returnedGood;
+  final DateTime? updatedAt;
+  final String? relatedStudentName;
+  final String? studentIdentityNumber;
+  final String? relatedItemName;
+  final String? relatedItemCode;
+  final String? relatedItemCategory;
   bool get isPending => status == 'pending';
   bool get isApproved => status == 'approved';
   bool get isRejected => status == 'rejected';
   bool get isReturned => status == 'returned';
 
-  factory Borrowing.fromJson(Map<String, dynamic> json) => Borrowing(
-    id: json['id'] as String,
-    userId: json['user_id'] as String,
-    itemId: json['item_id'] as String,
-    namaPeminjam: json['nama_peminjam'] as String,
-    namaBarang: json['nama_barang'] as String,
-    jumlah: (json['jumlah'] as num).toInt(),
-    tglPinjam: DateTime.parse(json['tgl_pinjam'] as String),
-    tglKembali: json['tgl_kembali'] == null
-        ? null
-        : DateTime.parse(json['tgl_kembali'] as String),
-    keperluan: json['keperluan'] as String,
-    status: json['status'] as String,
-    catatanKondisi: json['catatan_kondisi'] as String?,
-    updatedBy: json['updated_by'] as String?,
-  );
+  factory Borrowing.fromJson(Map<String, dynamic> json) {
+    final student = json['student'];
+    final item = json['related_item'];
+    return Borrowing(
+      id: json['id'] as String,
+      userId: json['user_id'] as String,
+      itemId: json['item_id'] as String,
+      namaPeminjam: json['nama_peminjam'] as String,
+      namaBarang: json['nama_barang'] as String,
+      jumlah: (json['jumlah'] as num).toInt(),
+      tglPinjam: DateTime.parse(json['tgl_pinjam'] as String),
+      tglKembali: json['tgl_kembali'] == null
+          ? null
+          : DateTime.parse(json['tgl_kembali'] as String),
+      keperluan: json['keperluan'] as String,
+      status: json['status'] as String,
+      catatanKondisi: json['catatan_kondisi'] as String?,
+      updatedBy: json['updated_by'] as String?,
+      createdAt: json['created_at'] == null
+          ? null
+          : DateTime.parse(json['created_at'] as String),
+      approvedAt: json['approved_at'] == null
+          ? null
+          : DateTime.parse(json['approved_at'] as String),
+      returnedAt: json['returned_at'] == null
+          ? null
+          : DateTime.parse(json['returned_at'] as String),
+      returnedGood: json['returned_good'] as bool?,
+      updatedAt: json['updated_at'] == null
+          ? null
+          : DateTime.parse(json['updated_at'] as String),
+      relatedStudentName: student is Map<String, dynamic>
+          ? student['nama'] as String?
+          : null,
+      studentIdentityNumber: student is Map<String, dynamic>
+          ? student['npm'] as String?
+          : null,
+      relatedItemName: item is Map<String, dynamic>
+          ? item['nama_barang'] as String?
+          : null,
+      relatedItemCode: item is Map<String, dynamic>
+          ? item['kode_barang'] as String?
+          : null,
+      relatedItemCategory: item is Map<String, dynamic>
+          ? item['kategori'] as String?
+          : null,
+    );
+  }
 }
 
 String businessDate(DateTime date) =>

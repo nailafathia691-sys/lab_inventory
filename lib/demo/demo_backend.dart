@@ -66,6 +66,7 @@ class DemoInventoryRepository implements InventoryRepository {
   Future<List<Borrowing>> getBorrowings({
     String? status,
     String? userId,
+    bool includeRelations = false,
   }) async {
     final profile = session.requireProfile();
     return _borrowings

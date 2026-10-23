@@ -24,18 +24,36 @@ class SupabaseAuthGateway implements AuthGateway {
         ? SessionEvent.signedOut
         : SessionEvent.changed,
   );
+
   @override
   Future<void> signIn(String email, String password) async {
-    final result = await client.auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
-    if (result.user == null || result.session == null) {
-      throw const AppFailure(
-        'Autentikasi belum berhasil. Silakan masuk kembali.',
+    try {
+      final result = await client.auth.signInWithPassword(
+        email: email.trim(),
+        password: password,
       );
+
+      if (result.user == null || result.session == null) {
+        throw const AppFailure(
+          'Autentikasi belum berhasil. Silakan masuk kembali.',
+        );
+      }
+
+      debugPrint('LOGIN BERHASIL: UID ${result.user!.id}');
+    } on AuthException catch (e) {
+      debugPrint('LOGIN AUTH ERROR: ${e.message}');
+      debugPrint('LOGIN AUTH STATUS: ${e.statusCode}');
+      rethrow;
+    } on PostgrestException catch (e) {
+      debugPrint('LOGIN DATABASE ERROR: ${e.message}');
+      debugPrint('LOGIN DATABASE CODE: ${e.code}');
+      rethrow;
+    } catch (e) {
+      debugPrint('LOGIN ERROR LAIN: $e');
+      rethrow;
     }
   }
+
 
   @override
   Future<AppProfile?> loadProfile() async {

@@ -52,6 +52,95 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+  testWidgets('transaction history opens details for the selected row', (
+    tester,
+  ) async {
+    repository.borrowings.add(
+      Borrowing(
+        id: 'loan-detail',
+        userId: studentProfile.id,
+        itemId: availableItem.id,
+        namaPeminjam: studentProfile.name,
+        namaBarang: 'Laptop detail',
+        jumlah: 2,
+        tglPinjam: DateTime(2026, 10, 20),
+        tglKembali: DateTime(2026, 10, 21),
+        keperluan: 'Praktikum',
+        status: 'returned',
+        catatanKondisi: 'Layar rusak',
+        createdAt: DateTime.utc(2026, 10, 19, 8, 30),
+        approvedAt: DateTime.utc(2026, 10, 19, 9),
+        returnedAt: DateTime.utc(2026, 10, 21, 10, 15),
+        returnedGood: false,
+      ),
+    );
+
+    await tester.pumpWidget(
+      const MaterialApp(home: TransactionHistoryScreen()),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Laptop detail - 2 unit'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('ID transaksi'), findsOneWidget);
+    expect(find.text('loan-detail'), findsOneWidget);
+    expect(find.text('Dikembalikan'), findsNWidgets(2));
+    expect(find.text('Layar rusak'), findsOneWidget);
+    expect(find.text('Rusak'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+  for (final decision in {'Setujui': 'approved', 'Tolak': 'rejected'}.entries) {
+    testWidgets(
+      'approval detail shows related records and can ${decision.key.toLowerCase()} the request',
+      (tester) async {
+        repository.borrowings.add(
+          Borrowing(
+            id: 'pending-detail',
+            userId: studentProfile.id,
+            itemId: availableItem.id,
+            namaPeminjam: 'Snapshot yang tidak dipakai',
+            namaBarang: 'Snapshot barang yang tidak dipakai',
+            jumlah: 3,
+            tglPinjam: DateTime(2026, 10, 24),
+            tglKembali: DateTime(2026, 10, 25),
+            keperluan: 'Praktikum instrumentasi',
+            status: 'pending',
+            createdAt: DateTime.utc(2026, 10, 23, 8, 30),
+            relatedStudentName: 'Nama dari profil terkait',
+            studentIdentityNumber: 'NPM-2026',
+            relatedItemName: 'Mikroskop dari inventaris',
+            relatedItemCode: 'LAB-022',
+            relatedItemCategory: 'Elektronik',
+          ),
+        );
+
+        await tester.pumpWidget(const MaterialApp(home: ApprovalScreen()));
+        await tester.pumpAndSettle();
+        expect(find.text('Nama dari profil terkait'), findsOneWidget);
+        expect(
+          find.textContaining('Mikroskop dari inventaris'),
+          findsOneWidget,
+        );
+        await tester.tap(find.text('Nama dari profil terkait'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('NPM-2026'), findsOneWidget);
+        expect(find.text('LAB-022'), findsOneWidget);
+        expect(find.text('Praktikum instrumentasi'), findsOneWidget);
+        expect(find.text('Snapshot yang tidak dipakai'), findsNothing);
+        expect(find.text('Snapshot barang yang tidak dipakai'), findsNothing);
+
+        final decisionButton = find.text(decision.key);
+        await tester.ensureVisible(decisionButton);
+        await tester.tap(decisionButton);
+        await tester.pumpAndSettle();
+
+        expect(repository.statusUpdates, ['pending-detail:${decision.value}']);
+        expect(repository.writeCalls, 1);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
   testWidgets('production login has no demo bypass or role selector', (
     tester,
   ) async {

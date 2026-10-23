@@ -10,7 +10,11 @@ import '../core/models.dart';
 
 abstract class InventoryRepository {
   Future<List<InventoryItem>> getItems();
-  Future<List<Borrowing>> getBorrowings({String? status, String? userId});
+  Future<List<Borrowing>> getBorrowings({
+    String? status,
+    String? userId,
+    bool includeRelations = false,
+  });
   Future<void> addItem({
     required String name,
     required String category,
@@ -159,10 +163,14 @@ class SupabaseInventoryRepository implements InventoryRepository {
   Future<List<Borrowing>> getBorrowings({
     String? status,
     String? userId,
+    bool includeRelations = false,
   }) async {
     final profile = session.requireProfile();
     try {
-      var query = client.from('borrowings').select();
+      final selection = includeRelations
+          ? '*, student:profiles!lab_borrowing_owner(nama,npm), related_item:items!lab_borrowing_item(nama_barang,kode_barang,kategori)'
+          : '*';
+      var query = client.from('borrowings').select(selection);
       final ownerId = profile.isAdmin ? userId : profile.id;
       if (ownerId != null) query = query.eq('user_id', ownerId);
       if (status != null) query = query.eq('status', status);

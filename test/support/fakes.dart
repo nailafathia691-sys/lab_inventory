@@ -59,6 +59,7 @@ class FakeInventoryRepository implements InventoryRepository {
   Object? readError;
   Object? writeError;
   int writeCalls = 0;
+  final List<String> statusUpdates = [];
   @override
   Future<List<InventoryItem>> getItems() async {
     if (readError != null) throw readError!;
@@ -69,6 +70,7 @@ class FakeInventoryRepository implements InventoryRepository {
   Future<List<Borrowing>> getBorrowings({
     String? status,
     String? userId,
+    bool includeRelations = false,
   }) async {
     if (readError != null) throw readError!;
     return borrowings;
@@ -102,5 +104,8 @@ class FakeInventoryRepository implements InventoryRepository {
     required String status,
     String? notes,
     bool? returnedGood,
-  }) => write();
+  }) async {
+    statusUpdates.add('$id:$status');
+    await write();
+  }
 }

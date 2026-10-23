@@ -70,6 +70,66 @@ void main() {
     await repository().getBorrowings(userId: 'other-user');
     expect(requests.single.url.queryParameters['user_id'], 'eq.student-a');
   });
+  test('borrowing reads map persisted transaction detail metadata', () async {
+    handler = (_) async => http.Response(
+      jsonEncode([
+        {
+          'id': 'loan-detail',
+          'user_id': 'student-a',
+          'item_id': 'item-a',
+          'nama_peminjam': 'Mahasiswa A',
+          'nama_barang': 'Laptop',
+          'jumlah': 2,
+          'tgl_pinjam': '2026-10-20',
+          'tgl_kembali': '2026-10-21',
+          'keperluan': 'Praktikum',
+          'status': 'returned',
+          'catatan_kondisi': 'Layar rusak',
+          'updated_by': 'admin-a',
+          'created_at': '2026-10-19T08:30:00Z',
+          'approved_at': '2026-10-19T09:00:00Z',
+          'returned_at': '2026-10-21T10:15:00Z',
+          'returned_good': false,
+          'updated_at': '2026-10-21T10:15:00Z',
+          'student': {'nama': 'Mahasiswa A', 'npm': '1001'},
+          'related_item': {
+            'nama_barang': 'Laptop',
+            'kode_barang': 'INV-001',
+            'kategori': 'Komputer',
+          },
+        },
+      ]),
+      200,
+      headers: {'content-type': 'application/json'},
+    );
+
+    final transaction = (await repository().getBorrowings(
+      includeRelations: true,
+    )).single;
+
+    expect(transaction.id, 'loan-detail');
+    expect(transaction.namaPeminjam, 'Mahasiswa A');
+    expect(transaction.namaBarang, 'Laptop');
+    expect(transaction.jumlah, 2);
+    expect(transaction.createdAt, DateTime.parse('2026-10-19T08:30:00Z'));
+    expect(transaction.approvedAt, DateTime.parse('2026-10-19T09:00:00Z'));
+    expect(transaction.returnedAt, DateTime.parse('2026-10-21T10:15:00Z'));
+    expect(transaction.returnedGood, isFalse);
+    expect(transaction.updatedAt, DateTime.parse('2026-10-21T10:15:00Z'));
+    expect(
+      requests.single.url.queryParameters['select'],
+      contains('profiles!lab_borrowing_owner'),
+    );
+    expect(
+      requests.single.url.queryParameters['select'],
+      contains('items!lab_borrowing_item'),
+    );
+    expect(transaction.relatedStudentName, 'Mahasiswa A');
+    expect(transaction.studentIdentityNumber, '1001');
+    expect(transaction.relatedItemName, 'Laptop');
+    expect(transaction.relatedItemCode, 'INV-001');
+    expect(transaction.relatedItemCategory, 'Komputer');
+  });
   test('read failures throw instead of returning an empty list or sample inventory', () async {
     handler = (_) async =>
         http.Response('{"message":"denied","code":"42501"}', 403);

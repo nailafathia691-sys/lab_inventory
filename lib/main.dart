@@ -3233,7 +3233,10 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
     setState(() => isLoading = true);
     loadError = null;
     try {
-      final data = await inventoryRepository.getBorrowings(status: 'pending');
+      final data = await inventoryRepository.getBorrowings(
+        status: 'pending',
+        includeRelations: true,
+      );
       if (mounted) {
         setState(() {
           pendingList = data;
@@ -3254,6 +3257,212 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
   }
 
   final Set<String> processingIds = {};
+
+  String _formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+  }
+
+  String _formatDateTime(DateTime date) {
+    final local = date.toLocal();
+    return '${_formatDate(local)} ${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
+  }
+
+  String _statusLabel(String status) => switch (status) {
+    'pending' => 'Menunggu persetujuan',
+    'approved' => 'Disetujui',
+    'rejected' => 'Ditolak',
+    'returned' => 'Dikembalikan',
+    _ => status,
+  };
+
+  void _showRequestDetails(Borrowing request) {
+    const unavailable = 'Tidak tersedia';
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: FractionallySizedBox(
+          heightFactor: 0.9,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade400,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Detail Pengajuan',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(sheetContext),
+                      icon: const Icon(Icons.close),
+                      tooltip: 'Tutup detail',
+                    ),
+                  ],
+                ),
+                InfoLine(label: 'ID transaksi', value: request.id),
+                InfoLine(label: 'Status', value: _statusLabel(request.status)),
+                const Divider(height: 24),
+                const Text(
+                  'Mahasiswa',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                InfoLine(
+                  label: 'Nama lengkap',
+                  value: request.relatedStudentName ?? unavailable,
+                ),
+                InfoLine(
+                  label: 'NPM/NIM',
+                  value: request.studentIdentityNumber?.isNotEmpty == true
+                      ? request.studentIdentityNumber!
+                      : unavailable,
+                ),
+                const Divider(height: 24),
+                const Text(
+                  'Barang yang diajukan',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                InfoLine(
+                  label: 'Nama barang',
+                  value: request.relatedItemName ?? unavailable,
+                ),
+                InfoLine(
+                  label: 'Kode barang',
+                  value: request.relatedItemCode ?? unavailable,
+                ),
+                InfoLine(
+                  label: 'Kategori',
+                  value: request.relatedItemCategory ?? unavailable,
+                ),
+                InfoLine(label: 'Jumlah', value: '${request.jumlah} unit'),
+                const Divider(height: 24),
+                const Text(
+                  'Informasi peminjaman',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                InfoLine(
+                  label: 'Tanggal pengajuan',
+                  value: request.createdAt == null
+                      ? unavailable
+                      : _formatDateTime(request.createdAt!),
+                ),
+                InfoLine(
+                  label: 'Tanggal pinjam',
+                  value: _formatDate(request.tglPinjam),
+                ),
+                InfoLine(
+                  label: 'Rencana kembali',
+                  value: request.tglKembali == null
+                      ? unavailable
+                      : _formatDate(request.tglKembali!),
+                ),
+                InfoLine(
+                  label: 'Tujuan/keperluan',
+                  value: request.keperluan.trim().isEmpty
+                      ? unavailable
+                      : request.keperluan,
+                ),
+                const Divider(height: 24),
+                const Text(
+                  'Persetujuan dan pengembalian',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                InfoLine(
+                  label: 'Waktu keputusan',
+                  value: request.approvedAt != null
+                      ? _formatDateTime(request.approvedAt!)
+                      : request.status == 'rejected' &&
+                            request.updatedAt != null
+                      ? _formatDateTime(request.updatedAt!)
+                      : unavailable,
+                ),
+                InfoLine(
+                  label: 'Waktu pengembalian',
+                  value: request.returnedAt == null
+                      ? unavailable
+                      : _formatDateTime(request.returnedAt!),
+                ),
+                InfoLine(
+                  label: 'Kondisi pengembalian',
+                  value: request.returnedGood == null
+                      ? unavailable
+                      : request.returnedGood!
+                      ? 'Baik'
+                      : 'Rusak',
+                ),
+                if (request.catatanKondisi?.trim().isNotEmpty ?? false)
+                  InfoLine(
+                    label: 'Catatan kondisi',
+                    value: request.catatanKondisi!.trim(),
+                  ),
+                if (request.isPending) ...[
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: processingIds.contains(request.id)
+                              ? null
+                              : () {
+                                  Navigator.pop(sheetContext);
+                                  processAction(
+                                    request.id,
+                                    'rejected',
+                                    request.relatedStudentName ?? '',
+                                  );
+                                },
+                          icon: const Icon(Icons.close),
+                          label: const Text('Tolak'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: FilledButton.icon(
+                          onPressed: processingIds.contains(request.id)
+                              ? null
+                              : () {
+                                  Navigator.pop(sheetContext);
+                                  processAction(
+                                    request.id,
+                                    'approved',
+                                    request.relatedStudentName ?? '',
+                                  );
+                                },
+                          icon: const Icon(Icons.check),
+                          label: const Text('Setujui'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> processAction(
     String id,
     String newStatus,
@@ -3318,16 +3527,17 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
                       itemBuilder: (context, index) {
                         final b = pendingList[index];
                         return PendingCard(
-                          busy: processingIds.contains(b.id),
-                          name: b.namaPeminjam.isNotEmpty
-                              ? b.namaPeminjam
-                              : 'Mahasiswa',
-                          item: b.namaBarang,
-                          amount: '${b.jumlah} Unit',
-                          onApprove: () =>
-                              processAction(b.id, 'approved', b.namaPeminjam),
-                          onReject: () =>
-                              processAction(b.id, 'rejected', b.namaPeminjam),
+                          name:
+                              b.relatedStudentName ??
+                              'Profil mahasiswa tidak tersedia',
+                          item:
+                              b.relatedItemName ?? 'Data barang tidak tersedia',
+                          amount: '${b.jumlah} unit',
+                          date: b.createdAt == null
+                              ? 'Tanggal pengajuan tidak tersedia'
+                              : 'Diajukan ${_formatDateTime(b.createdAt!)}',
+                          status: _statusLabel(b.status),
+                          onTap: () => _showRequestDetails(b),
                         );
                       },
                     )
@@ -4041,6 +4251,130 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
     return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}';
   }
 
+  String _formatDateTime(DateTime dt) {
+    final local = dt.toLocal();
+    return '${_formatDate(local)} ${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
+  }
+
+  String _statusLabel(String status) => switch (status) {
+    'pending' => 'Menunggu persetujuan',
+    'approved' => 'Disetujui',
+    'rejected' => 'Ditolak',
+    'returned' => 'Dikembalikan',
+    _ => status,
+  };
+
+  void _showTransactionDetails(Borrowing transaction) {
+    const unavailable = 'Tidak tersedia';
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: FractionallySizedBox(
+          heightFactor: 0.85,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade400,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Detail Transaksi',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close),
+                      tooltip: 'Tutup detail',
+                    ),
+                  ],
+                ),
+                InfoLine(label: 'ID transaksi', value: transaction.id),
+                InfoLine(
+                  label: 'Status',
+                  value: _statusLabel(transaction.status),
+                ),
+                InfoLine(label: 'Nama barang', value: transaction.namaBarang),
+                InfoLine(label: 'Jumlah', value: '${transaction.jumlah} unit'),
+                InfoLine(label: 'Mahasiswa', value: transaction.namaPeminjam),
+                InfoLine(
+                  label: 'Tanggal pengajuan',
+                  value: transaction.createdAt == null
+                      ? unavailable
+                      : _formatDateTime(transaction.createdAt!),
+                ),
+                InfoLine(
+                  label: 'Tanggal pinjam',
+                  value: _formatDate(transaction.tglPinjam),
+                ),
+                InfoLine(label: 'Keperluan', value: transaction.keperluan),
+                const Divider(height: 24),
+                const Text(
+                  'Persetujuan dan pengembalian',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                InfoLine(
+                  label: 'Waktu keputusan',
+                  value: transaction.approvedAt != null
+                      ? _formatDateTime(transaction.approvedAt!)
+                      : transaction.status == 'rejected' &&
+                            transaction.updatedAt != null
+                      ? _formatDateTime(transaction.updatedAt!)
+                      : unavailable,
+                ),
+                InfoLine(
+                  label: 'Rencana tanggal kembali',
+                  value: transaction.tglKembali == null
+                      ? unavailable
+                      : _formatDate(transaction.tglKembali!),
+                ),
+                InfoLine(
+                  label: 'Waktu pengembalian',
+                  value: transaction.returnedAt == null
+                      ? unavailable
+                      : _formatDateTime(transaction.returnedAt!),
+                ),
+                InfoLine(
+                  label: 'Kondisi saat dikembalikan',
+                  value: transaction.returnedGood == null
+                      ? unavailable
+                      : transaction.returnedGood!
+                      ? 'Baik'
+                      : 'Rusak',
+                ),
+                if (transaction.catatanKondisi?.trim().isNotEmpty ?? false)
+                  InfoLine(
+                    label: 'Catatan kondisi',
+                    value: transaction.catatanKondisi!.trim(),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -4071,13 +4405,12 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                           const SizedBox(height: 10),
                       itemBuilder: (context, index) {
                         final t = transactions[index];
-                        final returnStr = t.tglKembali != null
-                            ? ' - ${_formatDate(t.tglKembali!)}'
-                            : '';
                         return HistoryCard(
-                          item: '${t.namaBarang} - Peminjam: ${t.namaPeminjam}',
-                          date: '${_formatDate(t.tglPinjam)}$returnStr',
-                          status: t.status.toUpperCase(),
+                          item: '${t.namaBarang} - ${t.jumlah} unit',
+                          date:
+                              'Peminjam: ${t.namaPeminjam} · Diajukan: ${t.createdAt == null ? 'Tidak tersedia' : _formatDateTime(t.createdAt!)}',
+                          status: _statusLabel(t.status),
+                          onTap: () => _showTransactionDetails(t),
                         );
                       },
                     )
@@ -4253,6 +4586,9 @@ class PendingCard extends StatelessWidget {
   final String name;
   final String item;
   final String amount;
+  final String? date;
+  final String? status;
+  final VoidCallback? onTap;
   final VoidCallback? onApprove;
   final VoidCallback? onReject;
   final bool busy;
@@ -4262,6 +4598,9 @@ class PendingCard extends StatelessWidget {
     required this.name,
     required this.item,
     required this.amount,
+    this.date,
+    this.status,
+    this.onTap,
     this.onApprove,
     this.onReject,
     this.busy = false,
@@ -4269,40 +4608,76 @@ class PendingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade400),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          const CircleAvatar(radius: 23, child: Icon(Icons.person_outline)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade400),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                const Text('Mahasiswa'),
-                Text('Barang: $item'),
-                Text('Jumlah: $amount'),
+                const CircleAvatar(
+                  radius: 23,
+                  child: Icon(Icons.person_outline),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text('Barang: $item'),
+                      Text('Jumlah: $amount'),
+                      if (date != null) Text(date!),
+                      if (status != null)
+                        Text(
+                          status!,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                    ],
+                  ),
+                ),
+                if (onTap != null)
+                  const Icon(
+                    Icons.chevron_right,
+                    semanticLabel: 'Lihat detail pengajuan',
+                  ),
               ],
             ),
-          ),
-          Column(
-            children: [
-              OutlinedButton(
-                onPressed: busy ? null : onApprove,
-                child: const Text('Setujui'),
-              ),
-              OutlinedButton(
-                onPressed: busy ? null : onReject,
-                child: const Text('Tolak'),
+            if (onApprove != null || onReject != null) ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  if (onReject != null)
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: busy ? null : onReject,
+                        child: const Text('Tolak'),
+                      ),
+                    ),
+                  if (onReject != null && onApprove != null)
+                    const SizedBox(width: 10),
+                  if (onApprove != null)
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: busy ? null : onApprove,
+                        child: const Text('Setujui'),
+                      ),
+                    ),
+                ],
               ),
             ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -4374,38 +4749,53 @@ class HistoryCard extends StatelessWidget {
   final String item;
   final String date;
   final String status;
+  final VoidCallback? onTap;
 
   const HistoryCard({
     super.key,
     required this.item,
     required this.date,
     required this.status,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade400),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.assignment_outlined, size: 35),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade400),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Text(item, style: const TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 5),
-                Text(date),
+                const Icon(Icons.assignment_outlined, size: 35),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    item,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                if (onTap != null)
+                  const Icon(
+                    Icons.chevron_right,
+                    semanticLabel: 'Lihat detail',
+                  ),
               ],
             ),
-          ),
-          Text(status, style: const TextStyle(fontWeight: FontWeight.bold)),
-        ],
+            const SizedBox(height: 8),
+            Text(date),
+            const SizedBox(height: 4),
+            Text(status, style: const TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
       ),
     );
   }
